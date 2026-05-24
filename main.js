@@ -3,6 +3,7 @@ const SECRET_ID = 'AKIDhojT7ey61jEkHhw0830qVyGUWSDpFnEW';
 const SECRET_KEY = 'GNIAMaieZyOehhWBi9QWUL4czCHAsQuG';
 // ====== 替换结束 ======
 
+
 const cos = new COS({
   SecretId: SECRET_ID,
   SecretKey: SECRET_KEY,
@@ -14,6 +15,14 @@ const REGION = 'ap-beijing';
 const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');
 const gallery = document.getElementById('gallery');
+
+const previewModal = document.getElementById('previewModal');
+const previewImage = document.getElementById('previewImage');
+const previewCaption = document.getElementById('previewCaption');
+const closeModal = document.getElementById('closeModal');
+
+let currentPreviewUrl = '';
+let currentPreviewKey = '';
 
 // 上传
 async function uploadFile() {
@@ -46,6 +55,28 @@ async function uploadFile() {
     const fileName = document.getElementById('fileName');
     if (fileName) fileName.textContent = '未选择文件';
   });
+}
+
+// 打开预览
+function openPreview(url, key) {
+  currentPreviewUrl = url;
+  currentPreviewKey = key;
+  previewImage.src = url;
+  previewCaption.textContent = key;
+  previewModal.classList.add('show');
+  previewModal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+// 关闭预览
+function closePreview() {
+  previewModal.classList.remove('show');
+  previewModal.setAttribute('aria-hidden', 'true');
+  previewImage.src = '';
+  previewCaption.textContent = '';
+  currentPreviewUrl = '';
+  currentPreviewKey = '';
+  document.body.style.overflow = '';
 }
 
 // 加载列表
@@ -113,13 +144,13 @@ function loadList() {
       const url = `https://${BUCKET}.cos.${REGION}.myqcloud.com/${item.Key}`;
       return `
         <div class="photo-item">
-          <div class="photo-preview">
+          <div class="photo-preview" onclick="openPreview('${url}', '${item.Key.replace(/'/g, "\\'")}')">
             <img src="${url}" alt="${item.Key}" loading="lazy" />
           </div>
           <div class="photo-meta">
             <div class="photo-name">${item.Key}</div>
             <div class="photo-actions">
-              <span class="photo-badge">已上传</span>
+              <span class="photo-badge">点击图片可放大</span>
               <button class="photo-action" onclick="deleteFile('${item.Key.replace(/'/g, "\\'")}')">删除</button>
             </div>
           </div>
@@ -143,17 +174,35 @@ function deleteFile(key) {
       alert('删除失败');
       return;
     }
-
     alert('删除成功');
     loadList();
+
+    // 如果删除的是当前预览图，顺便关闭预览
+    if (currentPreviewKey === key) {
+      closePreview();
+    }
   });
 }
 
-// 暴露 deleteFile 到全局（因 onclick 是字符串调用）
+// 暴露到全局
 window.deleteFile = deleteFile;
+window.openPreview = openPreview;
 
-// 绑定上传按钮
+// 绑定事件
 uploadBtn.addEventListener('click', uploadFile);
+closeModal.addEventListener('click', closePreview);
 
-// 初始化加载
+// 点击遮罩关闭
+previewModal.addEventListener('click', (e) => {
+  if (e.target === previewModal) closePreview();
+});
+
+// ESC 关闭
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && previewModal.classList.contains('show')) {
+    closePreview();
+  }
+});
+
+// 初始化
 loadList();
