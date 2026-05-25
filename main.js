@@ -3,7 +3,6 @@ const SECRET_ID = 'AKIDhojT7ey61jEkHhw0830qVyGUWSDpFnEW';
 const SECRET_KEY = 'GNIAMaieZyOehhWBi9QWUL4czCHAsQuG';
 // ====== 替换结束 ======
 
-
 const cos = new COS({
   SecretId: SECRET_ID,
   SecretKey: SECRET_KEY,
@@ -14,69 +13,117 @@ const REGION = 'ap-beijing';
 
 const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');
+const chooseBtn = document.getElementById('chooseBtn');
 const gallery = document.getElementById('gallery');
 
+// 预览弹窗相关
 const previewModal = document.getElementById('previewModal');
 const previewImage = document.getElementById('previewImage');
 const previewCaption = document.getElementById('previewCaption');
-const closeModal = document.getElementById('closeModal');
-
-let currentPreviewUrl = '';
-let currentPreviewKey = '';
-
-// 上传
-async function uploadFile() {
-  const file = fileInput.files[0];
-  if (!file) return alert('请选择一张图片');
-
-  const key = `photos/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '')}`;
-
-  uploadBtn.disabled = true;
-  uploadBtn.textContent = '上传中...';
-
-  cos.uploadFile({
-    Bucket: BUCKET,
-    Region: REGION,
-    Key: key,
-    Body: file,
-  }, function (err, data) {
-    uploadBtn.disabled = false;
-    uploadBtn.textContent = '上传照片';
-
-    if (err) {
-      console.error('上传失败:', err);
-      alert('上传失败，请检查密钥或网络');
-      return;
-    }
-
-    alert('上传成功！');
-    loadList();
-    fileInput.value = '';
-    const fileName = document.getElementById('fileName');
-    if (fileName) fileName.textContent = '未选择文件';
-  });
-}
+const closeModalBtn = document.getElementById('closeModal');
 
 // 打开预览
-function openPreview(url, key) {
-  currentPreviewUrl = url;
-  currentPreviewKey = key;
+function openPreview(url, caption) {
+  if (!previewModal || !previewImage || !previewCaption) return;
+
   previewImage.src = url;
-  previewCaption.textContent = key;
+  previewImage.alt = caption || '预览图片';
+  previewCaption.textContent = caption || '';
+
   previewModal.classList.add('show');
   previewModal.setAttribute('aria-hidden', 'false');
-  document.body.style.overflow = 'hidden';
 }
 
 // 关闭预览
 function closePreview() {
+  if (!previewModal || !previewImage || !previewCaption) return;
+
   previewModal.classList.remove('show');
   previewModal.setAttribute('aria-hidden', 'true');
   previewImage.src = '';
   previewCaption.textContent = '';
-  currentPreviewUrl = '';
-  currentPreviewKey = '';
-  document.body.style.overflow = '';
+}
+
+// 点击遮罩关闭
+if (previewModal) {
+  previewModal.addEventListener('click', (e) => {
+    if (e.target === previewModal) {
+      closePreview();
+    }
+  });
+}
+
+// 关闭按钮
+if (closeModalBtn) {
+  closeModalBtn.addEventListener('click', closePreview);
+}
+
+// 按 ESC 关闭
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closePreview();
+  }
+});
+
+function sanitizeFileName(name) {
+  return name.replace(/[^a-zA-Z0-9._-]/g, '');
+}
+
+function getSelectedFiles() {
+  return Array.from(fileInput.files || []);
+}
+
+function updateChooseButtonText() {
+  const count = getSelectedFiles().length;
+  chooseBtn.textContent = count > 0 ? `已选择 ${count} 张` : '选择图片';
+}
+
+// 上传单个文件
+function uploadSingleFile(file) {
+  return new Promise((resolve, reject) => {
+    const key = `photos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${sanitizeFileName(file.name)}`;
+
+    cos.uploadFile({
+      Bucket: BUCKET,
+      Region: REGION,
+      Key: key,
+      Body: file,
+    }, function (err, data) {
+      if (err) return reject(err);
+      resolve(data);
+    });
+  });
+}
+
+// 上传多张
+async function uploadFiles() {
+  const files = getSelectedFiles();
+  if (!files.length) {
+    alert('请选择一张或多张图片');
+    return;
+  }
+
+  uploadBtn.disabled = true;
+  chooseBtn.style.pointerEvents = 'none';
+  uploadBtn.textContent = '上传中...';
+
+  try {
+    for (let i = 0; i < files.length; i++) {
+      await uploadSingleFile(files[i]);
+    }
+
+    alert(`上传成功！共上传 ${files.length} 张`);
+    fileInput.value = '';
+    updateChooseButtonText();
+    loadList();
+  } catch (err) {
+    console.error('上传失败:', err);
+    alert('上传失败，请检查密钥、Bucket、Region 或网络');
+  } finally {
+    uploadBtn.disabled = false;
+    chooseBtn.style.pointerEvents = '';
+    uploadBtn.textContent = '上传图片';
+  }
 }
 
 // 加载列表
@@ -133,7 +180,7 @@ function loadList() {
               </svg>
             </div>
             <h2 class="state-title">暂无照片</h2>
-            <p class="state-desc">还没有上传内容，点击上方“选择文件”并上传第一张照片吧。</p>
+            <p class="state-desc">还没有上传内容，点击上方“选择图片”并上传第一张照片吧。</p>
           </div>
         </div>
       `;
@@ -142,18 +189,15 @@ function loadList() {
 
     gallery.innerHTML = items.map(item => {
       const url = `https://${BUCKET}.cos.${REGION}.myqcloud.com/${item.Key}`;
+      const safeKey = item.Key.replace(/'/g, "\\'");
+      const safeUrl = url.replace(/'/g, "\\'");
+
       return `
         <div class="photo-item">
-          <div class="photo-preview" onclick="openPreview('${url}', '${item.Key.replace(/'/g, "\\'")}')">
+          <div class="photo-preview" onclick="openPreview('${safeUrl}', '${safeKey}')">
             <img src="${url}" alt="${item.Key}" loading="lazy" />
           </div>
-          <div class="photo-meta">
-            <div class="photo-name">${item.Key}</div>
-            <div class="photo-actions">
-              <span class="photo-badge">点击图片可放大</span>
-              <button class="photo-action" onclick="deleteFile('${item.Key.replace(/'/g, "\\'")}')">删除</button>
-            </div>
-          </div>
+          <button class="photo-action" onclick="deleteFile('${safeKey}')">删除</button>
         </div>
       `;
     }).join('');
@@ -174,35 +218,23 @@ function deleteFile(key) {
       alert('删除失败');
       return;
     }
+
     alert('删除成功');
     loadList();
-
-    // 如果删除的是当前预览图，顺便关闭预览
-    if (currentPreviewKey === key) {
-      closePreview();
-    }
   });
 }
 
 // 暴露到全局
 window.deleteFile = deleteFile;
 window.openPreview = openPreview;
+window.closePreview = closePreview;
 
-// 绑定事件
-uploadBtn.addEventListener('click', uploadFile);
-closeModal.addEventListener('click', closePreview);
+// 绑定选择图片显示数量
+fileInput.addEventListener('change', updateChooseButtonText);
 
-// 点击遮罩关闭
-previewModal.addEventListener('click', (e) => {
-  if (e.target === previewModal) closePreview();
-});
-
-// ESC 关闭
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && previewModal.classList.contains('show')) {
-    closePreview();
-  }
-});
+// 绑定上传按钮
+uploadBtn.addEventListener('click', uploadFiles);
 
 // 初始化
+updateChooseButtonText();
 loadList();
