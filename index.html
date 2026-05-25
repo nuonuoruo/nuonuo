@@ -481,7 +481,7 @@
         </div>
 
         <div class="tip-card" id="homeTip">
-          当前未登录：可以浏览照片墙和留言板，但上传照片、发布留言时会提示先登录。
+          当前未登录
         </div>
       </section>
     </main>
@@ -677,14 +677,14 @@
           <div class="auth-status">当前登录：${escapeHtml(user.username)}</div>
           <button class="btn danger-btn" id="logoutBtn" type="button">退出登录</button>
         `;
-        homeTip.textContent = '当前已登录：进入照片墙和留言板不需要再次登录，可以直接上传照片或发布留言。';
+        homeTip.textContent = '当前已登录';
       } else {
         authBox.innerHTML = `
           <div class="auth-status">未登录</div>
           <button class="btn primary-btn" id="loginBtn" type="button">登录</button>
           <button class="btn ghost-btn" id="registerBtn" type="button">注册</button>
         `;
-        homeTip.textContent = '当前未登录：可以浏览照片墙和留言板，但上传照片、发布留言时会提示先登录。';
+        homeTip.textContent = '当前未登录';
       }
 
       const loginBtn = document.getElementById('loginBtn');
