@@ -9,7 +9,9 @@
     :root {
       --bg: #f5f5f7;
       --panel: rgba(255, 255, 255, 0.72);
-      --panel-strong: rgba(255, 255, 255, 0.9);
+      --panel-strong: rgba(255, 255, 255, 0.88);
+      --glass: rgba(255, 255, 255, 0.48);
+      --glass-strong: rgba(255, 255, 255, 0.66);
       --text: #1d1d1f;
       --subtext: #6e6e73;
       --line: rgba(0, 0, 0, 0.08);
@@ -43,6 +45,15 @@
       padding: 24px;
     }
 
+    /* 顶部观察锚点：用于监听是否滚动出顶部视口，避免 scroll 频繁触发 */
+    .top-sentinel {
+      height: 1px;
+      width: 1px;
+      margin-top: -1px;
+      pointer-events: none;
+      opacity: 0;
+    }
+
     .page {
       max-width: 1280px;
       margin: 0 auto;
@@ -64,6 +75,17 @@
       justify-content: space-between;
       gap: 14px;
       flex-wrap: wrap;
+      transition: padding .22s ease, transform .22s ease, opacity .22s ease, border-radius .22s ease, box-shadow .22s ease, background .22s ease;
+      will-change: transform, opacity;
+      contain: layout paint;
+    }
+
+    .toolbar.is-compact {
+      padding: 10px 14px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.55);
+      opacity: 0.98;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
     }
 
     .toolbar-left {
@@ -72,6 +94,11 @@
       gap: 12px;
       flex-wrap: wrap;
       min-width: 0;
+      transition: gap .22s ease;
+    }
+
+    .toolbar.is-compact .toolbar-left {
+      gap: 10px;
     }
 
     .back-btn {
@@ -82,7 +109,7 @@
       padding: 11px 16px;
       font-size: 14px;
       font-weight: 600;
-      transition: transform .15s ease, background .2s ease;
+      transition: transform .15s ease, background .2s ease, opacity .2s ease, padding .22s ease, font-size .22s ease;
       white-space: nowrap;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
@@ -93,17 +120,37 @@
       transform: translateY(-1px);
     }
 
+    .toolbar.is-compact .back-btn {
+      padding: 8px 13px;
+      font-size: 13px;
+    }
+
     .brand h1 {
       margin: 0;
       font-size: 28px;
       line-height: 1.15;
       letter-spacing: -0.03em;
+      transition: font-size .22s ease;
+    }
+
+    .toolbar.is-compact .brand h1 {
+      font-size: 18px;
     }
 
     .brand p {
       margin: 6px 0 0;
       color: var(--subtext);
       font-size: 14px;
+      transition: opacity .22s ease, max-height .22s ease, margin .22s ease, transform .22s ease;
+      overflow: hidden;
+      max-height: 40px;
+    }
+
+    .toolbar.is-compact .brand p {
+      opacity: 0;
+      max-height: 0;
+      margin: 0;
+      transform: translateY(-6px);
     }
 
     .toolbar-right {
@@ -112,6 +159,16 @@
       flex-wrap: wrap;
       align-items: center;
       margin-left: auto;
+      transition: opacity .22s ease, max-width .22s ease, margin .22s ease, transform .22s ease;
+    }
+
+    .toolbar.is-compact .toolbar-right {
+      opacity: 0;
+      max-width: 0;
+      margin-left: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      overflow: hidden;
     }
 
     input[type="file"] {
@@ -157,7 +214,6 @@
       margin-top: 18px;
     }
 
-    /* 核心改动：更自适应的网格 */
     .gallery {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -166,17 +222,29 @@
     }
 
     .photo-item {
-      background: rgba(255,255,255,.58);
-      border: 1px solid rgba(255,255,255,.8);
+      position: relative;
+      background: rgba(255,255,255,.42);
+      border: 1px solid rgba(255,255,255,.78);
       border-radius: 24px;
       box-shadow: var(--shadow-soft);
       overflow: hidden;
+      backdrop-filter: saturate(180%) blur(18px);
+      -webkit-backdrop-filter: saturate(180%) blur(18px);
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+      content-visibility: auto;
+      contain-intrinsic-size: 320px;
+    }
+
+    .photo-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.08);
+      background: rgba(255,255,255,.52);
     }
 
     .photo-preview {
       aspect-ratio: 1 / 1;
       background: rgba(0,0,0,.04);
-      cursor: pointer;
+      cursor: zoom-in;
       overflow: hidden;
       position: relative;
     }
@@ -187,24 +255,80 @@
       object-fit: cover;
       display: block;
       transition: transform .3s ease;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .photo-preview:hover img {
-      transform: scale(1.04);
+      transform: scale(1.05);
     }
 
-    .photo-action {
-      margin: 12px 14px 14px;
+    .photo-meta,
+    .photo-owner {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px 58px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.48));
+      border-top: 1px solid rgba(255,255,255,.68);
+      backdrop-filter: saturate(180%) blur(24px);
+      -webkit-backdrop-filter: saturate(180%) blur(24px);
+      text-shadow: 0 1px 0 rgba(255,255,255,.35);
+    }
+
+    .photo-meta strong,
+    .photo-owner strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .photo-meta > div:last-child,
+    .photo-owner > div:last-child {
+      color: rgba(29, 29, 31, .72);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .photo-item .photo-action,
+    .photo-item .delete-btn,
+    .photo-item .btn-danger {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 4;
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      padding: 0;
       border: none;
       border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 13px;
-      font-weight: 700;
+      display: inline-grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
       cursor: pointer;
-      background: rgba(255,59,48,.92);
       color: #fff;
-      box-shadow: 0 8px 18px rgba(255,59,48,.18);
-      width: calc(100% - 28px);
+      background: linear-gradient(180deg, rgba(255,82,74,.98), rgba(255,59,48,.96));
+      box-shadow: 0 10px 22px rgba(255,59,48,.22);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform .15s ease, filter .2s ease, box-shadow .2s ease, opacity .2s ease;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .photo-item .photo-action:hover,
+    .photo-item .delete-btn:hover,
+    .photo-item .btn-danger:hover {
+      transform: translateY(-1px) scale(1.03);
+      filter: brightness(1.02);
+      box-shadow: 0 12px 26px rgba(255,59,48,.26);
     }
 
     .loading-state,
@@ -295,6 +419,12 @@
       border-radius: 999px;
       cursor: pointer;
       z-index: 2;
+      transition: transform .15s ease, background .2s ease;
+    }
+
+    .modal-close:hover {
+      transform: scale(1.04);
+      background: rgba(255,255,255,.20);
     }
 
     .modal-body {
@@ -313,6 +443,8 @@
       object-fit: contain;
       display: block;
       background: #000;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .modal-caption {
@@ -322,7 +454,7 @@
       bottom: 16px;
       color: rgba(255,255,255,.92);
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.55;
       white-space: pre-wrap;
       text-shadow: 0 2px 10px rgba(0,0,0,.4);
       pointer-events: none;
@@ -352,6 +484,10 @@
         border-radius: 22px;
       }
 
+      .toolbar.is-compact {
+        padding: 10px 12px;
+      }
+
       .toolbar-left {
         width: 100%;
       }
@@ -359,6 +495,10 @@
       .toolbar-right {
         width: 100%;
         margin-left: 0;
+      }
+
+      .toolbar.is-compact .toolbar-right {
+        display: none;
       }
 
       .btn {
@@ -373,7 +513,6 @@
         font-size: 13px;
       }
 
-      /* 手机上默认两列，提高可用性 */
       .gallery {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
@@ -387,11 +526,20 @@
         aspect-ratio: 1 / 1;
       }
 
-      .photo-action {
-        margin: 10px 10px 12px;
-        width: calc(100% - 20px);
-        padding: 9px 12px;
-        font-size: 12px;
+      .photo-meta,
+      .photo-owner {
+        padding: 10px 11px 52px;
+      }
+
+      .photo-item .photo-action,
+      .photo-item .delete-btn,
+      .photo-item .btn-danger {
+        right: 10px;
+        bottom: 10px;
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        font-size: 16px;
       }
 
       .modal {
@@ -412,30 +560,45 @@
     }
 
     @media (max-width: 420px) {
-      /* 特别小屏，仍尽量保持两列，但留足点击空间 */
       .gallery {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
       }
 
-      .photo-action {
-        padding: 8px 10px;
-        font-size: 12px;
+      .photo-item .photo-action,
+      .photo-item .delete-btn,
+      .photo-item .btn-danger {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        right: 8px;
+        bottom: 8px;
       }
     }
 
     @media (max-width: 340px) {
-      /* 超小屏再退回一列，避免挤压 */
       .gallery {
         grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+        animation: none !important;
       }
     }
   </style>
 </head>
 
 <body>
+  <div class="top-sentinel" id="topSentinel" aria-hidden="true"></div>
+
   <div class="page">
-    <header class="toolbar">
+    <header class="toolbar" id="toolbar">
       <div class="toolbar-left">
         <a class="back-btn" href="./index.html">← 返回主页</a>
         <div class="brand">
@@ -468,5 +631,151 @@
 
   <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
   <script src="./main.js"></script>
+
+  <script>
+    (function () {
+      const gallery = document.getElementById('gallery');
+      const modal = document.getElementById('previewModal');
+      const modalImg = document.getElementById('previewImage');
+      const modalCaption = document.getElementById('previewCaption');
+      const closeBtn = document.getElementById('closeModal');
+      const toolbar = document.getElementById('toolbar');
+      const topSentinel = document.getElementById('topSentinel');
+
+      let lastFocusedEl = null;
+
+      function openPreview(src, caption = '') {
+        if (!src) return;
+        lastFocusedEl = document.activeElement;
+        modalImg.src = src;
+        modalCaption.textContent = caption || '';
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus({ preventScroll: true });
+      }
+
+      function closePreview() {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        modalImg.src = '';
+        modalCaption.textContent = '';
+        if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') {
+          lastFocusedEl.focus({ preventScroll: true });
+        }
+      }
+
+      function getTextFromElement(root, selectors) {
+        for (const selector of selectors) {
+          const el = root.querySelector(selector);
+          if (el) {
+            const text = (el.textContent || '').trim();
+            if (text) return text;
+          }
+        }
+        return '';
+      }
+
+      function getCardCaption(card) {
+        if (!card) return '';
+
+        const uploader = getTextFromElement(card, [
+          '[data-uploader]',
+          '.uploader',
+          '.photo-uploader',
+          '.author',
+          '.photo-author',
+          '[class*="uploader"]',
+          '[class*="author"]',
+          '[class*="user"]',
+          '[class*="name"]'
+        ]);
+
+        const dateText = getTextFromElement(card, [
+          '[data-date]',
+          '.date',
+          '.photo-date',
+          '.upload-date',
+          '.time',
+          '[class*="date"]',
+          '[class*="time"]'
+        ]);
+
+        const extraText = getTextFromElement(card, [
+          '.caption',
+          '.photo-caption-text',
+          '.desc',
+          '.description',
+          '[class*="caption"]',
+          '[class*="desc"]',
+          '[class*="description"]'
+        ]);
+
+        const parts = [];
+        if (uploader) parts.push(`上传者：${uploader}`);
+        if (dateText) parts.push(`上传日期：${dateText}`);
+        if (extraText && extraText !== uploader && extraText !== dateText) parts.push(extraText);
+
+        return parts.join('\n');
+      }
+
+      if (gallery) {
+        gallery.addEventListener('click', function (e) {
+          if (e.target.closest('button, a, input, label, textarea, select')) return;
+          const img = e.target.closest ? e.target.closest('.photo-preview img, .photo-item img') : null;
+          if (!img || !gallery.contains(img)) return;
+
+          const card = img.closest('.photo-item');
+          const src = img.dataset.fullsrc || img.dataset.src || img.currentSrc || img.src;
+          const caption = getCardCaption(card) || img.alt || img.title || '';
+          openPreview(src, caption);
+        });
+      }
+
+      closeBtn.addEventListener('click', closePreview);
+
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal || e.target.classList.contains('modal-body')) {
+          closePreview();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('show')) {
+          closePreview();
+        }
+      });
+
+      // 更轻量的顶部缩略：IntersectionObserver，避免 scroll 频繁计算卡顿
+      if ('IntersectionObserver' in window && topSentinel) {
+        const observer = new IntersectionObserver((entries) => {
+          const entry = entries[0];
+          const shouldCompact = !entry.isIntersecting;
+          toolbar.classList.toggle('is-compact', shouldCompact);
+        }, {
+          threshold: 0,
+          rootMargin: '0px'
+        });
+
+        observer.observe(topSentinel);
+      } else {
+        // 兜底：不支持 IO 的旧浏览器再用节流滚动
+        let ticking = false;
+        function updateToolbarState() {
+          toolbar.classList.toggle('is-compact', window.scrollY > 18);
+          ticking = false;
+        }
+
+        window.addEventListener('scroll', function () {
+          if (ticking) return;
+          ticking = true;
+          window.requestAnimationFrame(updateToolbarState);
+        }, { passive: true });
+
+        updateToolbarState();
+      }
+    })();
+  </script>
 </body>
 </html>
