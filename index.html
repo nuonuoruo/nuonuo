@@ -299,6 +299,13 @@
       box-shadow: 0 8px 18px rgba(255,59,48,.18);
     }
 
+    /* 只针对“退出登录”按钮：更短一点、文字左对齐 */
+   .logout-btn {
+  padding: 8px 12px;
+  min-width: 88px;
+  width: auto;
+  flex: 0 0 auto;
+}
     .auth-modal {
       position: fixed;
       inset: 0;
@@ -447,6 +454,10 @@
       }
       .btn {
         width: 100%;
+      }
+      /* 手机上也保持“退出登录”按钮更短 */
+      .auth-box .logout-btn {
+        width: auto;
       }
     }
 
@@ -727,7 +738,7 @@
       if (user) {
         authBox.innerHTML = `
           <div class="auth-status">当前登录：${escapeHtml(user.username)}</div>
-          <button class="btn danger-btn" id="logoutBtn" type="button">退出登录</button>
+          <button class="btn danger-btn logout-btn" id="logoutBtn" type="button">退出登录</button>
         `;
       } else {
         authBox.innerHTML = `
