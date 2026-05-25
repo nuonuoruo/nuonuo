@@ -3,7 +3,6 @@ const SECRET_ID = 'AKIDhojT7ey61jEkHhw0830qVyGUWSDpFnEW';
 const SECRET_KEY = 'GNIAMaieZyOehhWBi9QWUL4czCHAsQuG';
 // ====== 替换结束 ======
 
-
 const BUCKET = 'photoalbum-123456-1395234423';
 const REGION = 'ap-beijing';
 
@@ -192,28 +191,82 @@ function ensureAuthStyles() {
       transform: none;
       box-shadow: none;
     }
+
+    .photo-meta,
     .photo-owner {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: 10px;
-      padding: 12px 14px 0;
+      gap: 12px;
+      padding: 12px 14px 58px;
       font-size: 12px;
-      color: var(--subtext);
-      line-height: 1.5;
+      line-height: 1.55;
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.48));
+      border-top: 1px solid rgba(255,255,255,.68);
+      backdrop-filter: saturate(180%) blur(24px);
+      -webkit-backdrop-filter: saturate(180%) blur(24px);
+      text-shadow: 0 1px 0 rgba(255,255,255,.35);
     }
+    .photo-meta strong,
     .photo-owner strong {
       color: var(--text);
       font-weight: 700;
     }
+    .photo-meta > div:last-child,
+    .photo-owner > div:last-child {
+      color: rgba(29, 29, 31, .72);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
     .photo-item {
       display: flex;
       flex-direction: column;
+      position: relative;
     }
     .photo-preview {
       flex: 1 1 auto;
       min-height: 0;
+      cursor: zoom-in;
     }
+
+    .photo-action,
+    .delete-btn,
+    .btn-danger {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 4;
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      padding: 0;
+      border: none;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(180deg, rgba(255,82,74,.98), rgba(255,59,48,.96));
+      box-shadow: 0 10px 22px rgba(255,59,48,.22);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform .15s ease, filter .2s ease, box-shadow .2s ease, opacity .2s ease;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .photo-action:hover,
+    .delete-btn:hover,
+    .btn-danger:hover {
+      transform: translateY(-1px) scale(1.03);
+      filter: brightness(1.02);
+      box-shadow: 0 12px 26px rgba(255,59,48,.26);
+    }
+
     .auth-modal {
       position: fixed;
       inset: 0;
@@ -775,33 +828,57 @@ async function loadList() {
 
     gallery.innerHTML = enriched.map(({ item, meta }) => {
       const url = `https://${BUCKET}.cos.${REGION}.myqcloud.com/${item.Key}`;
-      const uploader = escapeHtml(meta?.uploader || '未知用户');
+      const originalName = meta?.originalName || item.Key;
+      const uploader = meta?.uploader || '未知用户';
       const createdAt = meta?.createdAt ? new Date(meta.createdAt) : null;
       const timeText = createdAt && !Number.isNaN(createdAt.getTime())
         ? createdAt.toLocaleString('zh-CN', { hour12: false })
         : '';
 
-      const safeKey = item.Key.replace(/'/g, "\\'");
-      const safeUrl = url.replace(/'/g, "\\'");
-      const caption = `${meta?.originalName || item.Key}\n上传者：${meta?.uploader || '未知用户'}`;
+      const safeUrl = escapeHtml(url);
+      const safeAlt = escapeHtml(originalName);
+      const safeUploader = escapeHtml(uploader);
+      const safeTime = escapeHtml(timeText);
 
       const deleteBtn = getCurrentUser()
-        ? `<button class="photo-action" onclick="deleteFile('${safeKey}')">删除</button>`
+        ? `<button class="photo-action delete-btn" type="button" data-key="${escapeHtml(item.Key)}" aria-label="删除" title="删除">×</button>`
         : '';
 
       return `
         <div class="photo-item">
-          <div class="photo-preview" onclick="openPreview('${safeUrl}', '${caption.replace(/'/g, "\\'")}')">
-            <img src="${url}" alt="${escapeHtml(meta?.originalName || item.Key)}" loading="lazy" />
+          <div class="photo-preview">
+            <img
+              src="${safeUrl}"
+              data-fullsrc="${safeUrl}"
+              alt="${safeAlt}"
+              title="${safeAlt}"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
-          <div class="photo-owner">
-            <div>上传者：<strong>${uploader}</strong></div>
-            <div>${escapeHtml(timeText)}</div>
+
+          <div class="photo-meta photo-owner" data-uploader="${safeUploader}" data-date="${safeTime}">
+            <div>上传者：<strong>${safeUploader}</strong></div>
+            <div>${safeTime}</div>
           </div>
+
           ${deleteBtn}
         </div>
       `;
     }).join('');
+
+    // 只给删除按钮做一次委托，不影响图片预览（预览由 photo.html 处理）
+    if (!gallery.__deleteBound) {
+      gallery.__deleteBound = true;
+      gallery.addEventListener('click', (e) => {
+        const btn = e.target.closest('.delete-btn, .photo-action, .btn-danger');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const key = btn.dataset.key;
+        if (key) deleteFile(key);
+      });
+    }
   } catch (err) {
     console.error('列表加载失败:', err);
     gallery.innerHTML = `
