@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>酒桌游戏</title>
+  <style>
+    :root {
+      --text: #1d1d1f;
+      --subtext: #6e6e73;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+      --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.06);
+      --primary: #0a84ff;
+      --primary-2: #0071e3;
+      --die-size: 76px;
+      --pip-size: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(0, 113, 227, 0.12), transparent 18%),
+        radial-gradient(circle at 85% 15%, rgba(0, 113, 227, 0.09), transparent 16%),
+        radial-gradient(circle at 70% 88%, rgba(44, 140, 255, 0.10), transparent 18%),
+        linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 100%);
+    }
+
+    body {
+      padding: 18px;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      min-height: calc(100vh - 36px);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding-top: 48px;
+    }
+
+    .hero {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: saturate(180%) blur(24px);
+      -webkit-backdrop-filter: saturate(180%) blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.82);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 30px 26px 26px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: auto -120px -120px auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,113,227,.09) 0%, rgba(0,113,227,0) 70%);
+      pointer-events: none;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .back-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 44px;
+      padding: 0 16px 0 14px;
+      border-radius: 999px;
+      text-decoration: none;
+      color: #1d1d1f;
+      background: #f2f2f7;
+      border: 1px solid #e5e5ea;
+      box-shadow: 0 1px 0 rgba(255,255,255,.85) inset;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1;
+      transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+      white-space: nowrap;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .back-pill:hover {
+      transform: translateY(-1px);
+      background: #ececf1;
+      box-shadow: 0 4px 12px rgba(0,0,0,.06), 0 1px 0 rgba(255,255,255,.85) inset;
+    }
+
+    .back-pill svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -0.06em;
+      font-weight: 900;
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      color: var(--subtext);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .panel {
+      margin-top: 22px;
+      background: rgba(255,255,255,.74);
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 26px;
+      box-shadow: var(--shadow-soft);
+      padding: 20px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: var(--subtext);
+      font-size: 13px;
+    }
+
+    .count-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .count-btn {
+      border: none;
+      height: 42px;
+      min-width: 52px;
+      padding: 0 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      background: rgba(0,0,0,.06);
+      color: var(--text);
+      transition: transform .15s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .count-btn:hover { transform: translateY(-1px); }
+
+    .count-btn.active {
+      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(0,113,227,.22);
+    }
+
+    .actions-row {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .roll-all-btn {
+      border: none;
+      height: 46px;
+      padding: 0 20px;
+      border-radius: 999px;
+      font-weight: 800;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
+      box-shadow: 0 10px 22px rgba(0,113,227,.24);
+      transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .roll-all-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 26px rgba(0,113,227,.28);
+    }
+
+    .roll-all-btn:disabled {
+      opacity: .7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .roll-tip {
+      font-size: 13px;
+      color: var(--subtext);
+    }
+
+    .roll-stat {
+      font-size: 13px;
+      color: var(--subtext);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    /* 不规则但不乱：保持每个骰子都可读 */
+    .dice-stage {
+      position: relative;
+      margin-top: 18px;
+      min-height: clamp(240px, 36vw, 320px);
+      overflow: hidden;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 50% 44%, rgba(255,255,255,.42), transparent 38%),
+        radial-gradient(circle at 50% 84%, rgba(0,0,0,.06), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.08));
+    }
+
+    .die {
+      position: absolute;
+      width: var(--die-size);
+      height: var(--die-size);
+      display: grid;
+      place-items: center;
+      transform: translate(-50%, -50%);
+      will-change: left, top;
+    }
+
+    .die.rolling {
+      animation: die-shake .7s ease-in-out both;
+    }
+
+    @keyframes die-shake {
+      0%   { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+      20%  { transform: translate(-50%, -50%) rotate(-12deg) scale(1.03); }
+      40%  { transform: translate(-50%, -50%) rotate(14deg) scale(1.04); }
+      60%  { transform: translate(-50%, -50%) rotate(-8deg) scale(1.02); }
+      80%  { transform: translate(-50%, -50%) rotate(6deg) scale(1.01); }
+      100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+    }
+
+    .die-face {
+      width: min(100%, var(--die-size));
+      height: min(100%, var(--die-size));
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 22% 16%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.72) 18%, rgba(245,247,251,.95) 52%, rgba(232,236,243,1) 100%);
+      border: 1px solid rgba(255,255,255,.92);
+      box-shadow:
+        0 10px 20px rgba(0,0,0,.12),
+        inset 0 1px 0 rgba(255,255,255,.98),
+        inset 0 -10px 16px rgba(0,0,0,.06),
+        inset 0 0 0 1px rgba(0,0,0,.03);
+    }
+
+    .die-face::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.78), rgba(255,255,255,0) 36%),
+        linear-gradient(180deg, rgba(255,255,255,.22), rgba(0,0,0,.02));
+      pointer-events: none;
+    }
+
+    .die-face::after {
+      content: "";
+      position: absolute;
+      top: -12%;
+      left: -18%;
+      width: 60%;
+      height: 48%;
+      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 70%);
+      transform: rotate(-18deg);
+      pointer-events: none;
+    }
+
+    .pips {
+      width: 78%;
+      height: 78%;
+      position: absolute;
+      inset: 11%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      place-items: center;
+      z-index: 1;
+    }
+
+    .pip {
+      width: var(--pip-size);
+      height: var(--pip-size);
+      border-radius: 999px;
+      background: radial-gradient(circle at 32% 30%, #5f5f5f 0%, #131313 64%, #000 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.18),
+        0 1px 1px rgba(0,0,0,.16);
+      border: 0.5px solid rgba(255,255,255,.06);
+    }
+
+    .die-shadow {
+      position: absolute;
+      left: 50%;
+      bottom: -12px;
+      width: 72%;
+      height: 16px;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse at center, rgba(0,0,0,.18) 0%, rgba(0,0,0,.10) 35%, rgba(0,0,0,0) 74%);
+      filter: blur(6px);
+      opacity: .95;
+      pointer-events: none;
+    }
+
+    .hint {
+      margin-top: 14px;
+      color: var(--subtext);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .footer-note {
+      margin-top: auto;
+      padding: 12px 2px 2px;
+      color: var(--subtext);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --die-size: 62px;
+        --pip-size: 10px;
+      }
+
+      body { padding: 12px; }
+
+      .page {
+        min-height: calc(100vh - 24px);
+        padding-top: 54px;
+      }
+
+      .hero {
+        border-radius: 24px;
+        padding: 22px 16px 18px;
+      }
+
+      .panel {
+        padding: 16px;
+        border-radius: 22px;
+      }
+
+      .dice-stage {
+        min-height: 236px;
+        border-radius: 18px;
+      }
+
+      .count-btn {
+        min-width: 48px;
+        height: 40px;
+        padding: 0 14px;
+      }
+
+      .roll-all-btn {
+        width: 100%;
+      }
+
+      .roll-stat {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+
+    @media (min-width: 721px) and (max-width: 980px) {
+      :root {
+        --die-size: 68px;
+        --pip-size: 11px;
+      }
+      .dice-stage {
+        min-height: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="title-row">
+        <a class="back-pill" href="./index.html" aria-label="返回主页">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M14.5 6.5L8.5 12l6 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>返回主页</span>
+        </a>
+        <h1 class="title">酒桌游戏</h1>
+      </div>
+
+     
+
+      <div class="panel">
+        <div class="section-title">
+          <h2>骰子数量</h2>
+       
+        </div>
+        <div class="count-row" id="countRow"></div>
+
+        <div class="actions-row">
+          <button class="roll-all-btn" id="rollAllBtn" type="button">摇一摇</button>
+          <div class="roll-tip"></div>
+          <div class="roll-stat" id="rollStat">一共摇了 0 次</div>
+        </div>
+
+        <div class="section-title" style="margin-top:20px;">
+          <h2>骰子</h2>
+       
+        </div>
+
+        <div class="dice-stage" id="diceStage"></div>
+
+      
+      </div>
+    </section>
+
+   
+  </div>
+
+  <script>
+    const countRow = document.getElementById('countRow');
+    const diceStage = document.getElementById('diceStage');
+    const rollAllBtn = document.getElementById('rollAllBtn');
+    const rollStat = document.getElementById('rollStat');
+
+    const pipMap = {
+      1: [[2, 2]],
+      2: [[1, 1], [3, 3]],
+      3: [[1, 1], [2, 2], [3, 3]],
+      4: [[1, 1], [1, 3], [3, 1], [3, 3]],
+      5: [[1, 1], [1, 3], [2, 2], [3, 1], [3, 3]],
+      6: [[1, 1], [2, 1], [3, 1], [1, 3], [2, 3], [3, 3]]
+    };
+
+    let audioCtx = null;
+
+    function getAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
+
+    function playClack(timeOffset, pitch, duration, gainLevel = 0.65) {
+      const ctx = getAudioCtx();
+      if (ctx.state === 'suspended') ctx.resume();
+
+      const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * duration));
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for (let i = 0; i < bufferSize; i++) {
+        const fade = 1 - (i / bufferSize);
+        data[i] = (Math.random() * 2 - 1) * fade * fade;
+      }
+
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+
+      const band = ctx.createBiquadFilter();
+      band.type = 'bandpass';
+      band.frequency.value = pitch;
+      band.Q.value = 5;
+
+      const gain = ctx.createGain();
+      const now = ctx.currentTime + timeOffset;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(gainLevel, now + 0.006);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      source.connect(band).connect(gain).connect(ctx.destination);
+      source.start(now);
+      source.stop(now + duration);
+    }
+
+    function playCollisionSound() {
+      playClack(0.00, 180, 0.045, 0.65);
+      playClack(0.04, 230, 0.040, 0.60);
+      playClack(0.09, 150, 0.052, 0.58);
+    }
+
+    function randFace() {
+      return Math.floor(Math.random() * 6) + 1;
+    }
+
+    function buildFace(face) {
+      const pips = pipMap[face].map(([r, c]) => {
+        return `<span class="pip" style="grid-row:${r};grid-column:${c};"></span>`;
+      }).join('');
+      return `<span class="pips">${pips}</span>`;
+    }
+
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function jitter(range) {
+      return (Math.random() * 2 - 1) * range;
+    }
+
+    // 不规则但不乱：保持每个骰子都可读
+    function getLayoutByCount(count) {
+      const presets = {
+        1: [
+          { x: 50, y: 50, z: 20 }
+        ],
+        2: [
+          { x: 40, y: 48, z: 20 },
+          { x: 61, y: 52, z: 21 }
+        ],
+        3: [
+          { x: 32, y: 43, z: 20 },
+          { x: 52, y: 37, z: 21 },
+          { x: 71, y: 47, z: 22 }
+        ],
+        4: [
+          { x: 30, y: 35, z: 20 },
+          { x: 64, y: 36, z: 21 },
+          { x: 36, y: 67, z: 22 },
+          { x: 70, y: 63, z: 23 }
+        ],
+        5: [
+          { x: 22, y: 44, z: 20 },
+          { x: 48, y: 30, z: 21 },
+          { x: 75, y: 44, z: 22 },
+          { x: 33, y: 69, z: 23 },
+          { x: 61, y: 71, z: 24 }
+        ]
+      };
+
+      const base = presets[count] || presets[5];
+
+      return base.map((p, index) => ({
+        x: clamp(p.x + jitter(3.2), 12, 88),
+        y: clamp(p.y + jitter(3.0), 16, 84),
+        z: p.z + index
+      }));
+    }
+
+    let state = {
+      count: 2,
+      dice: [],
+      totalRolls: 0
+    };
+
+    function updateRollStat() {
+      rollStat.textContent = `一共摇了 ${state.totalRolls} 次`;
+    }
+
+    function renderCountButtons() {
+      countRow.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'count-btn' + (i === state.count ? ' active' : '');
+        btn.type = 'button';
+        btn.textContent = i;
+        btn.addEventListener('click', () => setCount(i));
+        countRow.appendChild(btn);
+      }
+    }
+
+    function createDie(value) {
+      const die = document.createElement('div');
+      die.className = 'die';
+      die.dataset.value = String(value);
+      die.innerHTML = `
+        <div class="die-face">${buildFace(value)}</div>
+        <div class="die-shadow"></div>
+      `;
+      return die;
+    }
+
+    function renderDice() {
+      diceStage.innerHTML = '';
+      const layouts = getLayoutByCount(state.count);
+
+      state.dice.forEach((die, index) => {
+        const layout = layouts[index];
+        die.style.left = `${layout.x}%`;
+        die.style.top = `${layout.y}%`;
+        die.style.zIndex = String(layout.z);
+        diceStage.appendChild(die);
+      });
+    }
+
+    function setCount(nextCount) {
+      state.count = nextCount;
+      state.dice = Array.from({ length: nextCount }, () => createDie(randFace()));
+      renderCountButtons();
+      renderDice();
+    }
+
+    function setDieValue(die, value) {
+      die.dataset.value = String(value);
+      const face = die.querySelector('.die-face');
+      face.innerHTML = buildFace(value);
+    }
+
+    function rollAllDice() {
+      if (rollAllBtn.disabled) return;
+
+      rollAllBtn.disabled = true;
+      state.totalRolls += 1;
+      updateRollStat();
+      playCollisionSound();
+
+      const dice = Array.from(diceStage.querySelectorAll('.die'));
+
+      dice.forEach((die, index) => {
+        die.classList.remove('rolling');
+        void die.offsetWidth;
+        die.classList.add('rolling');
+
+        const finalValue = randFace();
+
+        setTimeout(() => {
+          setDieValue(die, finalValue);
+        }, 320 + index * 60);
+      });
+
+      setTimeout(() => {
+        dice.forEach(die => die.classList.remove('rolling'));
+        rollAllBtn.disabled = false;
+      }, 900);
+    }
+
+    // 初始化
+    setCount(2);
+    renderCountButtons();
+    renderDice();
+    updateRollStat();
+
+    rollAllBtn.addEventListener('click', rollAllDice);
+  </script>
+</body>
+</html>
