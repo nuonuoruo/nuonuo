@@ -144,8 +144,8 @@
       margin-top: 28px;
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-      max-width: 720px;
+      gap: clamp(12px, 2vw, 18px);
+      max-width: 760px;
     }
 
     .app-link {
@@ -160,36 +160,75 @@
     }
 
     .app-icon {
-      width: 92px;
-      height: 92px;
-      border-radius: 24px;
-      background:
-        radial-gradient(circle at 25% 20%, rgba(255,255,255,.55), transparent 28%),
-        linear-gradient(180deg, #6bb3ff 0%, #2d89ef 100%);
-      box-shadow:
-        0 16px 28px rgba(0, 113, 227, 0.18),
-        inset 0 1px 0 rgba(255,255,255,.28);
+      width: clamp(84px, 18vw, 108px);
+      aspect-ratio: 1 / 1;
+      border-radius: 28px;
       display: grid;
       place-items: center;
-      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
       position: relative;
       overflow: hidden;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      box-shadow:
+        0 14px 30px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255,255,255,.35);
+      border: 1px solid rgba(255,255,255,.35);
+    }
+
+    .app-icon::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 25% 18%, rgba(255,255,255,.52), transparent 28%),
+        radial-gradient(circle at 75% 88%, rgba(255,255,255,.14), transparent 26%);
+      pointer-events: none;
+    }
+
+    .app-icon::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 42%;
+      background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.12));
+      pointer-events: none;
     }
 
     .app-link:hover .app-icon {
-      transform: translateY(-2px);
+      transform: translateY(-2px) scale(1.01);
       box-shadow:
-        0 22px 32px rgba(0, 113, 227, 0.22),
-        inset 0 1px 0 rgba(255,255,255,.30);
-      filter: saturate(1.03);
+        0 18px 36px rgba(0, 0, 0, 0.14),
+        inset 0 1px 0 rgba(255,255,255,.38);
     }
 
     .app-icon svg {
-      width: 38px;
-      height: 38px;
+      width: clamp(34px, 7vw, 42px);
+      height: clamp(34px, 7vw, 42px);
       display: block;
       color: #fff;
-      opacity: 0.96;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,.12));
+    }
+
+    /* 保持蓝色风格 */
+    .icon-photo {
+      background: linear-gradient(180deg, #79bcff 0%, #2f89f1 100%);
+    }
+
+    .icon-days {
+      background: linear-gradient(180deg, #6fb0ff 0%, #2d7fe8 100%);
+    }
+
+    .icon-message {
+      background: linear-gradient(180deg, #67b7ff 0%, #1f89e5 100%);
+    }
+
+    .icon-game {
+      background: linear-gradient(180deg, #5ea8ff 0%, #1f79e0 100%);
+    }
+
+    .icon-drink {
+      background: linear-gradient(180deg, #7ec2ff 0%, #3a92f2 100%);
     }
 
     .app-label {
@@ -384,14 +423,14 @@
       }
       .app-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        gap: 14px;
         max-width: 100%;
       }
       .app-icon {
         width: 100%;
-        aspect-ratio: 1 / 1;
-        height: auto;
-        border-radius: 20px;
+        max-width: 150px;
+        margin: 0 auto;
+        border-radius: 24px;
       }
       .app-icon svg {
         width: 34px;
@@ -437,7 +476,7 @@
 
         <div class="app-grid">
           <a class="app-link" href="./photo.html" aria-label="照片墙">
-            <div class="app-icon">
+            <div class="app-icon icon-photo">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M7 16l3-3 3 3 4-4 2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8"/>
@@ -448,7 +487,7 @@
           </a>
 
           <a class="app-link" href="./days.html" aria-label="在一起多少天">
-            <div class="app-icon">
+            <div class="app-icon icon-days">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M7 4.5h10A2.5 2.5 0 0 1 19.5 7v10A2.5 2.5 0 0 1 17 19.5H7A2.5 2.5 0 0 1 4.5 17V7A2.5 2.5 0 0 1 7 4.5Z" stroke="currentColor" stroke-width="1.8"/>
                 <path d="M8 3.8v3.2M16 3.8v3.2M7.2 9.5h9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -459,7 +498,7 @@
           </a>
 
           <a class="app-link" href="./message.html" aria-label="留言墙">
-            <div class="app-icon">
+            <div class="app-icon icon-message">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M6.5 5.5h11A2.5 2.5 0 0 1 20 8v6a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3v-3H6.5A2.5 2.5 0 0 1 4 14V8a2.5 2.5 0 0 1 2.5-2.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
                 <path d="M7.5 9h9M7.5 12h6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -468,8 +507,9 @@
             <div class="app-label">留言墙</div>
           </a>
 
+          <!-- 原来的小游戏，保留不变 -->
           <a class="app-link" href="./game.html" aria-label="小游戏" data-requires-auth="true">
-            <div class="app-icon">
+            <div class="app-icon icon-game">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M9.5 12.5c.5 0 .9-.4.9-.9V10h1.6c.5 0 .9-.4.9-.9s-.4-.9-.9-.9h-1.6V6.6c0-.5-.4-.9-.9-.9s-.9.4-.9.9v1.6H7.9c-.5 0-.9.4-.9.9s.4.9.9.9h1.6v1.6c0 .5.4.9.9.9Z" fill="currentColor"/>
                 <path d="M17.2 13.1c1.4 0 2.6 1.1 2.6 2.5 0 2.2-2.1 3.5-4.9 3.5-2.1 0-3.8-.7-5.1-1.9-1.3 1.2-3 1.9-5.1 1.9-2.8 0-4.9-1.3-4.9-3.5 0-1.4 1.2-2.5 2.6-2.5h1.8c.8 0 1.5-.5 1.8-1.2l.5-1.2c.2-.5.7-.8 1.2-.8h4.2c.5 0 1 .3 1.2.8l.5 1.2c.3.7 1 1.2 1.8 1.2h1.8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
@@ -478,6 +518,21 @@
               </svg>
             </div>
             <div class="app-label">小游戏</div>
+          </a>
+
+          <!-- 新增：酒桌游戏入口，不需要登录 -->
+          <a class="app-link" href="./drinkgame.html" aria-label="酒桌游戏">
+            <div class="app-icon icon-drink">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="4.3" y="4.3" width="15.4" height="15.4" rx="4.3" stroke="currentColor" stroke-width="1.8"/>
+                <circle cx="8.4" cy="8.4" r="1.2" fill="currentColor"/>
+                <circle cx="15.6" cy="8.4" r="1.2" fill="currentColor"/>
+                <circle cx="8.4" cy="15.6" r="1.2" fill="currentColor"/>
+                <circle cx="15.6" cy="15.6" r="1.2" fill="currentColor"/>
+                <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="app-label">酒桌游戏</div>
           </a>
         </div>
       </section>
@@ -697,6 +752,7 @@
       }
     }
 
+    // 只有标记了 data-requires-auth="true" 的入口才需要登录
     document.querySelectorAll('.app-link[data-requires-auth="true"]').forEach(link => {
       link.addEventListener('click', (e) => {
         if (getCurrentUser()) return;
