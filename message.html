@@ -234,12 +234,6 @@
       gap: 14px;
     }
 
-    .field-row {
-      display: grid;
-      grid-template-columns: 180px 1fr;
-      gap: 14px;
-    }
-
     .field {
       display: grid;
       gap: 8px;
@@ -799,10 +793,6 @@
     }
 
     @media (max-width: 920px) {
-      .field-row {
-        grid-template-columns: 1fr;
-      }
-
       .message-body,
       .attachment {
         padding-left: 0;
@@ -925,21 +915,14 @@
         <h2 class="section-title">写一条留言</h2>
 
         <div class="composer">
-          <div class="field-row">
-            <div class="field">
-              <label for="nicknameInput">昵称</label>
-              <input id="nicknameInput" class="input" type="text" maxlength="20" placeholder="例如：我家小宝" />
+          <div class="field">
+            <label for="fileInput">附件</label>
+            <div class="upload-left">
+              <label class="choose-btn" for="fileInput" id="chooseBtn">选择文件</label>
+              <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.doc,.docx,.zip,.rar,.mp4,.mov" />
+              <button id="clearFileBtn" class="ghost-btn" type="button">清除附件</button>
             </div>
-
-            <div class="field">
-              <label for="fileInput">附件</label>
-              <div class="upload-left">
-                <label class="choose-btn" for="fileInput" id="chooseBtn">选择文件</label>
-                <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.doc,.docx,.zip,.rar,.mp4,.mov" />
-                <button id="clearFileBtn" class="ghost-btn" type="button">清除附件</button>
-              </div>
-              <div class="selected-file" id="selectedFileText">未选择附件</div>
-            </div>
+            <div class="selected-file" id="selectedFileText">未选择附件</div>
           </div>
 
           <div class="field">
@@ -1025,14 +1008,12 @@
     const AUTH_USER_PREFIX = 'users/';
 
     const LS_CURRENT_USER = 'site_current_user_v1';
-    const LS_NICKNAME = 'guest_nickname_message_wall';
 
     const cos = new COS({
       SecretId: SECRET_ID,
       SecretKey: SECRET_KEY,
     });
 
-    const nicknameInput = document.getElementById('nicknameInput');
     const contentInput = document.getElementById('contentInput');
     const fileInput = document.getElementById('fileInput');
     const chooseBtn = document.getElementById('chooseBtn');
@@ -1372,7 +1353,6 @@
       const user = requireLogin();
       if (!user) return;
 
-      const nickname = (nicknameInput.value || localStorage.getItem(LS_NICKNAME) || '匿名').trim() || '匿名';
       const content = (contentInput.value || '').trim();
       const file = getCurrentFile();
 
@@ -1384,8 +1364,6 @@
       setLoadingState(true);
 
       try {
-        localStorage.setItem(LS_NICKNAME, nickname);
-
         let attachment = null;
         if (file) {
           attachment = await uploadAttachment(file);
@@ -1395,7 +1373,6 @@
         const messageId = `${Date.now()}-${randomId()}`;
         const message = {
           id: messageId,
-          nickname,
           uploader: user.username,
           content,
           createdAt: now.toISOString(),
@@ -1510,7 +1487,6 @@
         const currentUser = getCurrentUser();
 
         messageList.innerHTML = messages.map(msg => {
-          const nickname = escapeHtml(msg.nickname || '匿名');
           const uploader = escapeHtml(msg.uploader || '未知用户');
           const content = escapeHtml(msg.content || '').replace(/\n/g, '<br>');
           const createdAt = formatDateTime(msg.createdAt);
@@ -1570,7 +1546,7 @@
                   <div class="avatar" aria-hidden="true">${initial}</div>
                   <div class="user-meta">
                     <h3 class="user-name">${uploader}</h3>
-                    <p class="user-time">上传者：${uploader} · 昵称：${nickname} · ${createdAt}</p>
+                    <p class="user-time">${uploader} · ${createdAt}</p>
                   </div>
                 </div>
 
@@ -1770,11 +1746,6 @@
     submitBtn.addEventListener('click', saveMessage);
     resetBtn.addEventListener('click', resetComposer);
 
-    nicknameInput.addEventListener('input', () => {
-      localStorage.setItem(LS_NICKNAME, nicknameInput.value || '');
-    });
-
-    nicknameInput.value = localStorage.getItem(LS_NICKNAME) || '';
     renderAuthState();
     renderComposerState();
     updateSelectedFileText();
