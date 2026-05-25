@@ -7,9 +7,6 @@
   <title>小游戏</title>
   <style>
     :root {
-      --bg1: #f2f6ff;
-      --bg2: #fff7fb;
-      --bg3: #f7fff7;
       --text: #1d1d1f;
       --subtext: #6e6e73;
       --shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
@@ -526,9 +523,7 @@
         opacity: 0;
         transform: translate(-50%, -50%) translate(var(--x0), var(--y0)) scale(.4) rotate(45deg);
       }
-      12% {
-        opacity: 1;
-      }
+      12% { opacity: 1; }
       100% {
         opacity: 0;
         transform: translate(-50%, -50%) translate(var(--x1), var(--y1)) scale(1.35) rotate(45deg);
@@ -540,9 +535,7 @@
         opacity: 0;
         transform: translate(-50%, -50%) translate(0, 0) scale(.55);
       }
-      10% {
-        opacity: 1;
-      }
+      10% { opacity: 1; }
       100% {
         opacity: 0;
         transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0);
@@ -638,7 +631,7 @@
         <div class="game-header">
           <div>
             <h1>爱意升级</h1>
-          
+    
           </div>
 
           <div class="game-stats">
@@ -721,12 +714,14 @@
     let gameState = defaultGameState();
     let saveChain = Promise.resolve();
 
-    // 长按控制
+    // 触摸/长按控制
     let pressTimer = null;
     let repeatTimer = null;
     let pressStartedAt = 0;
     let longPressStarted = false;
-    let isPressing = false;
+    let isTouchPressing = false;
+    let suppressNextClickUntil = 0;
+    let activePointerId = null;
 
     function defaultGameState() {
       return {
@@ -771,6 +766,10 @@
 
     function makeGameKey(username) {
       return `${GAME_STATE_PREFIX}${encodeURIComponent(username)}/heart.json`;
+    }
+
+    function makeUserKey(username) {
+      return `${AUTH_USER_PREFIX}${encodeURIComponent(username)}.json`;
     }
 
     function putJsonToCos(key, obj) {
@@ -1081,12 +1080,9 @@
     function triggerUpgradeAnimation() {
       heartBtn.classList.remove('upgrade-pop');
       heartStage.classList.remove('pulse');
-
       void heartBtn.offsetWidth;
-
       heartBtn.classList.add('upgrade-pop');
       heartStage.classList.add('pulse');
-
       setTimeout(() => {
         heartBtn.classList.remove('upgrade-pop');
         heartStage.classList.remove('pulse');
@@ -1126,96 +1122,113 @@
         clearInterval(repeatTimer);
         repeatTimer = null;
       }
-      isPressing = false;
+      isTouchPressing = false;
       longPressStarted = false;
+      activePointerId = null;
     }
 
-    function startLongPress(pointerId) {
+    function startTouchPress(pointerId) {
       if (!currentUser) return;
-      if (isPressing) return;
+      if (isTouchPressing) return;
 
-      isPressing = true;
+      isTouchPressing = true;
       pressStartedAt = Date.now();
       longPressStarted = false;
+      activePointerId = pointerId;
+      suppressNextClickUntil = Date.now() + 800;
 
       clearPressTimers();
 
       pressTimer = setTimeout(() => {
-        if (!isPressing) return;
+        if (!isTouchPressing) return;
         longPressStarted = true;
         performIncrement();
         repeatTimer = setInterval(() => {
-          if (!isPressing) return;
+          if (!isTouchPressing) return;
           performIncrement();
         }, 200);
-      }, 200);
-
-      try {
-        heartBtn.setPointerCapture(pointerId);
-      } catch {}
+      }, 220);
     }
 
-    function endLongPress() {
-      if (!isPressing) return;
+    function endTouchPress() {
+      if (!isTouchPressing) return;
 
       const duration = Date.now() - pressStartedAt;
       const wasLongPress = longPressStarted;
 
       clearPressTimers();
 
-      if (!wasLongPress && duration < 200) {
+      if (!wasLongPress && duration < 220) {
         performIncrement();
       }
     }
 
-    // 鼠标：单击一次
-    // 触摸：按住后开始连点，短按也算一次
-    heartBtn.addEventListener('pointerdown', (e) => {
-      if (!currentUser) return;
+    function setupPointerSupport() {
+      const hasPointer = 'PointerEvent' in window;
 
-      if (e.pointerType === 'mouse') {
+      if (hasPointer) {
+        heartBtn.addEventListener('pointerdown', (e) => {
+          if (!currentUser) return;
+
+          if (e.pointerType === 'mouse') {
+            // 鼠标走 click，避免桌面双触发
+            return;
+          }
+
+          if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+            e.preventDefault();
+            try { heartBtn.setPointerCapture(e.pointerId); } catch {}
+            startTouchPress(e.pointerId);
+          }
+        });
+
+        heartBtn.addEventListener('pointerup', (e) => {
+          if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+            e.preventDefault();
+            endTouchPress();
+          }
+        });
+
+        heartBtn.addEventListener('pointercancel', () => {
+          clearPressTimers();
+        });
+
+        heartBtn.addEventListener('lostpointercapture', () => {
+          clearPressTimers();
+        });
+      } else {
+        // 旧浏览器兜底：触摸
+        heartBtn.addEventListener('touchstart', (e) => {
+          if (!currentUser) return;
+          e.preventDefault();
+          startTouchPress(1);
+        }, { passive: false });
+
+        heartBtn.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          endTouchPress();
+        }, { passive: false });
+
+        heartBtn.addEventListener('touchcancel', () => {
+          clearPressTimers();
+        });
+      }
+
+      // 桌面和键盘
+      heartBtn.addEventListener('click', (e) => {
+        if (!currentUser) return;
+
+        // 过滤掉触摸产生的 click，避免双加
+        if (Date.now() < suppressNextClickUntil) {
+          e.preventDefault();
+          return;
+        }
+
         performIncrement();
-        return;
-      }
+      });
 
-      if (e.pointerType === 'touch' || e.pointerType === 'pen') {
-        e.preventDefault();
-        startLongPress(e.pointerId);
-      }
-    });
-
-    heartBtn.addEventListener('pointerup', (e) => {
-      if (e.pointerType === 'touch' || e.pointerType === 'pen') {
-        e.preventDefault();
-        endLongPress();
-      }
-    });
-
-    heartBtn.addEventListener('pointercancel', () => {
-      clearPressTimers();
-    });
-
-    heartBtn.addEventListener('lostpointercapture', () => {
-      clearPressTimers();
-    });
-
-    // 触摸兼容兜底
-    heartBtn.addEventListener('touchstart', (e) => {
-      if (!currentUser) return;
-      e.preventDefault();
-      startLongPress(1);
-    }, { passive: false });
-
-    heartBtn.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      endLongPress();
-    }, { passive: false });
-
-    heartBtn.addEventListener('touchcancel', () => {
-      clearPressTimers();
-    });
-
-    heartBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+      heartBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
 
     document.addEventListener('keydown', (e) => {
       if (!currentUser) return;
@@ -1236,6 +1249,7 @@
         gameState = defaultGameState();
         renderGame();
       }
+      setupPointerSupport();
     }
 
     window.addEventListener('storage', (e) => {
