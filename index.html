@@ -3,21 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>我们俩的小空间</title>
+  <title>主页</title>
   <style>
     :root {
-      --bg: #f5f5f7;
-      --panel: rgba(255, 255, 255, 0.72);
-      --panel-strong: rgba(255, 255, 255, 0.9);
+      --bg1: #f2f6ff;
+      --bg2: #fff7fb;
+      --bg3: #f7fff7;
       --text: #1d1d1f;
       --subtext: #6e6e73;
-      --line: rgba(0, 0, 0, 0.08);
-      --primary: #0071e3;
+      --panel: rgba(255, 255, 255, 0.72);
+      --panel-strong: rgba(255, 255, 255, 0.9);
+      --stroke: rgba(255, 255, 255, 0.8);
       --shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
       --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.06);
+      --primary: #0a84ff;
+      --primary-2: #0071e3;
+      --danger: #ff3b30;
       --radius-xl: 28px;
       --radius-lg: 22px;
       --radius-md: 16px;
+      --radius-sm: 12px;
     }
 
     * { box-sizing: border-box; }
@@ -30,280 +35,754 @@
         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
-      overflow: hidden;
       background:
-        radial-gradient(circle at top left, rgba(0, 113, 227, 0.14), transparent 26%),
-        radial-gradient(circle at top right, rgba(255, 59, 48, 0.09), transparent 24%),
-        radial-gradient(circle at bottom center, rgba(52, 199, 89, 0.10), transparent 28%),
+        radial-gradient(circle at 12% 12%, rgba(0, 113, 227, 0.12), transparent 18%),
+        radial-gradient(circle at 85% 15%, rgba(255, 80, 120, 0.12), transparent 16%),
+        radial-gradient(circle at 70% 88%, rgba(80, 200, 120, 0.10), transparent 18%),
         linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 100%);
     }
 
-    .desktop {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      padding: 24px;
+    body {
+      padding: 20px;
+    }
+
+    .page {
+      max-width: 940px;
+      margin: 0 auto;
+      min-height: calc(100vh - 40px);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
     }
 
     .topbar {
-      height: 54px;
-      padding: 0 18px;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: saturate(180%) blur(22px);
+      -webkit-backdrop-filter: saturate(180%) blur(22px);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      padding: 16px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--panel);
-      backdrop-filter: saturate(180%) blur(18px);
-      -webkit-backdrop-filter: saturate(180%) blur(18px);
-      border: 1px solid rgba(255, 255, 255, 0.72);
-      border-radius: 22px;
-      box-shadow: var(--shadow-soft);
+      gap: 14px;
+      flex-wrap: wrap;
     }
 
-    .topbar-left,
-    .topbar-right {
+    .brand-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      min-width: 0;
     }
 
-    .logo-dot {
+    .brand-dot {
       width: 12px;
       height: 12px;
       border-radius: 999px;
-      background: linear-gradient(180deg, #0a84ff, #0071e3);
-      box-shadow: 0 6px 16px rgba(0, 113, 227, 0.24);
+      background: linear-gradient(180deg, #2c8cff 0%, #0066d6 100%);
+      box-shadow: 0 0 0 6px rgba(44, 140, 255, 0.10);
+      flex: 0 0 auto;
     }
 
-    .brand {
-      font-size: 14px;
+    .brand-title {
+      font-size: 15px;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      color: var(--text);
+      white-space: nowrap;
     }
 
-    .time {
+    .hero-wrap {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding-top: 2px;
+    }
+
+    .hero {
+      width: min(100%, 720px);
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: saturate(180%) blur(24px);
+      -webkit-backdrop-filter: saturate(180%) blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.82);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 34px 30px 28px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: auto -120px -120px auto;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,113,227,.09) 0%, rgba(0,113,227,0) 70%);
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1.08;
+      letter-spacing: -0.06em;
+      font-weight: 900;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      color: var(--subtext);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .app-grid {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      max-width: 560px;
+    }
+
+    .app-link {
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app-icon {
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(255,255,255,.55), transparent 28%),
+        linear-gradient(180deg, #6bb3ff 0%, #2d89ef 100%);
+      box-shadow:
+        0 16px 28px rgba(0, 113, 227, 0.18),
+        inset 0 1px 0 rgba(255,255,255,.28);
+      display: grid;
+      place-items: center;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      position: relative;
+    }
+
+    .app-link:hover .app-icon {
+      transform: translateY(-2px);
+      box-shadow:
+        0 22px 32px rgba(0, 113, 227, 0.22),
+        inset 0 1px 0 rgba(255,255,255,.30);
+      filter: saturate(1.03);
+    }
+
+    .app-icon svg {
+      width: 38px;
+      height: 38px;
+      display: block;
+      color: #fff;
+      opacity: 0.96;
+    }
+
+    .app-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f2328;
+      letter-spacing: -0.01em;
+      text-align: center;
+    }
+
+    .bottom-space {
+      flex: 1;
+      min-height: 240px;
+      background:
+        radial-gradient(circle at 50% 85%, rgba(170, 255, 200, 0.10), transparent 25%);
+      border-radius: 24px;
+    }
+
+    .auth-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .auth-status {
       font-size: 13px;
       color: var(--subtext);
       padding: 8px 12px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.42);
       border: 1px solid rgba(0, 0, 0, 0.05);
+      white-space: nowrap;
     }
 
-    .desktop-main {
-      position: absolute;
-      inset: 78px 24px 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .welcome {
-      max-width: 720px;
-      margin-top: 24px;
-      padding: 28px;
-      border-radius: var(--radius-xl);
-      background: rgba(255, 255, 255, 0.48);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .welcome h1 {
-      margin: 0;
-      font-size: clamp(30px, 4vw, 54px);
-      line-height: 1.06;
-      letter-spacing: -0.05em;
-    }
-
-    .welcome p {
-      margin: 14px 0 0;
-      font-size: 16px;
-      line-height: 1.8;
-      color: var(--subtext);
-      max-width: 58ch;
-    }
-
-    .app-area {
-      display: flex;
-      align-items: flex-start;
-      gap: 18px;
-      flex-wrap: wrap;
-      margin-top: 34px;
-    }
-
-    .app-card {
-      width: 128px;
-      text-decoration: none;
-      color: inherit;
+    .btn {
+      border: none;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
-      transition: transform .18s ease, box-shadow .18s ease;
+      transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      font-size: 14px;
     }
 
-    .app-card:hover {
-      transform: translateY(-4px);
+    .btn:hover { transform: translateY(-1px); }
+
+    .primary-btn {
+      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(0,113,227,.24);
     }
 
-    .app-card:hover .app-icon {
-      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
-    }
-
-    .app-icon {
-      width: 96px;
-      height: 96px;
-      margin: 0 auto;
-      border-radius: 22px;
-      display: grid;
-      place-items: center;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.42), rgba(255,255,255,0.18)),
-        linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
-      box-shadow: 0 14px 30px rgba(0, 113, 227, 0.22);
-      border: 1px solid rgba(255,255,255,0.28);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .app-icon::before {
-      content: "";
-      position: absolute;
-      inset: -20% -30%;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.45), transparent 35%);
-      transform: rotate(12deg);
-    }
-
-    .app-icon svg {
-      width: 42px;
-      height: 42px;
-      position: relative;
-      z-index: 1;
-      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.12));
-    }
-
-    .app-name {
-      margin-top: 12px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
+    .ghost-btn {
+      background: rgba(0,0,0,.06);
       color: var(--text);
     }
 
-    .app-desc {
-      margin-top: 6px;
-      text-align: center;
-      font-size: 12px;
+    .danger-btn {
+      background: rgba(255,59,48,.92);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(255,59,48,.18);
+    }
+
+    .tip-card {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.62);
+      border: 1px solid rgba(0,0,0,.06);
       color: var(--subtext);
-      line-height: 1.5;
+      font-size: 13px;
+      line-height: 1.8;
+      max-width: 760px;
+    }
+
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,.65);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .auth-modal.show { display: flex; }
+
+    .auth-modal-card {
+      width: min(92vw, 420px);
+      border-radius: 24px;
+      background: rgba(255,255,255,.95);
+      border: 1px solid rgba(255,255,255,.3);
+      box-shadow: 0 30px 80px rgba(0,0,0,.28);
+      overflow: hidden;
+    }
+
+    .auth-modal-head {
+      padding: 18px 20px 12px;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+
+    .auth-modal-head h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-modal-head p {
+      margin: 8px 0 0;
+      color: var(--subtext);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .auth-modal-body {
+      padding: 18px 20px 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .auth-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .auth-field label {
+      font-size: 13px;
+      color: var(--subtext);
+      font-weight: 700;
+    }
+
+    .auth-input {
+      height: 46px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.08);
+      padding: 0 14px;
+      font-size: 14px;
+      outline: none;
+      background: rgba(255,255,255,.96);
+    }
+
+    .auth-input:focus {
+      border-color: rgba(0,113,227,.28);
+      box-shadow: 0 0 0 4px rgba(0,113,227,.10);
+    }
+
+    .auth-modal-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .auth-modal-actions button {
+      flex: 1 1 0;
+      min-width: 120px;
+      height: 44px;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-modal-actions .ok {
+      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
+      color: #fff;
+    }
+
+    .auth-modal-actions .cancel {
+      background: rgba(0,0,0,.06);
+      color: var(--text);
+    }
+
+    .auth-switch {
+      font-size: 13px;
+      color: var(--subtext);
+      cursor: pointer;
+      user-select: none;
+      text-decoration: underline;
     }
 
     @media (max-width: 720px) {
-      html, body {
-        overflow: auto;
+      body { padding: 12px; }
+      .page {
+        min-height: calc(100vh - 24px);
       }
-
-      .desktop {
-        padding: 14px;
-      }
-
-      .desktop-main {
-        inset: 72px 14px 14px;
-      }
-
       .topbar {
-        height: auto;
-        min-height: 54px;
-        padding: 12px 14px;
-        gap: 10px;
+        border-radius: 22px;
+        padding: 14px 16px;
       }
-
-      .welcome {
-        padding: 20px;
-        margin-top: 18px;
+      .hero {
+        border-radius: 24px;
+        padding: 24px 18px 22px;
       }
-
-      .app-card {
-        width: 104px;
+      .app-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        max-width: 100%;
       }
-
       .app-icon {
-        width: 84px;
-        height: 84px;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        height: auto;
         border-radius: 20px;
+      }
+      .app-icon svg {
+        width: 34px;
+        height: 34px;
+      }
+      .app-label {
+        font-size: 13px;
+      }
+      .bottom-space {
+        min-height: 160px;
+      }
+      .auth-box {
+        width: 100%;
+      }
+      .btn {
+        width: 100%;
+      }
+    }
+
+    @media (min-width: 721px) and (max-width: 900px) {
+      .app-grid {
+        grid-template-columns: repeat(3, minmax(110px, 1fr));
+        max-width: 560px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="desktop">
+  <div class="page">
     <header class="topbar">
-      <div class="topbar-left">
-        <div class="logo-dot" aria-hidden="true"></div>
-        <div class="brand">我们的桌面</div>
+      <div class="brand-row">
+        <div class="brand-dot" aria-hidden="true"></div>
+        <div class="brand-title">我们的桌面</div>
       </div>
-      <div class="topbar-right">
-        <div class="time" id="clock">--:--</div>
-      </div>
+
+      <div class="auth-box" id="authBox"></div>
     </header>
 
-    <main class="desktop-main">
-      <section>
-        <div class="welcome">
-          <h1>欢迎我家小宝！</h1>
-          <p>
-            这是我们的小网页，记录我们的一点一滴
-          </p>
-<div class="app-area">
-  <a class="app-card" href="./photo.html" aria-label="进入照片墙">
-    <div class="app-icon">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M7.5 7.75C7.5 5.679 9.179 4 11.25 4h1.5C14.821 4 16.5 5.679 16.5 7.75v1c0 .414.336.75.75.75h1.25A2.5 2.5 0 0 1 21 12v4.5a3.5 3.5 0 0 1-3.5 3.5h-11A3.5 3.5 0 0 1 3 16.5V12a2.5 2.5 0 0 1 2.5-2.5h1.25c.414 0 .75-.336.75-.75v-1Z" fill="white" opacity="0.95"/>
-        <path d="M8 18.75c2.2 0 4-1.79 4-4s-1.8-4-4-4-4 1.79-4 4 1.8 4 4 4Z" fill="#D1D1D6"/>
-        <path d="M16 10.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" fill="#D1D1D6"/>
-      </svg>
-    </div>
-    <div class="app-name">照片墙</div>
+    <main class="hero-wrap">
+      <section class="hero">
+        <h1>欢迎我家小宝！</h1>
+        <p>这是我们的小网页，记录我们的一点一滴</p>
 
-  </a>
+        <div class="app-grid">
+          <a class="app-link" href="./photo.html" aria-label="照片墙">
+            <div class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 16l3-3 3 3 4-4 2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M9 10.5A1.5 1.5 0 1 0 9 7.5a1.5 1.5 0 0 0 0 3Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="app-label">照片墙</div>
+          </a>
 
-  <a class="app-card" href="./days.html" aria-label="进入在一起多少天">
-    <div class="app-icon">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M7 4.5v2M17 4.5v2M5.5 8.5h13" stroke="white" stroke-width="1.9" stroke-linecap="round"/>
-        <path d="M6.5 6.5h11A2.5 2.5 0 0 1 20 9v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18V9a2.5 2.5 0 0 1 2.5-2.5Z" stroke="white" stroke-width="1.7" opacity="0.95"/>
-        <path d="M8 12.5h8M8 16h5" stroke="#D1D1D6" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <div class="app-name">在一起多少天</div>
-  
-  </a>
+          <a class="app-link" href="./days.html" aria-label="在一起多少天">
+            <div class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 4.5h10A2.5 2.5 0 0 1 19.5 7v10A2.5 2.5 0 0 1 17 19.5H7A2.5 2.5 0 0 1 4.5 17V7A2.5 2.5 0 0 1 7 4.5Z" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M8 3.8v3.2M16 3.8v3.2M7.2 9.5h9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M9 12.8h6M9 15.8h4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="app-label">在一起多少天</div>
+          </a>
 
-  <a class="app-card" href="./message.html" aria-label="进入留言墙">
-    <div class="app-icon">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M6.5 5.5h11A2.5 2.5 0 0 1 20 8v6a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3v-3H6.5A2.5 2.5 0 0 1 4 14V8a2.5 2.5 0 0 1 2.5-2.5Z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M7.5 9h9M7.5 12h6.5" stroke="#D1D1D6" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <div class="app-name">留言墙</div>
- 
-  </a>
-</div>
-                </div>
+          <a class="app-link" href="./message.html" aria-label="留言墙">
+            <div class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6.5 5.5h11A2.5 2.5 0 0 1 20 8v6a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3v-3H6.5A2.5 2.5 0 0 1 4 14V8a2.5 2.5 0 0 1 2.5-2.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M7.5 9h9M7.5 12h6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="app-label">留言墙</div>
+          </a>
+        </div>
+
+        <div class="tip-card" id="homeTip">
+          当前未登录：可以浏览照片墙和留言板，但上传照片、发布留言时会提示先登录。
+        </div>
       </section>
     </main>
+
+    <div class="bottom-space" aria-hidden="true"></div>
   </div>
 
+  <div id="authModal" class="auth-modal" aria-hidden="true">
+    <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <div class="auth-modal-head">
+        <h3 id="authTitle">登录</h3>
+        <p id="authDesc">登录后进入照片墙和留言板就不用再次登录了。</p>
+      </div>
+      <div class="auth-modal-body">
+        <div class="auth-field">
+          <label for="authUsername">用户名</label>
+          <input id="authUsername" class="auth-input" type="text" maxlength="20" placeholder="请输入用户名" />
+        </div>
+        <div class="auth-field">
+          <label for="authPassword">密码</label>
+          <input id="authPassword" class="auth-input" type="password" maxlength="50" placeholder="请输入密码" />
+        </div>
+        <div class="auth-field" id="authPassword2Wrap" style="display:none;">
+          <label for="authPassword2">确认密码</label>
+          <input id="authPassword2" class="auth-input" type="password" maxlength="50" placeholder="再次输入密码" />
+        </div>
+        <div class="auth-modal-actions">
+          <button class="ok" id="authSubmitBtn" type="button">登录</button>
+          <button class="cancel" id="authCancelBtn" type="button">取消</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div class="auth-switch" id="authSwitchBtn">没有账号？去注册</div>
+          <div class="auth-switch">注册信息会保存到你的 COS 桶里</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
   <script>
-    function updateClock() {
-      const el = document.getElementById('clock');
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      el.textContent = `${h}:${m}`;
+    const SECRET_ID = 'AKIDhojT7ey61jEkHhw0830qVyGUWSDpFnEW';
+    const SECRET_KEY = 'GNIAMaieZyOehhWBi9QWUL4czCHAsQuG';
+    const BUCKET = 'photoalbum-123456-1395234423';
+    const REGION = 'ap-beijing';
+
+    const AUTH_USER_PREFIX = 'users/';
+    const LS_CURRENT_USER = 'site_current_user_v1';
+
+    const cos = new COS({
+      SecretId: SECRET_ID,
+      SecretKey: SECRET_KEY,
+    });
+
+    const authBox = document.getElementById('authBox');
+    const homeTip = document.getElementById('homeTip');
+
+    const authModal = document.getElementById('authModal');
+    const authTitle = document.getElementById('authTitle');
+    const authDesc = document.getElementById('authDesc');
+    const authUsername = document.getElementById('authUsername');
+    const authPassword = document.getElementById('authPassword');
+    const authPassword2 = document.getElementById('authPassword2');
+    const authPassword2Wrap = document.getElementById('authPassword2Wrap');
+    const authSubmitBtn = document.getElementById('authSubmitBtn');
+    const authCancelBtn = document.getElementById('authCancelBtn');
+    const authSwitchBtn = document.getElementById('authSwitchBtn');
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
-    updateClock();
-    setInterval(updateClock, 1000);
+
+    function sanitizeUsername(name) {
+      return String(name || '').trim();
+    }
+
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem(LS_CURRENT_USER);
+        if (!raw) return null;
+        const user = JSON.parse(raw);
+        if (!user || !user.username) return null;
+        return user;
+      } catch {
+        return null;
+      }
+    }
+
+    function setCurrentUser(user) {
+      if (!user) {
+        localStorage.removeItem(LS_CURRENT_USER);
+      } else {
+        localStorage.setItem(LS_CURRENT_USER, JSON.stringify(user));
+      }
+      renderAuthState();
+    }
+
+    function makeUserKey(username) {
+      return `${AUTH_USER_PREFIX}${encodeURIComponent(username)}.json`;
+    }
+
+    function putJsonToCos(key, obj) {
+      return new Promise((resolve, reject) => {
+        cos.putObject({
+          Bucket: BUCKET,
+          Region: REGION,
+          Key: key,
+          Body: JSON.stringify(obj, null, 2),
+          ContentType: 'application/json; charset=utf-8',
+        }, function (err, data) {
+          if (err) return reject(err);
+          resolve(data);
+        });
+      });
+    }
+
+    function getObjectText(key) {
+      return new Promise((resolve, reject) => {
+        cos.getObject({
+          Bucket: BUCKET,
+          Region: REGION,
+          Key: key,
+        }, async function (err, data) {
+          if (err) return reject(err);
+          try {
+            const body = data.Body;
+            if (typeof body === 'string') return resolve(body);
+            if (body instanceof Blob) return resolve(await body.text());
+            if (body && typeof body.text === 'function') return resolve(await body.text());
+            if (body instanceof ArrayBuffer) {
+              return resolve(new TextDecoder('utf-8').decode(body));
+            }
+            if (ArrayBuffer.isView(body)) {
+              return resolve(new TextDecoder('utf-8').decode(body));
+            }
+            resolve(String(body || ''));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+    }
+
+    async function getUserByName(username) {
+      const key = makeUserKey(username);
+      try {
+        const text = await getObjectText(key);
+        return JSON.parse(text);
+      } catch (err) {
+        if (err && (err.statusCode === 404 || err.error && err.error.Code === 'NoSuchKey')) {
+          return null;
+        }
+        if (String(err && err.message || '').includes('404')) return null;
+        throw err;
+      }
+    }
+
+    function openAuthModal(mode = 'login') {
+      setAuthMode(mode);
+      authModal.classList.add('show');
+      authModal.setAttribute('aria-hidden', 'false');
+      setTimeout(() => authUsername.focus(), 0);
+    }
+
+    function closeAuthModal() {
+      authModal.classList.remove('show');
+      authModal.setAttribute('aria-hidden', 'true');
+    }
+
+    function setAuthMode(mode) {
+      const isRegister = mode === 'register';
+      authModal.dataset.mode = mode;
+      authTitle.textContent = isRegister ? '注册' : '登录';
+      authDesc.textContent = isRegister
+        ? '注册后账号信息会保存到你的 COS 桶里，之后进入照片墙和留言板都可共用登录状态。'
+        : '登录后进入照片墙和留言板无需再次登录。';
+      authSubmitBtn.textContent = isRegister ? '注册' : '登录';
+      authSwitchBtn.textContent = isRegister ? '已有账号？去登录' : '没有账号？去注册';
+      authPassword2Wrap.style.display = isRegister ? '' : 'none';
+      authPassword.value = '';
+      authPassword2.value = '';
+    }
+
+    function renderAuthState() {
+      const user = getCurrentUser();
+
+      if (user) {
+        authBox.innerHTML = `
+          <div class="auth-status">当前登录：${escapeHtml(user.username)}</div>
+          <button class="btn danger-btn" id="logoutBtn" type="button">退出登录</button>
+        `;
+        homeTip.textContent = '当前已登录：进入照片墙和留言板不需要再次登录，可以直接上传照片或发布留言。';
+      } else {
+        authBox.innerHTML = `
+          <div class="auth-status">未登录</div>
+          <button class="btn primary-btn" id="loginBtn" type="button">登录</button>
+          <button class="btn ghost-btn" id="registerBtn" type="button">注册</button>
+        `;
+        homeTip.textContent = '当前未登录：可以浏览照片墙和留言板，但上传照片、发布留言时会提示先登录。';
+      }
+
+      const loginBtn = document.getElementById('loginBtn');
+      const registerBtn = document.getElementById('registerBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (loginBtn) loginBtn.onclick = () => openAuthModal('login');
+      if (registerBtn) registerBtn.onclick = () => openAuthModal('register');
+      if (logoutBtn) {
+        logoutBtn.onclick = () => {
+          if (!confirm('确定要退出登录吗？')) return;
+          setCurrentUser(null);
+          alert('已退出登录');
+        };
+      }
+    }
+
+    authCancelBtn.addEventListener('click', closeAuthModal);
+
+    authSwitchBtn.addEventListener('click', () => {
+      const mode = authModal.dataset.mode === 'register' ? 'login' : 'register';
+      setAuthMode(mode);
+    });
+
+    authSubmitBtn.addEventListener('click', async () => {
+      const mode = authModal.dataset.mode || 'login';
+      const username = sanitizeUsername(authUsername.value);
+      const password = authPassword.value;
+      const password2 = authPassword2.value;
+
+      if (!username || !password) {
+        alert('请输入用户名和密码');
+        return;
+      }
+
+      if (username.length < 2) {
+        alert('用户名至少 2 个字符');
+        return;
+      }
+
+      if (mode === 'register') {
+        if (password.length < 4) {
+          alert('密码至少 4 位');
+          return;
+        }
+        if (password !== password2) {
+          alert('两次密码不一致');
+          return;
+        }
+
+        try {
+          const oldUser = await getUserByName(username);
+          if (oldUser) {
+            alert('这个用户名已经存在了');
+            return;
+          }
+
+          const userData = {
+            username,
+            password,
+            createdAt: new Date().toISOString()
+          };
+
+          await putJsonToCos(makeUserKey(username), userData);
+          setCurrentUser({ username });
+          closeAuthModal();
+          alert('注册成功，已自动登录');
+        } catch (err) {
+          console.error(err);
+          alert('注册失败，请检查密钥、Bucket、Region、CORS 或网络');
+        }
+        return;
+      }
+
+      try {
+        const userData = await getUserByName(username);
+        if (!userData || userData.password !== password) {
+          alert('用户名或密码错误');
+          return;
+        }
+        setCurrentUser({ username });
+        closeAuthModal();
+        alert('登录成功');
+      } catch (err) {
+        console.error(err);
+        alert('登录失败，请检查密钥、Bucket、Region、CORS 或网络');
+      }
+    });
+
+    authModal.addEventListener('click', (e) => {
+      if (e.target === authModal) closeAuthModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeAuthModal();
+    });
+
+    renderAuthState();
   </script>
 </body>
 </html>
