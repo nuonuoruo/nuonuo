@@ -132,6 +132,82 @@
       font-size: 14px;
     }
 
+    .auth-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+
+    .auth-status {
+      font-size: 13px;
+      color: var(--subtext);
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.42);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      white-space: nowrap;
+    }
+
+    .auth-btn,
+    .choose-btn,
+    .primary-btn,
+    .ghost-btn,
+    .danger-btn,
+    .mini-btn,
+    .modal-close {
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+      outline: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .auth-btn:hover,
+    .choose-btn:hover,
+    .primary-btn:hover,
+    .ghost-btn:hover,
+    .danger-btn:hover,
+    .mini-btn:hover,
+    .modal-close:hover {
+      transform: translateY(-1px);
+    }
+
+    .auth-btn {
+      padding: 10px 14px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .auth-btn.primary {
+      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(0, 113, 227, 0.20);
+    }
+
+    .auth-btn.ghost {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--text);
+    }
+
+    .auth-btn.danger {
+      background: rgba(255, 59, 48, 0.92);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(255, 59, 48, 0.18);
+    }
+
+    .auth-btn:disabled,
+    .primary-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
     .content {
       margin-top: 18px;
       display: grid;
@@ -232,22 +308,6 @@
       min-width: 0;
     }
 
-    .choose-btn,
-    .primary-btn,
-    .ghost-btn,
-    .danger-btn,
-    .mini-btn,
-    .modal-close {
-      border: none;
-      border-radius: 999px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
-      outline: none;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
     .choose-btn {
       background: rgba(0, 0, 0, 0.06);
       color: var(--text);
@@ -281,13 +341,6 @@
       box-shadow: 0 12px 26px rgba(0, 113, 227, 0.28);
     }
 
-    .primary-btn:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
     .ghost-btn {
       background: rgba(0, 0, 0, 0.05);
       color: var(--text);
@@ -312,18 +365,6 @@
       background: rgba(255, 59, 48, 1);
       transform: translateY(-1px);
       box-shadow: 0 10px 22px rgba(255, 59, 48, 0.26);
-    }
-
-    .mini-btn {
-      background: rgba(0, 0, 0, 0.05);
-      color: var(--text);
-      padding: 8px 12px;
-      font-size: 12px;
-    }
-
-    .mini-btn:hover {
-      background: rgba(0, 0, 0, 0.08);
-      transform: translateY(-1px);
     }
 
     .helper {
@@ -505,16 +546,8 @@
       color: var(--subtext);
     }
 
-    .message-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-      padding-left: 60px;
-    }
-
-    .empty-state,
-    .loading-state {
+    .loading-state,
+    .empty-state {
       min-height: 280px;
       display: grid;
       place-items: center;
@@ -568,7 +601,17 @@
       line-height: 1.8;
     }
 
-    /* 预览弹窗 */
+    .browse-tip {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.56);
+      border: 1px solid rgba(0,0,0,.06);
+      color: var(--subtext);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
     .modal {
       position: fixed;
       inset: 0;
@@ -646,14 +689,122 @@
       pointer-events: none;
     }
 
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .auth-modal.show { display: flex; }
+
+    .auth-modal-card {
+      width: min(92vw, 420px);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(255,255,255,0.3);
+      box-shadow: 0 30px 80px rgba(0,0,0,.28);
+      overflow: hidden;
+    }
+
+    .auth-modal-head {
+      padding: 18px 20px 12px;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+
+    .auth-modal-head h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-modal-head p {
+      margin: 8px 0 0;
+      color: var(--subtext);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .auth-modal-body {
+      padding: 18px 20px 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .auth-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .auth-field label {
+      font-size: 13px;
+      color: var(--subtext);
+      font-weight: 700;
+    }
+
+    .auth-input {
+      height: 46px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.08);
+      padding: 0 14px;
+      font-size: 14px;
+      outline: none;
+      background: rgba(255,255,255,.96);
+    }
+
+    .auth-input:focus {
+      border-color: rgba(0,113,227,.28);
+      box-shadow: 0 0 0 4px rgba(0,113,227,.10);
+    }
+
+    .auth-modal-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .auth-modal-actions button {
+      flex: 1 1 0;
+      min-width: 120px;
+      height: 44px;
+      border: none;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-modal-actions .ok {
+      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
+      color: #fff;
+    }
+
+    .auth-modal-actions .cancel {
+      background: rgba(0,0,0,.06);
+      color: var(--text);
+    }
+
+    .auth-switch {
+      font-size: 13px;
+      color: var(--subtext);
+      cursor: pointer;
+      user-select: none;
+      text-decoration: underline;
+    }
+
     @media (max-width: 920px) {
       .field-row {
         grid-template-columns: 1fr;
       }
 
       .message-body,
-      .attachment,
-      .message-actions {
+      .attachment {
         padding-left: 0;
         margin-left: 0;
       }
@@ -676,6 +827,11 @@
 
       .topbar-left {
         width: 100%;
+      }
+
+      .auth-box {
+        width: 100%;
+        margin-left: 0;
       }
 
       .brand-text h1 {
@@ -729,6 +885,10 @@
       .message-item {
         padding: 14px;
       }
+
+      .auth-modal-actions button {
+        min-width: 100%;
+      }
     }
   </style>
 </head>
@@ -748,13 +908,19 @@
           </div>
           <div class="brand-text">
             <h1>留言墙</h1>
-        
+            <p>未登录可浏览，登录后才能发布留言和上传附件</p>
           </div>
         </div>
       </div>
+
+      <div class="auth-box" id="authBox"></div>
     </header>
 
     <main class="content">
+      <div class="browse-tip" id="browseTip">
+        未登录时只能浏览留言；登录后才能发布留言、上传附件、删除留言。
+      </div>
+
       <section class="card">
         <h2 class="section-title">写一条留言</h2>
 
@@ -784,7 +950,7 @@
           <div class="upload-bar">
             <div class="helper">
               提示：支持上传图片或其他文件，图片会直接预览，其他文件可以打开/下载。<br />
-            
+              未登录时只能浏览，登录后才能发布留言、上传附件、删除留言。
             </div>
             <div class="upload-left" style="justify-content:flex-end;">
               <button id="resetBtn" class="ghost-btn" type="button">清空</button>
@@ -801,12 +967,11 @@
         </div>
 
         <div id="messageList"></div>
-        <div class="footer-tip">提示：如需多人使用，建议把上传和删除权限改成后端签名/临时密钥；当前写法适合个人小站或内部使用。</div>
+        <div class="footer-tip">说明：当前是纯前端 COS 方案，注册信息保存在桶里；如果以后想更安全，建议再加后端鉴权。</div>
       </section>
     </main>
   </div>
 
-  <!-- 预览弹窗 -->
   <div id="previewModal" class="modal" aria-hidden="true">
     <div class="modal-content">
       <button class="modal-close" id="closeModal" aria-label="关闭预览">×</button>
@@ -817,17 +982,50 @@
     </div>
   </div>
 
+  <div id="authModal" class="auth-modal" aria-hidden="true">
+    <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <div class="auth-modal-head">
+        <h3 id="authTitle">登录</h3>
+        <p id="authDesc">登录后才能发布留言、上传附件、删除留言。</p>
+      </div>
+      <div class="auth-modal-body">
+        <div class="auth-field">
+          <label for="authUsername">用户名</label>
+          <input id="authUsername" class="auth-input" type="text" maxlength="20" placeholder="请输入用户名" />
+        </div>
+        <div class="auth-field">
+          <label for="authPassword">密码</label>
+          <input id="authPassword" class="auth-input" type="password" maxlength="50" placeholder="请输入密码" />
+        </div>
+        <div class="auth-field" id="authPassword2Wrap" style="display:none;">
+          <label for="authPassword2">确认密码</label>
+          <input id="authPassword2" class="auth-input" type="password" maxlength="50" placeholder="再次输入密码" />
+        </div>
+        <div class="auth-modal-actions">
+          <button class="ok" id="authSubmitBtn" type="button">登录</button>
+          <button class="cancel" id="authCancelBtn" type="button">取消</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div class="auth-switch" id="authSwitchBtn">没有账号？去注册</div>
+          <div class="auth-switch">注册信息会保存到 COS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
   <script>
-    // ====== 请替换为你自己的 COS 密钥 ======
     const SECRET_ID = 'AKIDhojT7ey61jEkHhw0830qVyGUWSDpFnEW';
     const SECRET_KEY = 'GNIAMaieZyOehhWBi9QWUL4czCHAsQuG';
-    // ====== 替换结束 ======
 
     const BUCKET = 'photoalbum-123456-1395234423';
-    const REGION = 'ap-beijing'; // 按你的实际 Region 修改
+    const REGION = 'ap-beijing';
     const MESSAGE_PREFIX = 'messages/';
     const ATTACH_PREFIX = 'message-attachments/';
+    const AUTH_USER_PREFIX = 'users/';
+
+    const LS_CURRENT_USER = 'site_current_user_v1';
+    const LS_NICKNAME = 'guest_nickname_message_wall';
 
     const cos = new COS({
       SecretId: SECRET_ID,
@@ -844,13 +1042,24 @@
     const resetBtn = document.getElementById('resetBtn');
     const messageList = document.getElementById('messageList');
     const statsText = document.getElementById('statsText');
+    const authBox = document.getElementById('authBox');
+    const browseTip = document.getElementById('browseTip');
 
     const previewModal = document.getElementById('previewModal');
     const previewImage = document.getElementById('previewImage');
     const previewCaption = document.getElementById('previewCaption');
     const closeModalBtn = document.getElementById('closeModal');
 
-    const LS_NICKNAME = 'guest_nickname_message_wall';
+    const authModal = document.getElementById('authModal');
+    const authTitle = document.getElementById('authTitle');
+    const authDesc = document.getElementById('authDesc');
+    const authUsername = document.getElementById('authUsername');
+    const authPassword = document.getElementById('authPassword');
+    const authPassword2 = document.getElementById('authPassword2');
+    const authPassword2Wrap = document.getElementById('authPassword2Wrap');
+    const authSubmitBtn = document.getElementById('authSubmitBtn');
+    const authCancelBtn = document.getElementById('authCancelBtn');
+    const authSwitchBtn = document.getElementById('authSwitchBtn');
 
     function sanitizeFileName(name) {
       return String(name || '').replace(/[^a-zA-Z0-9._-]/g, '');
@@ -913,7 +1122,7 @@
       resetBtn.disabled = isLoading;
       clearFileBtn.disabled = isLoading;
       chooseBtn.style.pointerEvents = isLoading ? 'none' : '';
-      submitBtn.textContent = isLoading ? '发布中...' : '发布留言';
+      submitBtn.textContent = isLoading ? '发布中...' : (getCurrentUser() ? '发布留言' : '请先登录');
     }
 
     function openPreview(url, caption) {
@@ -938,21 +1147,33 @@
 
     function isImageFile(fileNameOrType) {
       const v = String(fileNameOrType || '').toLowerCase();
-      return v.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|svg)$/.test(v);
+      return v.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|svg|heic|avif)$/.test(v);
     }
 
-    function uploadFileToCos(file, key) {
-      return new Promise((resolve, reject) => {
-        cos.uploadFile({
-          Bucket: BUCKET,
-          Region: REGION,
-          Key: key,
-          Body: file,
-        }, function (err, data) {
-          if (err) return reject(err);
-          resolve(data);
-        });
-      });
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem(LS_CURRENT_USER);
+        if (!raw) return null;
+        const user = JSON.parse(raw);
+        if (!user || !user.username) return null;
+        return user;
+      } catch {
+        return null;
+      }
+    }
+
+    function setCurrentUser(user) {
+      if (!user) {
+        localStorage.removeItem(LS_CURRENT_USER);
+      } else {
+        localStorage.setItem(LS_CURRENT_USER, JSON.stringify(user));
+      }
+      renderAuthState();
+      renderComposerState();
+    }
+
+    function makeUserKey(username) {
+      return `${AUTH_USER_PREFIX}${encodeURIComponent(username)}.json`;
     }
 
     function putJsonToCos(key, obj) {
@@ -963,6 +1184,20 @@
           Key: key,
           Body: JSON.stringify(obj, null, 2),
           ContentType: 'application/json; charset=utf-8',
+        }, function (err, data) {
+          if (err) return reject(err);
+          resolve(data);
+        });
+      });
+    }
+
+    function uploadFileToCos(file, key) {
+      return new Promise((resolve, reject) => {
+        cos.uploadFile({
+          Bucket: BUCKET,
+          Region: REGION,
+          Key: key,
+          Body: file,
         }, function (err, data) {
           if (err) return reject(err);
           resolve(data);
@@ -995,19 +1230,14 @@
           try {
             const body = data.Body;
             if (typeof body === 'string') return resolve(body);
-
             if (body instanceof Blob) return resolve(await body.text());
-
             if (body && typeof body.text === 'function') return resolve(await body.text());
-
             if (body instanceof ArrayBuffer) {
               return resolve(new TextDecoder('utf-8').decode(body));
             }
-
             if (ArrayBuffer.isView(body)) {
               return resolve(new TextDecoder('utf-8').decode(body));
             }
-
             resolve(String(body || ''));
           } catch (e) {
             reject(e);
@@ -1016,10 +1246,119 @@
       });
     }
 
-    async function uploadAttachment(file) {
+    async function getUserByName(username) {
+      try {
+        const text = await getObjectText(makeUserKey(username));
+        return JSON.parse(text);
+      } catch (err) {
+        if (err && (err.statusCode === 404 || (err.error && err.error.Code === 'NoSuchKey'))) return null;
+        if (String(err && err.message || '').includes('404')) return null;
+        throw err;
+      }
+    }
+
+    function openAuthModal(mode = 'login') {
+      authModal.classList.add('show');
+      authModal.setAttribute('aria-hidden', 'false');
+      setAuthMode(mode);
+      setTimeout(() => authUsername.focus(), 0);
+    }
+
+    function closeAuthModal() {
+      authModal.classList.remove('show');
+      authModal.setAttribute('aria-hidden', 'true');
+    }
+
+    function setAuthMode(mode) {
+      const isRegister = mode === 'register';
+      authTitle.textContent = isRegister ? '注册' : '登录';
+      authDesc.textContent = isRegister
+        ? '注册一个账号，信息会保存到你的 COS 桶里。登录后进入照片墙和留言板都不需要再次登录。'
+        : '登录后才能发布留言、上传附件、删除留言，并让上传者信息显示在页面上。';
+      authSubmitBtn.textContent = isRegister ? '注册' : '登录';
+      authSwitchBtn.textContent = isRegister ? '已有账号？去登录' : '没有账号？去注册';
+      authPassword2Wrap.style.display = isRegister ? '' : 'none';
+      authModal.dataset.mode = mode;
+      authPassword.value = '';
+      authPassword2.value = '';
+    }
+
+    function renderAuthState() {
+      const user = getCurrentUser();
+
+      if (user) {
+        authBox.innerHTML = `
+          <div class="auth-status">当前登录：${escapeHtml(user.username)}</div>
+          <button class="auth-btn danger" id="logoutBtn" type="button">退出</button>
+        `;
+      } else {
+        authBox.innerHTML = `
+          <div class="auth-status">未登录</div>
+          <button class="auth-btn primary" id="loginBtn" type="button">登录</button>
+          <button class="auth-btn ghost" id="registerBtn" type="button">注册</button>
+        `;
+      }
+
+      const loginBtn = document.getElementById('loginBtn');
+      const registerBtn = document.getElementById('registerBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (loginBtn) loginBtn.onclick = () => openAuthModal('login');
+      if (registerBtn) registerBtn.onclick = () => openAuthModal('register');
+      if (logoutBtn) {
+        logoutBtn.onclick = () => {
+          if (!confirm('确定要退出登录吗？')) return;
+          setCurrentUser(null);
+          alert('已退出登录');
+          loadMessages();
+        };
+      }
+    }
+
+    function renderComposerState() {
+      const user = getCurrentUser();
+      const loggedIn = !!user;
+
+      submitBtn.disabled = !loggedIn;
+      chooseBtn.style.pointerEvents = loggedIn ? '' : 'none';
+      chooseBtn.style.opacity = loggedIn ? '' : '0.55';
+      fileInput.disabled = !loggedIn;
+      clearFileBtn.disabled = !loggedIn;
+      submitBtn.textContent = loggedIn ? '发布留言' : '请先登录';
+
+      if (!loggedIn) {
+        selectedFileText.textContent = '未选择附件';
+        chooseBtn.textContent = '选择文件';
+        fileInput.value = '';
+      }
+
+      browseTip.textContent = loggedIn
+        ? '你已登录，可以发布留言、上传附件、删除留言；进入其他页面也不需要再次登录。'
+        : '未登录时只能浏览留言；登录后才能发布留言、上传附件、删除留言。';
+    }
+
+    function requireLogin() {
+      const user = getCurrentUser();
+      if (!user) {
+        alert('请先登录后再操作');
+        openAuthModal('login');
+        return null;
+      }
+      return user;
+    }
+
+    function makeAttachmentKey(file) {
       const safeName = sanitizeFileName(file.name || 'file');
-      const key = `${ATTACH_PREFIX}${Date.now()}-${randomId()}-${safeName}`;
+      return `${ATTACH_PREFIX}${Date.now()}-${randomId()}-${safeName}`;
+    }
+
+    async function uploadAttachment(file) {
+      const user = requireLogin();
+      if (!user) throw new Error('NOT_LOGGED_IN');
+
+      const key = makeAttachmentKey(file);
       await uploadFileToCos(file, key);
+
       return {
         key,
         url: makeBucketUrl(key),
@@ -1030,6 +1369,9 @@
     }
 
     async function saveMessage() {
+      const user = requireLogin();
+      if (!user) return;
+
       const nickname = (nicknameInput.value || localStorage.getItem(LS_NICKNAME) || '匿名').trim() || '匿名';
       const content = (contentInput.value || '').trim();
       const file = getCurrentFile();
@@ -1054,6 +1396,7 @@
         const message = {
           id: messageId,
           nickname,
+          uploader: user.username,
           content,
           createdAt: now.toISOString(),
           attachment,
@@ -1065,13 +1408,16 @@
         contentInput.value = '';
         fileInput.value = '';
         updateSelectedFileText();
-        loadMessages();
+        await loadMessages();
         alert('留言发布成功');
       } catch (err) {
         console.error('发布失败：', err);
-        alert('发布失败，请检查密钥、Bucket、Region、CORS 或网络设置');
+        if (String(err && err.message) !== 'NOT_LOGGED_IN') {
+          alert('发布失败，请检查密钥、Bucket、Region、CORS 或网络设置');
+        }
       } finally {
         setLoadingState(false);
+        renderComposerState();
       }
     }
 
@@ -1161,11 +1507,14 @@
           return;
         }
 
+        const currentUser = getCurrentUser();
+
         messageList.innerHTML = messages.map(msg => {
           const nickname = escapeHtml(msg.nickname || '匿名');
+          const uploader = escapeHtml(msg.uploader || '未知用户');
           const content = escapeHtml(msg.content || '').replace(/\n/g, '<br>');
           const createdAt = formatDateTime(msg.createdAt);
-          const initial = escapeHtml((msg.nickname || '匿').trim().charAt(0) || '匿');
+          const initial = escapeHtml((msg.uploader || msg.nickname || '匿').trim().charAt(0) || '匿');
           const attachment = msg.attachment || null;
 
           let attachmentHtml = '';
@@ -1212,19 +1561,24 @@
             }
           }
 
+          const canDelete = !!currentUser;
+
           return `
-            <article class="message-item" data-key="${escapeHtml(msg.__key || '')}">
+            <article class="message-item">
               <div class="message-top">
                 <div class="user-block">
                   <div class="avatar" aria-hidden="true">${initial}</div>
                   <div class="user-meta">
-                    <h3 class="user-name">${nickname}</h3>
-                    <p class="user-time">${createdAt}</p>
+                    <h3 class="user-name">${uploader}</h3>
+                    <p class="user-time">上传者：${uploader} · 昵称：${nickname} · ${createdAt}</p>
                   </div>
                 </div>
-                <button class="danger-btn" type="button" data-action="delete" data-key="${escapeHtml(msg.__key || '')}" data-attach-key="${escapeHtml(attachment && attachment.key ? attachment.key : '')}">
-                  删除
-                </button>
+
+                ${canDelete ? `
+                  <button class="danger-btn" type="button" data-action="delete" data-key="${escapeHtml(msg.__key || '')}" data-attach-key="${escapeHtml(attachment && attachment.key ? attachment.key : '')}">
+                    删除
+                  </button>
+                ` : ''}
               </div>
 
               <div class="message-body">${content || '<span style="color: var(--subtext);">（无文字内容）</span>'}</div>
@@ -1256,6 +1610,9 @@
     }
 
     async function deleteMessageByKey(messageKey, attachKey) {
+      const user = requireLogin();
+      if (!user) return;
+
       if (!messageKey) return;
       if (!confirm('确定要删除这条留言吗？此操作不可恢复。')) return;
 
@@ -1277,10 +1634,22 @@
         alert('删除失败');
       } finally {
         setLoadingState(false);
+        renderComposerState();
       }
     }
 
-    // 事件委托
+    function resetComposer() {
+      if (!confirm('要清空当前正在编辑的内容吗？')) return;
+      contentInput.value = '';
+      fileInput.value = '';
+      updateSelectedFileText();
+    }
+
+    function clearAttachment() {
+      fileInput.value = '';
+      updateSelectedFileText();
+    }
+
     messageList.addEventListener('click', (e) => {
       const delBtn = e.target.closest('[data-action="delete"]');
       if (delBtn) {
@@ -1291,11 +1660,9 @@
       const previewNode = e.target.closest('[data-action="preview"]');
       if (previewNode) {
         openPreview(previewNode.dataset.url, previewNode.dataset.caption || '附件预览');
-        return;
       }
     });
 
-    // 弹窗关闭
     if (previewModal) {
       previewModal.addEventListener('click', (e) => {
         if (e.target === previewModal) closePreview();
@@ -1306,37 +1673,110 @@
       closeModalBtn.addEventListener('click', closePreview);
     }
 
+    if (authModal) {
+      authModal.addEventListener('click', (e) => {
+        if (e.target === authModal) closeAuthModal();
+      });
+    }
+
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closePreview();
+      if (e.key === 'Escape') {
+        closePreview();
+        closeAuthModal();
+      }
     });
 
-    // 绑定上传相关
+    authCancelBtn.addEventListener('click', closeAuthModal);
+
+    authSwitchBtn.addEventListener('click', () => {
+      const mode = authModal.dataset.mode === 'register' ? 'login' : 'register';
+      setAuthMode(mode);
+    });
+
+    authSubmitBtn.addEventListener('click', async () => {
+      const mode = authModal.dataset.mode || 'login';
+      const username = authUsername.value.trim();
+      const password = authPassword.value;
+      const password2 = authPassword2.value;
+
+      if (!username || !password) {
+        alert('请输入用户名和密码');
+        return;
+      }
+      if (username.length < 2) {
+        alert('用户名至少 2 个字符');
+        return;
+      }
+
+      if (mode === 'register') {
+        if (password.length < 4) {
+          alert('密码至少 4 位');
+          return;
+        }
+        if (password !== password2) {
+          alert('两次密码不一致');
+          return;
+        }
+
+        try {
+          const oldUser = await getUserByName(username);
+          if (oldUser) {
+            alert('这个用户名已经存在了');
+            return;
+          }
+
+          await putJsonToCos(makeUserKey(username), {
+            username,
+            password,
+            createdAt: new Date().toISOString()
+          });
+
+          setCurrentUser({ username });
+          closeAuthModal();
+          alert('注册成功，已自动登录');
+        } catch (err) {
+          console.error(err);
+          alert('注册失败，请检查密钥、Bucket、Region、CORS 或网络');
+        }
+        return;
+      }
+
+      try {
+        const user = await getUserByName(username);
+        if (!user || user.password !== password) {
+          alert('用户名或密码错误');
+          return;
+        }
+
+        setCurrentUser({ username });
+        closeAuthModal();
+        alert('登录成功');
+      } catch (err) {
+        console.error(err);
+        alert('登录失败，请检查密钥、Bucket、Region、CORS 或网络');
+      }
+    });
+
     fileInput.addEventListener('change', updateSelectedFileText);
 
     chooseBtn.addEventListener('click', () => {
-      updateSelectedFileText();
+      if (!getCurrentUser()) {
+        alert('请先登录后再上传附件');
+        openAuthModal('login');
+      }
     });
 
-    clearFileBtn.addEventListener('click', () => {
-      fileInput.value = '';
-      updateSelectedFileText();
-    });
-
+    clearFileBtn.addEventListener('click', clearAttachment);
     submitBtn.addEventListener('click', saveMessage);
-
-    resetBtn.addEventListener('click', () => {
-      if (!confirm('要清空当前正在编辑的内容吗？')) return;
-      contentInput.value = '';
-      fileInput.value = '';
-      updateSelectedFileText();
-    });
+    resetBtn.addEventListener('click', resetComposer);
 
     nicknameInput.addEventListener('input', () => {
       localStorage.setItem(LS_NICKNAME, nicknameInput.value || '');
     });
 
-    // 初始化
     nicknameInput.value = localStorage.getItem(LS_NICKNAME) || '';
+    renderAuthState();
+    renderComposerState();
     updateSelectedFileText();
     loadMessages();
   </script>
