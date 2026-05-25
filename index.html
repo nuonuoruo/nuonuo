@@ -481,7 +481,7 @@
         </div>
 
         <div class="tip-card" id="homeTip">
-          当前未登录
+          
         </div>
       </section>
     </main>
@@ -514,7 +514,7 @@
         </div>
         <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
           <div class="auth-switch" id="authSwitchBtn">没有账号？去注册</div>
-          <div class="auth-switch">注册信息会保存到你的 COS 桶里</div>
+          <div class="auth-switch"></div>
         </div>
       </div>
     </div>
@@ -677,14 +677,14 @@
           <div class="auth-status">当前登录：${escapeHtml(user.username)}</div>
           <button class="btn danger-btn" id="logoutBtn" type="button">退出登录</button>
         `;
-        homeTip.textContent = '当前已登录';
+        homeTip.textContent = '';
       } else {
         authBox.innerHTML = `
           <div class="auth-status">未登录</div>
           <button class="btn primary-btn" id="loginBtn" type="button">登录</button>
           <button class="btn ghost-btn" id="registerBtn" type="button">注册</button>
         `;
-        homeTip.textContent = '当前未登录';
+        homeTip.textContent = '';
       }
 
       const loginBtn = document.getElementById('loginBtn');
