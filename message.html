@@ -1,0 +1,1344 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>留言墙</title>
+
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --panel: rgba(255, 255, 255, 0.72);
+      --panel-strong: rgba(255, 255, 255, 0.9);
+      --text: #1d1d1f;
+      --subtext: #6e6e73;
+      --line: rgba(0, 0, 0, 0.08);
+      --primary: #0071e3;
+      --primary-hover: #0060c7;
+      --danger: #ff3b30;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+      --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.06);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      background:
+        radial-gradient(circle at top left, rgba(0, 113, 227, 0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(255, 59, 48, 0.08), transparent 24%),
+        linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 100%);
+    }
+
+    body {
+      padding: 24px;
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 20;
+      background: var(--panel);
+      backdrop-filter: saturate(180%) blur(18px);
+      -webkit-backdrop-filter: saturate(180%) blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      color: var(--text);
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 999px;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform .15s ease, background .2s ease;
+      white-space: nowrap;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .back-btn:hover {
+      background: rgba(0, 0, 0, 0.09);
+      transform: translateY(-1px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #1d1d1f 0%, #4b4b50 100%);
+      display: grid;
+      place-items: center;
+      color: white;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+      flex: 0 0 auto;
+    }
+
+    .brand-mark svg {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+
+    .brand-text h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-text p {
+      margin: 6px 0 0;
+      color: var(--subtext);
+      font-size: 14px;
+    }
+
+    .content {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.52);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      padding: 22px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .composer {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--subtext);
+      font-weight: 600;
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.72);
+      border-radius: 18px;
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+      transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+    }
+
+    .input:focus,
+    .textarea:focus {
+      border-color: rgba(0, 113, 227, 0.32);
+      box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.10);
+    }
+
+    .input {
+      height: 48px;
+      padding: 0 16px;
+      font-size: 15px;
+    }
+
+    .textarea {
+      min-height: 160px;
+      padding: 14px 16px;
+      resize: vertical;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    input[type="file"] {
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+    }
+
+    .upload-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .upload-left {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .choose-btn,
+    .primary-btn,
+    .ghost-btn,
+    .danger-btn,
+    .mini-btn,
+    .modal-close {
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+      outline: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .choose-btn {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--text);
+      padding: 12px 18px;
+      font-size: 14px;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 120px;
+      text-decoration: none;
+    }
+
+    .choose-btn:hover {
+      background: rgba(0, 0, 0, 0.09);
+      transform: translateY(-1px);
+    }
+
+    .primary-btn {
+      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
+      color: #fff;
+      padding: 12px 18px;
+      font-size: 14px;
+      box-shadow: 0 10px 22px rgba(0, 113, 227, 0.24);
+      min-width: 120px;
+    }
+
+    .primary-btn:hover {
+      background: linear-gradient(180deg, #2491ff 0%, var(--primary-hover) 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(0, 113, 227, 0.28);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .ghost-btn {
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--text);
+      padding: 12px 18px;
+      font-size: 14px;
+    }
+
+    .ghost-btn:hover {
+      background: rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .danger-btn {
+      background: rgba(255, 59, 48, 0.92);
+      color: #fff;
+      padding: 10px 14px;
+      font-size: 13px;
+      box-shadow: 0 8px 18px rgba(255, 59, 48, 0.22);
+    }
+
+    .danger-btn:hover {
+      background: rgba(255, 59, 48, 1);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(255, 59, 48, 0.26);
+    }
+
+    .mini-btn {
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--text);
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .mini-btn:hover {
+      background: rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .helper {
+      color: var(--subtext);
+      font-size: 12px;
+      line-height: 1.7;
+      margin-top: -4px;
+    }
+
+    .selected-file {
+      margin-top: 6px;
+      color: var(--subtext);
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    .list-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .stats {
+      color: var(--subtext);
+      font-size: 13px;
+    }
+
+    #messageList {
+      display: grid;
+      gap: 16px;
+    }
+
+    .message-item {
+      background: var(--panel-strong);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .message-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 54px rgba(0, 0, 0, 0.10);
+    }
+
+    .message-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .user-block {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #0a84ff 0%, #0071e3 100%);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      box-shadow: 0 10px 24px rgba(0, 113, 227, 0.20);
+      flex: 0 0 auto;
+      user-select: none;
+    }
+
+    .user-meta {
+      min-width: 0;
+    }
+
+    .user-name {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      word-break: break-all;
+    }
+
+    .user-time {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--subtext);
+    }
+
+    .message-body {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding-left: 60px;
+    }
+
+    .attachment {
+      margin-top: 14px;
+      margin-left: 60px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .attachment-preview {
+      width: 100%;
+      max-width: 520px;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(0,0,0,0.04);
+      border: 1px solid rgba(0,0,0,0.06);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .attachment-preview img {
+      display: block;
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+    }
+
+    .attachment-file {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(0, 0, 0, 0.05);
+      text-decoration: none;
+      color: var(--text);
+      max-width: 100%;
+      word-break: break-all;
+    }
+
+    .attachment-file:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .attachment-file .icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(0, 113, 227, 0.14), rgba(0, 113, 227, 0.08));
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      flex: 0 0 auto;
+    }
+
+    .attachment-file .icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .attachment-file .meta {
+      min-width: 0;
+    }
+
+    .attachment-file .meta .name {
+      font-size: 13px;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .attachment-file .meta .sub {
+      font-size: 12px;
+      margin: 2px 0 0;
+      color: var(--subtext);
+    }
+
+    .message-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      padding-left: 60px;
+    }
+
+    .empty-state,
+    .loading-state {
+      min-height: 280px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: var(--subtext);
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .state-card {
+      max-width: 360px;
+    }
+
+    .state-icon {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 16px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(0, 113, 227, 0.12), rgba(0, 113, 227, 0.06));
+      color: var(--primary);
+    }
+
+    .state-icon svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    .state-title {
+      margin: 0;
+      font-size: 18px;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .state-desc {
+      margin: 8px 0 0;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--subtext);
+    }
+
+    .footer-tip {
+      margin-top: 14px;
+      color: var(--subtext);
+      font-size: 12px;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    /* 预览弹窗 */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      width: min(96vw, 1100px);
+      max-height: 92vh;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      font-size: 22px;
+      z-index: 2;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .modal-body {
+      background: rgba(0, 0, 0, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      max-height: 92vh;
+    }
+
+    .modal-body img {
+      width: 100%;
+      height: auto;
+      max-height: 92vh;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+
+    .modal-caption {
+      position: absolute;
+      left: 18px;
+      right: 72px;
+      bottom: 16px;
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 13px;
+      line-height: 1.4;
+      word-break: break-all;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+
+    @media (max-width: 920px) {
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+
+      .message-body,
+      .attachment,
+      .message-actions {
+        padding-left: 0;
+        margin-left: 0;
+      }
+
+      .message-top {
+        align-items: center;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 14px;
+      }
+
+      .topbar {
+        top: 10px;
+        padding: 14px 16px;
+        border-radius: 22px;
+      }
+
+      .topbar-left {
+        width: 100%;
+      }
+
+      .brand-text h1 {
+        font-size: 24px;
+      }
+
+      .card {
+        padding: 16px;
+        border-radius: 22px;
+      }
+
+      .upload-bar {
+        align-items: stretch;
+      }
+
+      .upload-left {
+        width: 100%;
+      }
+
+      .choose-btn,
+      .primary-btn,
+      .ghost-btn {
+        width: 100%;
+      }
+
+      .modal {
+        padding: 12px;
+      }
+
+      .modal-content {
+        width: 100%;
+        border-radius: 22px;
+      }
+
+      .modal-caption {
+        left: 14px;
+        right: 64px;
+        bottom: 12px;
+      }
+
+      .user-block {
+        align-items: flex-start;
+      }
+
+      .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+      }
+
+      .message-item {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="topbar-left">
+        <a class="back-btn" href="./index.html">← 返回主页</a>
+
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M6.5 5.5h11A2.5 2.5 0 0 1 20 8v6a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3v-3H6.5A2.5 2.5 0 0 1 4 14V8a2.5 2.5 0 0 1 2.5-2.5Z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M7.5 9h9M7.5 12h6.5" stroke="#D1D1D6" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>留言墙</h1>
+            <p>发表、浏览、上传附件和删除留言，保持和主页一致的简洁风格</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="card">
+        <h2 class="section-title">写一条留言</h2>
+
+        <div class="composer">
+          <div class="field-row">
+            <div class="field">
+              <label for="nicknameInput">昵称</label>
+              <input id="nicknameInput" class="input" type="text" maxlength="20" placeholder="例如：我家小宝" />
+            </div>
+
+            <div class="field">
+              <label for="fileInput">附件</label>
+              <div class="upload-left">
+                <label class="choose-btn" for="fileInput" id="chooseBtn">选择文件</label>
+                <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.doc,.docx,.zip,.rar,.mp4,.mov" />
+                <button id="clearFileBtn" class="ghost-btn" type="button">清除附件</button>
+              </div>
+              <div class="selected-file" id="selectedFileText">未选择附件</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="contentInput">留言内容</label>
+            <textarea id="contentInput" class="textarea" placeholder="想说的话都可以写在这里…"></textarea>
+          </div>
+
+          <div class="upload-bar">
+            <div class="helper">
+              提示：支持上传图片或其他文件，图片会直接预览，其他文件可以打开/下载。<br />
+              留言会保存到云端，刷新页面后仍然保留。
+            </div>
+            <div class="upload-left" style="justify-content:flex-end;">
+              <button id="resetBtn" class="ghost-btn" type="button">清空</button>
+              <button id="submitBtn" class="primary-btn" type="button">发布留言</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="list-head">
+          <h2 class="section-title" style="margin:0;">留言列表</h2>
+          <div class="stats" id="statsText">正在加载…</div>
+        </div>
+
+        <div id="messageList"></div>
+        <div class="footer-tip">提示：如需多人使用，建议把上传和删除权限改成后端签名/临时密钥；当前写法适合个人小站或内部使用。</div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 预览弹窗 -->
+  <div id="previewModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal" aria-label="关闭预览">×</button>
+      <div class="modal-body">
+        <img id="previewImage" src="" alt="预览" />
+      </div>
+      <div class="modal-caption" id="previewCaption"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
+  <script>
+    // ====== 请替换为你自己的 COS 密钥 ======
+    const SECRET_ID = 'AKIDhojT7ey61jEkHhw0830qVyGUWSDpFnEW';
+    const SECRET_KEY = 'GNIAMaieZyOehhWBi9QWUL4czCHAsQuG';
+    // ====== 替换结束 ======
+
+    const BUCKET = 'photoalbum-123456-1395234423';
+    const REGION = 'ap-beijing'; // 按你的实际 Region 修改
+    const MESSAGE_PREFIX = 'messages/';
+    const ATTACH_PREFIX = 'message-attachments/';
+
+    const cos = new COS({
+      SecretId: SECRET_ID,
+      SecretKey: SECRET_KEY,
+    });
+
+    const nicknameInput = document.getElementById('nicknameInput');
+    const contentInput = document.getElementById('contentInput');
+    const fileInput = document.getElementById('fileInput');
+    const chooseBtn = document.getElementById('chooseBtn');
+    const clearFileBtn = document.getElementById('clearFileBtn');
+    const selectedFileText = document.getElementById('selectedFileText');
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const messageList = document.getElementById('messageList');
+    const statsText = document.getElementById('statsText');
+
+    const previewModal = document.getElementById('previewModal');
+    const previewImage = document.getElementById('previewImage');
+    const previewCaption = document.getElementById('previewCaption');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    const LS_NICKNAME = 'guest_nickname_message_wall';
+
+    function sanitizeFileName(name) {
+      return String(name || '').replace(/[^a-zA-Z0-9._-]/g, '');
+    }
+
+    function randomId() {
+      return Math.random().toString(36).slice(2, 10);
+    }
+
+    function formatDateTime(input) {
+      const d = input ? new Date(input) : new Date();
+      if (Number.isNaN(d.getTime())) return '未知时间';
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const h = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      return `${y}-${m}-${day} ${h}:${min}`;
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function humanSize(bytes) {
+      const n = Number(bytes || 0);
+      if (!n) return '0 B';
+      const units = ['B', 'KB', 'MB', 'GB'];
+      let i = 0;
+      let val = n;
+      while (val >= 1024 && i < units.length - 1) {
+        val /= 1024;
+        i++;
+      }
+      return `${val.toFixed(val >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
+    }
+
+    function getCurrentFile() {
+      return fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+    }
+
+    function updateSelectedFileText() {
+      const file = getCurrentFile();
+      if (!file) {
+        selectedFileText.textContent = '未选择附件';
+        chooseBtn.textContent = '选择文件';
+        return;
+      }
+      selectedFileText.textContent = `${file.name}（${humanSize(file.size)}）`;
+      chooseBtn.textContent = '已选择文件';
+    }
+
+    function setLoadingState(isLoading) {
+      submitBtn.disabled = isLoading;
+      resetBtn.disabled = isLoading;
+      clearFileBtn.disabled = isLoading;
+      chooseBtn.style.pointerEvents = isLoading ? 'none' : '';
+      submitBtn.textContent = isLoading ? '发布中...' : '发布留言';
+    }
+
+    function openPreview(url, caption) {
+      if (!url) return;
+      previewImage.src = url;
+      previewImage.alt = caption || '预览';
+      previewCaption.textContent = caption || '';
+      previewModal.classList.add('show');
+      previewModal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closePreview() {
+      previewModal.classList.remove('show');
+      previewModal.setAttribute('aria-hidden', 'true');
+      previewImage.src = '';
+      previewCaption.textContent = '';
+    }
+
+    function makeBucketUrl(key) {
+      return `https://${BUCKET}.cos.${REGION}.myqcloud.com/${key}`;
+    }
+
+    function isImageFile(fileNameOrType) {
+      const v = String(fileNameOrType || '').toLowerCase();
+      return v.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|svg)$/.test(v);
+    }
+
+    function uploadFileToCos(file, key) {
+      return new Promise((resolve, reject) => {
+        cos.uploadFile({
+          Bucket: BUCKET,
+          Region: REGION,
+          Key: key,
+          Body: file,
+        }, function (err, data) {
+          if (err) return reject(err);
+          resolve(data);
+        });
+      });
+    }
+
+    function putJsonToCos(key, obj) {
+      return new Promise((resolve, reject) => {
+        cos.putObject({
+          Bucket: BUCKET,
+          Region: REGION,
+          Key: key,
+          Body: JSON.stringify(obj, null, 2),
+          ContentType: 'application/json; charset=utf-8',
+        }, function (err, data) {
+          if (err) return reject(err);
+          resolve(data);
+        });
+      });
+    }
+
+    function deleteObject(key) {
+      return new Promise((resolve, reject) => {
+        cos.deleteObject({
+          Bucket: BUCKET,
+          Region: REGION,
+          Key: key,
+        }, function (err, data) {
+          if (err) return reject(err);
+          resolve(data);
+        });
+      });
+    }
+
+    function getObjectText(key) {
+      return new Promise((resolve, reject) => {
+        cos.getObject({
+          Bucket: BUCKET,
+          Region: REGION,
+          Key: key,
+        }, async function (err, data) {
+          if (err) return reject(err);
+
+          try {
+            const body = data.Body;
+            if (typeof body === 'string') return resolve(body);
+
+            if (body instanceof Blob) return resolve(await body.text());
+
+            if (body && typeof body.text === 'function') return resolve(await body.text());
+
+            if (body instanceof ArrayBuffer) {
+              return resolve(new TextDecoder('utf-8').decode(body));
+            }
+
+            if (ArrayBuffer.isView(body)) {
+              return resolve(new TextDecoder('utf-8').decode(body));
+            }
+
+            resolve(String(body || ''));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      });
+    }
+
+    async function uploadAttachment(file) {
+      const safeName = sanitizeFileName(file.name || 'file');
+      const key = `${ATTACH_PREFIX}${Date.now()}-${randomId()}-${safeName}`;
+      await uploadFileToCos(file, key);
+      return {
+        key,
+        url: makeBucketUrl(key),
+        name: file.name,
+        type: file.type || '',
+        size: file.size || 0,
+      };
+    }
+
+    async function saveMessage() {
+      const nickname = (nicknameInput.value || localStorage.getItem(LS_NICKNAME) || '匿名').trim() || '匿名';
+      const content = (contentInput.value || '').trim();
+      const file = getCurrentFile();
+
+      if (!content && !file) {
+        alert('请至少填写留言内容或选择一个附件');
+        return;
+      }
+
+      setLoadingState(true);
+
+      try {
+        localStorage.setItem(LS_NICKNAME, nickname);
+
+        let attachment = null;
+        if (file) {
+          attachment = await uploadAttachment(file);
+        }
+
+        const now = new Date();
+        const messageId = `${Date.now()}-${randomId()}`;
+        const message = {
+          id: messageId,
+          nickname,
+          content,
+          createdAt: now.toISOString(),
+          attachment,
+        };
+
+        const key = `${MESSAGE_PREFIX}${messageId}.json`;
+        await putJsonToCos(key, message);
+
+        contentInput.value = '';
+        fileInput.value = '';
+        updateSelectedFileText();
+        loadMessages();
+        alert('留言发布成功');
+      } catch (err) {
+        console.error('发布失败：', err);
+        alert('发布失败，请检查密钥、Bucket、Region、CORS 或网络设置');
+      } finally {
+        setLoadingState(false);
+      }
+    }
+
+    async function loadMessages() {
+      messageList.innerHTML = `
+        <div class="loading-state">
+          <div class="state-card">
+            <div class="state-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h2 class="state-title">正在加载留言</h2>
+            <p class="state-desc">请稍候，正在从云端获取留言内容。</p>
+          </div>
+        </div>
+      `;
+
+      statsText.textContent = '正在加载…';
+
+      try {
+        const bucketData = await new Promise((resolve, reject) => {
+          cos.getBucket({
+            Bucket: BUCKET,
+            Region: REGION,
+            Prefix: MESSAGE_PREFIX,
+          }, function (err, data) {
+            if (err) return reject(err);
+            resolve(data);
+          });
+        });
+
+        const items = (bucketData.Contents || [])
+          .filter(item => item && item.Key && item.Key.endsWith('.json'))
+          .sort((a, b) => new Date(b.LastModified || 0) - new Date(a.LastModified || 0));
+
+        if (items.length === 0) {
+          messageList.innerHTML = `
+            <div class="empty-state">
+              <div class="state-card">
+                <div class="state-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M6.5 5.5h11A2.5 2.5 0 0 1 20 8v6a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3v-3H6.5A2.5 2.5 0 0 1 4 14V8a2.5 2.5 0 0 1 2.5-2.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M7.5 9h9M7.5 12h6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <h2 class="state-title">暂无留言</h2>
+                <p class="state-desc">还没有人留言，快来写下第一条留言吧。</p>
+              </div>
+            </div>
+          `;
+          statsText.textContent = '共 0 条留言';
+          return;
+        }
+
+        const messages = [];
+        for (const item of items) {
+          try {
+            const text = await getObjectText(item.Key);
+            const data = JSON.parse(text);
+            data.__key = item.Key;
+            data.__lastModified = item.LastModified || data.createdAt || '';
+            messages.push(data);
+          } catch (e) {
+            console.warn('读取留言失败：', item.Key, e);
+          }
+        }
+
+        messages.sort((a, b) => new Date(b.createdAt || b.__lastModified || 0) - new Date(a.createdAt || a.__lastModified || 0));
+
+        if (messages.length === 0) {
+          messageList.innerHTML = `
+            <div class="empty-state">
+              <div class="state-card">
+                <div class="state-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M6.5 5.5h11A2.5 2.5 0 0 1 20 8v6a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3v-3H6.5A2.5 2.5 0 0 1 4 14V8a2.5 2.5 0 0 1 2.5-2.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M7.5 9h9M7.5 12h6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <h2 class="state-title">暂无可显示的留言</h2>
+                <p class="state-desc">留言文件可能损坏，或者还没有成功保存。</p>
+              </div>
+            </div>
+          `;
+          statsText.textContent = '共 0 条留言';
+          return;
+        }
+
+        messageList.innerHTML = messages.map(msg => {
+          const nickname = escapeHtml(msg.nickname || '匿名');
+          const content = escapeHtml(msg.content || '').replace(/\n/g, '<br>');
+          const createdAt = formatDateTime(msg.createdAt);
+          const initial = escapeHtml((msg.nickname || '匿').trim().charAt(0) || '匿');
+          const attachment = msg.attachment || null;
+
+          let attachmentHtml = '';
+          if (attachment && attachment.url) {
+            const typeOrName = String(attachment.type || attachment.name || '').toLowerCase();
+            const previewable = isImageFile(typeOrName);
+            if (previewable) {
+              attachmentHtml = `
+                <div class="attachment">
+                  <div class="attachment-preview" data-action="preview" data-url="${escapeHtml(attachment.url)}" data-caption="${escapeHtml(attachment.name || '附件')}">
+                    <img src="${escapeHtml(attachment.url)}" alt="${escapeHtml(attachment.name || '附件预览')}" loading="lazy" />
+                  </div>
+                  <a class="attachment-file" href="${escapeHtml(attachment.url)}" target="_blank" rel="noreferrer">
+                    <div class="icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M7 16l3-3 3 3 4-4 2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7"/>
+                      </svg>
+                    </div>
+                    <div class="meta">
+                      <p class="name">${escapeHtml(attachment.name || '图片附件')}</p>
+                      <p class="sub">${escapeHtml(attachment.type || 'image')}${attachment.size ? ' · ' + humanSize(attachment.size) : ''}</p>
+                    </div>
+                  </a>
+                </div>
+              `;
+            } else {
+              attachmentHtml = `
+                <div class="attachment">
+                  <a class="attachment-file" href="${escapeHtml(attachment.url)}" target="_blank" rel="noreferrer">
+                    <div class="icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M7 4.5h6.7c.4 0 .8.2 1.1.5l3.2 3.2c.3.3.5.7.5 1.1V19a2.5 2.5 0 0 1-2.5 2.5H7A2.5 2.5 0 0 1 4.5 19V7A2.5 2.5 0 0 1 7 4.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                        <path d="M14 4.5V8a1 1 0 0 0 1 1h3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                    <div class="meta">
+                      <p class="name">${escapeHtml(attachment.name || '附件')}</p>
+                      <p class="sub">${escapeHtml(attachment.type || 'file')}${attachment.size ? ' · ' + humanSize(attachment.size) : ''}</p>
+                    </div>
+                  </a>
+                </div>
+              `;
+            }
+          }
+
+          return `
+            <article class="message-item" data-key="${escapeHtml(msg.__key || '')}">
+              <div class="message-top">
+                <div class="user-block">
+                  <div class="avatar" aria-hidden="true">${initial}</div>
+                  <div class="user-meta">
+                    <h3 class="user-name">${nickname}</h3>
+                    <p class="user-time">${createdAt}</p>
+                  </div>
+                </div>
+                <button class="danger-btn" type="button" data-action="delete" data-key="${escapeHtml(msg.__key || '')}" data-attach-key="${escapeHtml(attachment && attachment.key ? attachment.key : '')}">
+                  删除
+                </button>
+              </div>
+
+              <div class="message-body">${content || '<span style="color: var(--subtext);">（无文字内容）</span>'}</div>
+              ${attachmentHtml}
+            </article>
+          `;
+        }).join('');
+
+        statsText.textContent = `共 ${messages.length} 条留言`;
+      } catch (err) {
+        console.error('加载留言失败：', err);
+        messageList.innerHTML = `
+          <div class="empty-state">
+            <div class="state-card">
+              <div class="state-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 9v4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                  <path d="M12 17h.01" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+                  <path d="M10.3 4.9 2.8 18a2 2 0 0 0 1.73 3h15a2 2 0 0 0 1.73-3l-7.5-13.1a2 2 0 0 0-3.46 0Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h2 class="state-title">加载失败</h2>
+              <p class="state-desc">请检查密钥、Bucket、Region、CORS 配置或网络后重试。</p>
+            </div>
+          </div>
+        `;
+        statsText.textContent = '加载失败';
+      }
+    }
+
+    async function deleteMessageByKey(messageKey, attachKey) {
+      if (!messageKey) return;
+      if (!confirm('确定要删除这条留言吗？此操作不可恢复。')) return;
+
+      setLoadingState(true);
+
+      try {
+        await deleteObject(messageKey);
+        if (attachKey) {
+          try {
+            await deleteObject(attachKey);
+          } catch (e) {
+            console.warn('附件删除失败，但留言本体已删除：', e);
+          }
+        }
+        await loadMessages();
+        alert('删除成功');
+      } catch (err) {
+        console.error('删除失败：', err);
+        alert('删除失败');
+      } finally {
+        setLoadingState(false);
+      }
+    }
+
+    // 事件委托
+    messageList.addEventListener('click', (e) => {
+      const delBtn = e.target.closest('[data-action="delete"]');
+      if (delBtn) {
+        deleteMessageByKey(delBtn.dataset.key, delBtn.dataset.attachKey);
+        return;
+      }
+
+      const previewNode = e.target.closest('[data-action="preview"]');
+      if (previewNode) {
+        openPreview(previewNode.dataset.url, previewNode.dataset.caption || '附件预览');
+        return;
+      }
+    });
+
+    // 弹窗关闭
+    if (previewModal) {
+      previewModal.addEventListener('click', (e) => {
+        if (e.target === previewModal) closePreview();
+      });
+    }
+
+    if (closeModalBtn) {
+      closeModalBtn.addEventListener('click', closePreview);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePreview();
+    });
+
+    // 绑定上传相关
+    fileInput.addEventListener('change', updateSelectedFileText);
+
+    chooseBtn.addEventListener('click', () => {
+      updateSelectedFileText();
+    });
+
+    clearFileBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      updateSelectedFileText();
+    });
+
+    submitBtn.addEventListener('click', saveMessage);
+
+    resetBtn.addEventListener('click', () => {
+      if (!confirm('要清空当前正在编辑的内容吗？')) return;
+      contentInput.value = '';
+      fileInput.value = '';
+      updateSelectedFileText();
+    });
+
+    nicknameInput.addEventListener('input', () => {
+      localStorage.setItem(LS_NICKNAME, nicknameInput.value || '');
+    });
+
+    // 初始化
+    nicknameInput.value = localStorage.getItem(LS_NICKNAME) || '';
+    updateSelectedFileText();
+    loadMessages();
+  </script>
+</body>
+</html>
