@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="format-detection" content="telephone=no" />
   <title>小游戏</title>
   <style>
@@ -29,11 +29,15 @@
         radial-gradient(circle at 85% 15%, rgba(255, 80, 120, 0.12), transparent 16%),
         radial-gradient(circle at 70% 88%, rgba(80, 200, 120, 0.10), transparent 18%),
         linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 100%);
+      touch-action: manipulation;
     }
 
     body {
       padding: 20px;
       overflow-x: hidden;
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     .page {
@@ -84,6 +88,7 @@
       -webkit-tap-highlight-color: transparent;
       transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
       touch-action: manipulation;
+      -webkit-touch-callout: none;
     }
 
     .back-btn:hover {
@@ -149,6 +154,7 @@
       justify-content: center;
       padding: 12px 18px;
       font-size: 14px;
+      touch-action: manipulation;
     }
 
     .btn:hover { transform: translateY(-1px); }
@@ -294,10 +300,12 @@
       place-items: center;
       -webkit-tap-highlight-color: transparent;
       transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease, filter .18s ease;
-      touch-action: none;
+      touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
+      -webkit-touch-callout: none;
+      touch-callout: none;
     }
 
     .heart-button:hover {
@@ -631,7 +639,6 @@
         <div class="game-header">
           <div>
             <h1>爱意升级</h1>
-    
           </div>
 
           <div class="game-stats">
@@ -646,7 +653,7 @@
         </div>
 
         <div class="game-board" id="gameBoard">
-          <button class="heart-button" id="heartBtn" type="button" aria-label="点击或长按爱心增加颜色">
+          <button class="heart-button" id="heartBtn" type="button" aria-label="点击爱心增加颜色">
             <div class="floating-hearts" id="floatingHearts"></div>
             <div class="burst-particles" id="burstParticles"></div>
 
@@ -714,14 +721,8 @@
     let gameState = defaultGameState();
     let saveChain = Promise.resolve();
 
-    // 触摸/长按控制
-    let pressTimer = null;
-    let repeatTimer = null;
-    let pressStartedAt = 0;
-    let longPressStarted = false;
-    let isTouchPressing = false;
+    // 移动端点击抑制：避免 touch 触发后的 click 再来一次
     let suppressNextClickUntil = 0;
-    let activePointerId = null;
 
     function defaultGameState() {
       return {
@@ -1113,121 +1114,57 @@
       queueSaveGameState();
     }
 
-    function clearPressTimers() {
-      if (pressTimer) {
-        clearTimeout(pressTimer);
-        pressTimer = null;
-      }
-      if (repeatTimer) {
-        clearInterval(repeatTimer);
-        repeatTimer = null;
-      }
-      isTouchPressing = false;
-      longPressStarted = false;
-      activePointerId = null;
-    }
-
-    function startTouchPress(pointerId) {
-      if (!currentUser) return;
-      if (isTouchPressing) return;
-
-      isTouchPressing = true;
-      pressStartedAt = Date.now();
-      longPressStarted = false;
-      activePointerId = pointerId;
-      suppressNextClickUntil = Date.now() + 800;
-
-      clearPressTimers();
-
-      pressTimer = setTimeout(() => {
-        if (!isTouchPressing) return;
-        longPressStarted = true;
-        performIncrement();
-        repeatTimer = setInterval(() => {
-          if (!isTouchPressing) return;
-          performIncrement();
-        }, 200);
-      }, 220);
-    }
-
-    function endTouchPress() {
-      if (!isTouchPressing) return;
-
-      const duration = Date.now() - pressStartedAt;
-      const wasLongPress = longPressStarted;
-
-      clearPressTimers();
-
-      if (!wasLongPress && duration < 220) {
-        performIncrement();
-      }
-    }
-
-    function setupPointerSupport() {
-      const hasPointer = 'PointerEvent' in window;
-
-      if (hasPointer) {
+    function setupClickSupport() {
+      // 触摸/笔：直接在 pointerup 触发一次，避免系统双击缩放导致误触
+      // 鼠标：正常 click
+      if ('PointerEvent' in window) {
         heartBtn.addEventListener('pointerdown', (e) => {
           if (!currentUser) return;
-
-          if (e.pointerType === 'mouse') {
-            // 鼠标走 click，避免桌面双触发
-            return;
-          }
-
-          if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+          if (e.pointerType !== 'mouse') {
             e.preventDefault();
             try { heartBtn.setPointerCapture(e.pointerId); } catch {}
-            startTouchPress(e.pointerId);
           }
-        });
+        }, { passive: false });
 
         heartBtn.addEventListener('pointerup', (e) => {
-          if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+          if (!currentUser) return;
+          if (e.pointerType !== 'mouse') {
             e.preventDefault();
-            endTouchPress();
+            suppressNextClickUntil = Date.now() + 700;
+            performIncrement();
+          }
+        }, { passive: false });
+
+        heartBtn.addEventListener('pointercancel', (e) => {
+          if (e.pointerType !== 'mouse') {
+            suppressNextClickUntil = Date.now() + 300;
           }
         });
-
-        heartBtn.addEventListener('pointercancel', () => {
-          clearPressTimers();
-        });
-
-        heartBtn.addEventListener('lostpointercapture', () => {
-          clearPressTimers();
-        });
       } else {
-        // 旧浏览器兜底：触摸
-        heartBtn.addEventListener('touchstart', (e) => {
+        // 老旧浏览器兜底
+        heartBtn.addEventListener('touchend', (e) => {
           if (!currentUser) return;
           e.preventDefault();
-          startTouchPress(1);
+          suppressNextClickUntil = Date.now() + 700;
+          performIncrement();
         }, { passive: false });
-
-        heartBtn.addEventListener('touchend', (e) => {
-          e.preventDefault();
-          endTouchPress();
-        }, { passive: false });
-
-        heartBtn.addEventListener('touchcancel', () => {
-          clearPressTimers();
-        });
       }
 
-      // 桌面和键盘
       heartBtn.addEventListener('click', (e) => {
         if (!currentUser) return;
 
-        // 过滤掉触摸产生的 click，避免双加
+        // 防止移动端 touch/pointerup 之后再补一个 click
         if (Date.now() < suppressNextClickUntil) {
           e.preventDefault();
           return;
         }
 
+        e.preventDefault();
         performIncrement();
       });
 
       heartBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+      heartBtn.addEventListener('dblclick', (e) => e.preventDefault());
     }
 
     document.addEventListener('keydown', (e) => {
@@ -1241,6 +1178,11 @@
       }
     });
 
+    // 进一步抑制 iOS/Safari 的缩放手势
+    document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+    document.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
+    document.addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
+
     async function init() {
       currentUser = getCurrentUser();
       renderAuthState();
@@ -1249,7 +1191,7 @@
         gameState = defaultGameState();
         renderGame();
       }
-      setupPointerSupport();
+      setupClickSupport();
     }
 
     window.addEventListener('storage', (e) => {
