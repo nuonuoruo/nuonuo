@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>照片墙</title>
+
   <style>
     :root {
       --bg: #f5f5f7;
@@ -38,7 +39,9 @@
         linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 100%);
     }
 
-    body { padding: 24px; }
+    body {
+      padding: 24px;
+    }
 
     .page {
       max-width: 1280px;
@@ -68,6 +71,7 @@
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
+      min-width: 0;
     }
 
     .back-btn {
@@ -80,6 +84,8 @@
       font-weight: 600;
       transition: transform .15s ease, background .2s ease;
       white-space: nowrap;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .back-btn:hover {
@@ -151,10 +157,12 @@
       margin-top: 18px;
     }
 
+    /* 核心改动：更自适应的网格 */
     .gallery {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      align-items: start;
     }
 
     .photo-item {
@@ -170,6 +178,7 @@
       background: rgba(0,0,0,.04);
       cursor: pointer;
       overflow: hidden;
+      position: relative;
     }
 
     .photo-preview img {
@@ -195,6 +204,7 @@
       background: rgba(255,59,48,.92);
       color: #fff;
       box-shadow: 0 8px 18px rgba(255,59,48,.18);
+      width: calc(100% - 28px);
     }
 
     .loading-state,
@@ -210,7 +220,9 @@
       padding: 24px;
     }
 
-    .state-card { max-width: 360px; }
+    .state-card {
+      max-width: 360px;
+    }
 
     .state-icon {
       width: 74px;
@@ -313,46 +325,114 @@
       line-height: 1.5;
       white-space: pre-wrap;
       text-shadow: 0 2px 10px rgba(0,0,0,.4);
+      pointer-events: none;
     }
 
     @media (max-width: 1100px) {
       .gallery {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       }
     }
 
     @media (max-width: 820px) {
       .gallery {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 14px;
       }
     }
 
     @media (max-width: 720px) {
-      body { padding: 14px; }
+      body {
+        padding: 14px;
+      }
+
       .toolbar {
         top: 10px;
         padding: 14px 16px;
+        border-radius: 22px;
       }
+
+      .toolbar-left {
+        width: 100%;
+      }
+
       .toolbar-right {
         width: 100%;
         margin-left: 0;
       }
+
       .btn {
         width: 100%;
       }
-      .gallery {
-        grid-template-columns: 1fr;
+
+      .brand h1 {
+        font-size: 24px;
       }
+
+      .brand p {
+        font-size: 13px;
+      }
+
+      /* 手机上默认两列，提高可用性 */
+      .gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .photo-item {
+        border-radius: 18px;
+      }
+
+      .photo-preview {
+        aspect-ratio: 1 / 1;
+      }
+
+      .photo-action {
+        margin: 10px 10px 12px;
+        width: calc(100% - 20px);
+        padding: 9px 12px;
+        font-size: 12px;
+      }
+
       .modal {
         padding: 12px;
       }
+
       .modal-content {
         width: 100%;
         border-radius: 22px;
       }
+
+      .modal-caption {
+        left: 14px;
+        right: 64px;
+        bottom: 12px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      /* 特别小屏，仍尽量保持两列，但留足点击空间 */
+      .gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .photo-action {
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 340px) {
+      /* 超小屏再退回一列，避免挤压 */
+      .gallery {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="page">
     <header class="toolbar">
