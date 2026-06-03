@@ -44,6 +44,72 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+const PASSWORD_ITERATIONS = 120000;
+
+function bytesToBase64(bytes) {
+  let binary = '';
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary);
+}
+
+function base64ToBytes(base64) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+async function hashPassword(password, saltBase64) {
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits({
+    name: 'PBKDF2',
+    hash: 'SHA-256',
+    salt: base64ToBytes(saltBase64),
+    iterations: PASSWORD_ITERATIONS,
+  }, keyMaterial, 256);
+  return bytesToBase64(new Uint8Array(bits));
+}
+
+async function createPasswordRecord(password) {
+  const salt = new Uint8Array(16);
+  crypto.getRandomValues(salt);
+  const passwordSalt = bytesToBase64(salt);
+  return {
+    passwordAlgo: 'PBKDF2-SHA256',
+    passwordIterations: PASSWORD_ITERATIONS,
+    passwordSalt,
+    passwordHash: await hashPassword(password, passwordSalt),
+  };
+}
+
+async function verifyPassword(user, password) {
+  if (!user) return false;
+  if (user.passwordHash && user.passwordSalt) {
+    return await hashPassword(password, user.passwordSalt) === user.passwordHash;
+  }
+  return typeof user.password === 'string' && user.password === password;
+}
+
+async function upgradePasswordIfNeeded(user, password) {
+  if (!user || user.passwordHash || user.password !== password) return;
+  const upgradedUser = {
+    ...user,
+    ...(await createPasswordRecord(password)),
+  };
+  delete upgradedUser.password;
+  await putJsonToCos(makeUserKey(user.username), upgradedUser);
+}
+
 function isImageKey(key) {
   return /\.(png|jpe?g|gif|webp|bmp|svg|heic|avif)$/i.test(String(key || ''));
 }
@@ -513,7 +579,7 @@ function ensureAuthModal() {
 
         await putJsonToCos(makeUserKey(username), {
           username,
-          password,
+          ...(await createPasswordRecord(password)),
           createdAt: new Date().toISOString()
         });
 
@@ -529,11 +595,16 @@ function ensureAuthModal() {
 
     try {
       const user = await getUserByName(username);
-      if (!user || user.password !== password) {
+      if (!user || !(await verifyPassword(user, password))) {
         alert('用户名或密码错误');
         return;
       }
 
+      try {
+        await upgradePasswordIfNeeded(user, password);
+      } catch (upgradeErr) {
+        console.warn('密码记录升级失败，将继续登录', upgradeErr);
+      }
       setCurrentUser({ username });
       closeAuthModal();
       alert('登录成功');
