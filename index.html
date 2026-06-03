@@ -620,119 +620,217 @@
         scroll-behavior: auto !important;
       }
     }
+
+    body.room-home {
+      padding: 0;
+      min-height: 100dvh;
+      background: #17110c;
+      overflow: hidden;
+    }
+
+    .room-viewport {
+      width: 100vw;
+      height: 100dvh;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+      background: #17110c;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .room-viewport::-webkit-scrollbar {
+      display: none;
+    }
+
+    .room-stage {
+      width: max(100vw, calc(100dvh * 1.453125));
+      height: 100dvh;
+      min-width: 1180px;
+      position: relative;
+      margin: 0 auto;
+      isolation: isolate;
+      overflow: hidden;
+      background: #17110c;
+      scroll-snap-align: center;
+    }
+
+    .room-scene {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .room-auth {
+      position: fixed;
+      top: 14px;
+      right: 28px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      width: 190px;
+      height: 48px;
+      color: #4d3826;
+      font-family: Georgia, "Times New Roman", "Songti SC", serif;
+      font-size: clamp(13px, 1.55vh, 16px);
+      line-height: 1;
+      text-shadow: 0 1px 0 rgba(255,255,255,.3);
+    }
+
+    .room-auth > * {
+      opacity: 0;
+    }
+
+    .room-auth .auth-status {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: inherit;
+      font-size: inherit;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .room-auth .btn {
+      padding: 0 0 0 8px;
+      min-width: 0;
+      height: auto;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      color: inherit;
+      font: inherit;
+      border-left: 1px solid rgba(77,56,38,.46);
+    }
+
+    .room-auth .btn:hover {
+      transform: none;
+      opacity: .72;
+    }
+
+    .room-auth .ghost-btn {
+      display: none;
+    }
+
+    .room-hotspot {
+      position: absolute;
+      z-index: 10;
+      width: clamp(48px, 5.6vh, 68px);
+      height: clamp(48px, 5.6vh, 68px);
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      outline: none;
+    }
+
+    .room-hotspot::before {
+      content: "";
+      position: absolute;
+      inset: 50% auto auto 50%;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      background: transparent;
+      box-shadow: none;
+      transition: transform .18s ease, opacity .18s ease;
+    }
+
+    .room-hotspot::after {
+      content: "";
+      position: absolute;
+      inset: 50% auto auto 50%;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      border: 1px solid transparent;
+    }
+
+    .room-hotspot:focus-visible::after {
+      border-color: rgba(255,255,255,.9);
+      box-shadow: 0 0 0 6px rgba(255,255,255,.24);
+    }
+
+    .room-hotspot:active::after {
+      background: rgba(255,255,255,.16);
+    }
+
+    @keyframes roomPulse {
+      0%, 100% { opacity: .42; transform: translate(-50%, -50%) scale(.86); }
+      50% { opacity: .82; transform: translate(-50%, -50%) scale(1.12); }
+    }
+
+    .hotspot-photo { left: 13.85%; top: 19.9%; }
+    .hotspot-days { left: 25.1%; top: 48.6%; }
+    .hotspot-message { left: 10.0%; top: 61.7%; }
+    .hotspot-game { left: 43.7%; top: 67.8%; }
+    .hotspot-pet { left: 69.5%; top: 69.2%; }
+    .hotspot-drink { left: 92.5%; top: 68.6%; }
+    .hotspot-video { left: 85.0%; top: 36.9%; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 720px) {
+      body.room-home {
+        background: #14100d;
+      }
+
+      .room-stage {
+        min-width: 0;
+        width: calc(100dvh * 1.453125);
+      }
+
+      .room-auth {
+        top: 10px;
+        right: 12px;
+        width: 150px;
+        height: 42px;
+      }
+
+      .room-hotspot {
+        width: 64px;
+        height: 64px;
+      }
+    }
   </style>
 </head>
-<body>
-  <div class="page">
-    <header class="topbar">
-      <div class="brand-row">
-        <div class="brand-dot" aria-hidden="true"></div>
-        <div class="brand-title">nuonuo小窝</div>
-      </div>
-
-      <div class="auth-box" id="authBox"></div>
-    </header>
-
-    <main class="hero-wrap">
-      <section class="hero">
-        <h1>nuonuo小窝</h1>
-        <p>把照片、留言、纪念日和小乐趣，都轻轻放在这里。</p>
-
-        <div class="app-grid">
-          <a class="app-link" href="./photo.html" aria-label="照片墙">
-            <div class="app-icon icon-photo has-image">
-              <img src="./assets/icons/optimized/home-photo.png" alt="" width="160" height="160" loading="eager" decoding="async" />
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M7 16l3-3 3 3 4-4 2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8"/>
-                <path d="M9 10.5A1.5 1.5 0 1 0 9 7.5a1.5 1.5 0 0 0 0 3Z" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="app-label">照片墙</div>
-          </a>
-
-          <a class="app-link" href="./days.html" aria-label="在一起多少天">
-            <div class="app-icon icon-days has-image">
-              <img src="./assets/icons/optimized/home-days.png" alt="" width="160" height="160" loading="eager" decoding="async" />
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M7 4.5h10A2.5 2.5 0 0 1 19.5 7v10A2.5 2.5 0 0 1 17 19.5H7A2.5 2.5 0 0 1 4.5 17V7A2.5 2.5 0 0 1 7 4.5Z" stroke="currentColor" stroke-width="1.8"/>
-                <path d="M8 3.8v3.2M16 3.8v3.2M7.2 9.5h9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                <path d="M9 12.8h6M9 15.8h4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="app-label">在一起多少天</div>
-          </a>
-
-          <a class="app-link" href="./message.html" aria-label="留言墙">
-            <div class="app-icon icon-message has-image">
-              <img src="./assets/icons/optimized/home-message.png" alt="" width="160" height="160" loading="eager" decoding="async" />
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M6.5 5.5h11A2.5 2.5 0 0 1 20 8v6a2.5 2.5 0 0 1-2.5 2.5H12l-4.5 3v-3H6.5A2.5 2.5 0 0 1 4 14V8a2.5 2.5 0 0 1 2.5-2.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-                <path d="M7.5 9h9M7.5 12h6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <div class="app-label">留言墙</div>
-          </a>
-
-          <!-- 原来的小游戏，保留不变 -->
-          <a class="app-link" href="./game.html" aria-label="爱心小游戏" data-requires-auth="true">
-            <div class="app-icon icon-game has-image">
-              <img src="./assets/icons/optimized/home-game.png" alt="" width="160" height="160" loading="eager" decoding="async" />
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M9.5 12.5c.5 0 .9-.4.9-.9V10h1.6c.5 0 .9-.4.9-.9s-.4-.9-.9-.9h-1.6V6.6c0-.5-.4-.9-.9-.9s-.9.4-.9.9v1.6H7.9c-.5 0-.9.4-.9.9s.4.9.9.9h1.6v1.6c0 .5.4.9.9.9Z" fill="currentColor"/>
-                <path d="M17.2 13.1c1.4 0 2.6 1.1 2.6 2.5 0 2.2-2.1 3.5-4.9 3.5-2.1 0-3.8-.7-5.1-1.9-1.3 1.2-3 1.9-5.1 1.9-2.8 0-4.9-1.3-4.9-3.5 0-1.4 1.2-2.5 2.6-2.5h1.8c.8 0 1.5-.5 1.8-1.2l.5-1.2c.2-.5.7-.8 1.2-.8h4.2c.5 0 1 .3 1.2.8l.5 1.2c.3.7 1 1.2 1.8 1.2h1.8Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                <circle cx="16.5" cy="9" r="1" fill="currentColor"/>
-                <circle cx="18.7" cy="11.2" r="1" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="app-label">爱心小游戏</div>
-          </a>
-<a class="app-link" href="./pet.html" aria-label="CoCo日记" data-requires-auth="true">
-  <div class="app-icon icon-pet has-image">
-    <img src="./assets/icons/optimized/home-pet.png" alt="" width="160" height="160" loading="eager" decoding="async" />
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M7.5 12.6c0-3 2.7-5.6 6.2-5.6s6.2 2.6 6.2 5.6c0 3.7-2.8 6.2-6.2 6.2s-6.2-2.5-6.2-6.2Z" stroke="currentColor" stroke-width="1.8" />
-      <path d="M8.2 8.6 6.4 6.8M15.8 8.6l1.8-1.8M10 13.1c.6.7 1.3 1 2.1 1s1.5-.3 2.1-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="10" cy="11" r="0.9" fill="currentColor"/>
-      <circle cx="14" cy="11" r="0.9" fill="currentColor"/>
-      <path d="M9 17.8c.8.5 1.8.7 3 .7s2.2-.2 3-.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-    </svg>
-  </div>
-  <div class="app-label">CoCo日记</div>
-</a>
-          <!-- 新增：酒桌游戏入口，不需要登录 -->
-          <a class="app-link" href="./drinkgame.html" aria-label="酒桌游戏">
-            <div class="app-icon icon-drink has-image">
-              <img src="./assets/icons/optimized/home-drink.png" alt="" width="160" height="160" loading="eager" decoding="async" />
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <rect x="4.3" y="4.3" width="15.4" height="15.4" rx="4.3" stroke="currentColor" stroke-width="1.8"/>
-                <circle cx="8.4" cy="8.4" r="1.2" fill="currentColor"/>
-                <circle cx="15.6" cy="8.4" r="1.2" fill="currentColor"/>
-                <circle cx="8.4" cy="15.6" r="1.2" fill="currentColor"/>
-                <circle cx="15.6" cy="15.6" r="1.2" fill="currentColor"/>
-                <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="app-label">酒桌游戏</div>
-          </a>
-
-          <a class="app-link" href="./video.html" aria-label="视频快放">
-            <div class="app-icon icon-video has-image">
-              <img src="./assets/icons/optimized/home-video.png" alt="" width="160" height="160" loading="eager" decoding="async" />
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5.5 6.5h8.8A2.7 2.7 0 0 1 17 9.2v5.6a2.7 2.7 0 0 1-2.7 2.7H5.5A2.7 2.7 0 0 1 2.8 14.8V9.2A2.7 2.7 0 0 1 5.5 6.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-                <path d="M17 10.2 20.8 8v8L17 13.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M8.5 9.6v4.8l4-2.4-4-2.4Z" fill="currentColor"/>
-              </svg>
-            </div>
-            <div class="app-label">视频快放</div>
-          </a>
-        </div>
-      </section>
+<body class="room-home">
+  <div class="room-viewport" id="roomViewport">
+    <main class="room-stage" aria-label="nuonuo小窝海景客厅主页">
+      <img class="room-scene" src="./assets/room/sea-living-room.jpg" alt="" width="1488" height="1024" fetchpriority="high" decoding="async" />
+      <a class="app-link room-hotspot hotspot-photo" href="./photo.html" aria-label="照片墙"><span class="sr-only">照片墙</span></a>
+      <a class="app-link room-hotspot hotspot-days" href="./days.html" aria-label="在一起多少天"><span class="sr-only">在一起多少天</span></a>
+      <a class="app-link room-hotspot hotspot-message" href="./message.html" aria-label="留言墙"><span class="sr-only">留言墙</span></a>
+      <a class="app-link room-hotspot hotspot-game" href="./game.html" aria-label="爱心小游戏" data-requires-auth="true"><span class="sr-only">爱心小游戏</span></a>
+      <a class="app-link room-hotspot hotspot-pet" href="./pet.html" aria-label="CoCo日记" data-requires-auth="true"><span class="sr-only">CoCo日记</span></a>
+      <a class="app-link room-hotspot hotspot-drink" href="./drinkgame.html" aria-label="酒桌游戏"><span class="sr-only">酒桌游戏</span></a>
+      <a class="app-link room-hotspot hotspot-video" href="./video.html" aria-label="视频快放"><span class="sr-only">视频快放</span></a>
     </main>
-
-    <div class="bottom-space" aria-hidden="true"></div>
   </div>
+
+  <div class="auth-box room-auth" id="authBox"></div>
 
   <div id="authModal" class="auth-modal" aria-hidden="true">
     <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
@@ -1131,6 +1229,14 @@
       }
     });
 
+    function centerRoomViewport() {
+      const viewport = document.getElementById('roomViewport');
+      if (!viewport || viewport.scrollWidth <= viewport.clientWidth) return;
+      viewport.scrollLeft = (viewport.scrollWidth - viewport.clientWidth) / 2;
+    }
+
+    window.addEventListener('load', centerRoomViewport, { once: true });
+    window.addEventListener('resize', centerRoomViewport);
     renderAuthState();
   </script>
 </body>
