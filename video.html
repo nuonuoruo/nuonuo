@@ -12,6 +12,7 @@
       --shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
       --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.06);
       --radius-xl: 28px;
+      --radius-lg: 22px;
     }
 
     * { box-sizing: border-box; }
@@ -23,13 +24,22 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
       background:
         radial-gradient(circle at top left, rgba(0, 113, 227, 0.10), transparent 28%),
         radial-gradient(circle at top right, rgba(255, 59, 48, 0.08), transparent 24%),
         linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 100%);
     }
 
-    body { padding: 24px; }
+    body {
+      padding: 24px;
+    }
+
+    body.no-scroll {
+      overflow: hidden;
+      padding: 0;
+      background: #000;
+    }
 
     .page {
       max-width: 980px;
@@ -85,7 +95,7 @@
       font-size: 14px;
     }
 
-    .card {
+    .video-card {
       margin-top: 18px;
       background: rgba(255, 255, 255, 0.54);
       border: 1px solid rgba(255, 255, 255, 0.78);
@@ -94,82 +104,131 @@
       padding: 18px;
     }
 
-    .player-shell {
+    .player {
+      position: relative;
       overflow: hidden;
+      min-height: 480px;
       border-radius: 24px;
       background: #000;
       box-shadow: var(--shadow-soft);
-      position: relative;
-      aspect-ratio: 16 / 9;
     }
 
     video {
       width: 100%;
       height: 100%;
+      min-height: 480px;
       display: block;
       object-fit: contain;
       background: #000;
     }
 
-    .empty {
+    .choose-empty {
       position: absolute;
       inset: 0;
+      z-index: 3;
       display: grid;
       place-items: center;
       padding: 24px;
-      text-align: center;
       color: #f5f5f7;
+      text-align: center;
       background: #000;
     }
 
-    .empty h2 {
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: -0.02em;
+    .choose-empty[hidden] {
+      display: none;
     }
 
-    .empty p {
-      margin: 8px 0 0;
-      color: rgba(255,255,255,.68);
+    .empty-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .empty-copy {
+      margin: 10px 0 18px;
+      color: rgba(255, 255, 255, 0.68);
       font-size: 14px;
       line-height: 1.7;
     }
 
-    .controls {
-      display: grid;
-      gap: 14px;
-      padding-top: 16px;
+    .top-controls,
+    .control-panel {
+      position: absolute;
+      z-index: 5;
+      left: 14px;
+      right: 14px;
     }
 
-    .file-row,
-    .button-row,
-    .speed-row,
-    .time-row {
+    .top-controls {
+      top: 14px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      pointer-events: none;
     }
 
-    .file-row { justify-content: space-between; }
+    .top-controls > * {
+      pointer-events: auto;
+    }
 
-    .file-name {
-      color: var(--subtext);
-      font-size: 14px;
+    .video-title {
       min-width: 0;
-      flex: 1 1 180px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      text-shadow: 0 1px 8px rgba(0,0,0,.6);
     }
 
-    .btn {
+    .control-panel {
+      bottom: 14px;
+      display: grid;
+      gap: 11px;
+      padding: 12px;
+      border-radius: 22px;
+      background: rgba(20, 20, 22, 0.72);
+      backdrop-filter: saturate(180%) blur(18px);
+      -webkit-backdrop-filter: saturate(180%) blur(18px);
+    }
+
+    .time-row,
+    .button-row,
+    .speed-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .time-row {
+      justify-content: space-between;
+      color: rgba(255,255,255,.76);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress {
+      width: 100%;
+      accent-color: #fff;
+    }
+
+    .button-row {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .speed-row {
+      padding: 3px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .btn,
+    .speed-btn {
       border: none;
-      border-radius: 999px;
-      min-height: 42px;
-      padding: 10px 16px;
-      font-size: 14px;
-      font-weight: 700;
       cursor: pointer;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
@@ -177,55 +236,50 @@
       white-space: nowrap;
     }
 
-    .btn:hover { transform: translateY(-1px); }
-    .btn:disabled { opacity: .45; cursor: default; transform: none; }
+    .btn:hover,
+    .speed-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn {
+      min-height: 38px;
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 14px;
+      font-weight: 800;
+    }
 
     .primary {
-      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
       color: #fff;
-      box-shadow: 0 10px 22px rgba(0, 113, 227, 0.20);
+      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
+      box-shadow: 0 10px 22px rgba(0, 113, 227, 0.22);
     }
 
-    .ghost {
-      background: rgba(0, 0, 0, 0.06);
+    .glass {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .light {
       color: var(--text);
-    }
-
-    .speed-row {
-      padding: 3px;
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.06);
-      flex-wrap: nowrap;
+      background: rgba(255, 255, 255, 0.88);
     }
 
     .speed-btn {
       flex: 1;
-      border: none;
+      height: 34px;
+      min-width: 0;
       border-radius: 9px;
-      height: 36px;
-      color: #3a3a3c;
+      color: #fff;
       background: transparent;
       font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
+      font-weight: 800;
     }
 
     .speed-btn.active {
-      background: rgba(255,255,255,.96);
-      color: var(--text);
-      box-shadow: 0 2px 8px rgba(0,0,0,.10);
-    }
-
-    .time-row {
-      justify-content: space-between;
-      color: var(--subtext);
-      font-size: 13px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .progress {
-      width: 100%;
-      accent-color: var(--primary);
+      color: #111;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,.16);
     }
 
     input[type="file"] {
@@ -236,88 +290,109 @@
       clip: rect(0 0 0 0);
     }
 
-    .fullscreen-mode {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: grid;
-      grid-template-rows: 1fr auto;
-      padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
-      background: #000;
+    .hint {
+      margin: 12px 2px 0;
+      color: var(--subtext);
+      font-size: 13px;
+      line-height: 1.7;
     }
 
-    .fullscreen-mode .topbar,
-    .fullscreen-mode .card > .controls,
-    .fullscreen-mode .file-row {
+    .is-fullscreen .topbar,
+    .is-fullscreen .hint {
       display: none;
     }
 
-    .fullscreen-mode .page,
-    .fullscreen-mode .card {
+    .is-fullscreen .page,
+    .is-fullscreen .video-card {
       max-width: none;
       margin: 0;
       padding: 0;
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      border-radius: 0;
-      min-height: 100%;
-      display: contents;
-    }
-
-    .fullscreen-mode .player-shell {
+      border: 0;
       border-radius: 0;
       box-shadow: none;
-      aspect-ratio: auto;
-      min-height: 0;
+      background: #000;
     }
 
-    .fullscreen-panel { display: none; }
-
-    .fullscreen-mode .fullscreen-panel {
-      display: grid;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 22px;
-      background: rgba(20, 20, 22, 0.72);
-      backdrop-filter: saturate(180%) blur(18px);
-      -webkit-backdrop-filter: saturate(180%) blur(18px);
+    .is-fullscreen .video-card {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
     }
 
-    .fullscreen-mode .fullscreen-panel .time-row {
-      color: rgba(255,255,255,.74);
+    .is-fullscreen .player {
+      width: 100vw;
+      height: 100vh;
+      min-height: 100vh;
+      border-radius: 0;
+      box-shadow: none;
     }
 
-    .fullscreen-mode .fullscreen-panel .ghost,
-    .fullscreen-mode .fullscreen-panel .speed-row {
-      background: rgba(255,255,255,.16);
-      color: #fff;
+    .is-fullscreen video {
+      height: 100vh;
+      min-height: 100vh;
     }
 
-    .fullscreen-mode .fullscreen-panel .speed-btn { color: #fff; }
+    .exit-fullscreen {
+      display: none;
+    }
 
-    .fullscreen-mode .fullscreen-panel .speed-btn.active {
-      color: #111;
-      background: #fff;
+    .is-fullscreen .enter-fullscreen {
+      display: none;
+    }
+
+    .is-fullscreen .exit-fullscreen {
+      display: inline-flex;
     }
 
     @media (max-width: 720px) {
       body { padding: 12px; }
+
       .topbar {
         border-radius: 22px;
         padding: 14px 16px;
       }
-      .title-wrap h1 { font-size: 21px; }
-      .card {
+
+      .title-wrap h1 {
+        font-size: 21px;
+      }
+
+      .title-wrap p {
+        font-size: 13px;
+      }
+
+      .video-card {
         border-radius: 24px;
-        padding: 12px;
+        padding: 10px;
       }
-      .player-shell {
+
+      .player,
+      video {
+        min-height: min(78vh, 620px);
+      }
+
+      .top-controls {
+        left: 10px;
+        right: 10px;
+        top: 10px;
+      }
+
+      .control-panel {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
         border-radius: 20px;
-        aspect-ratio: 1 / 1;
       }
-      .button-row .btn { flex: 1 1 72px; }
-      .speed-row { width: 100%; }
+
+      .btn {
+        flex: 1 1 58px;
+        min-height: 36px;
+        padding: 8px 9px;
+        font-size: 13px;
+      }
+
+      .speed-btn {
+        font-size: 13px;
+      }
     }
   </style>
 </head>
@@ -327,94 +402,73 @@
       <a class="back" href="./index.html">返回主页</a>
       <div class="title-wrap">
         <h1>视频快放</h1>
-        <p>从相册选择视频，本地快放和快进，不上传文件。</p>
+        <p>选择本机相册视频，直接倍速播放和快进。</p>
       </div>
     </header>
 
-    <main class="card">
-      <div class="player-shell">
-        <video id="video" playsinline webkit-playsinline></video>
-        <div id="empty" class="empty">
+    <main class="video-card" id="videoCard">
+      <section class="player" id="player">
+        <video id="video" playsinline webkit-playsinline preload="metadata"></video>
+
+        <div class="choose-empty" id="emptyState">
           <div>
-            <h2>选择一个视频</h2>
-            <p>支持相册视频，本页只在本机播放。</p>
+            <h2 class="empty-title">选择一个视频</h2>
+            <p class="empty-copy">视频只在本机播放，不上传到网络。</p>
+            <button class="btn primary" type="button" id="emptyChooseBtn">选择视频</button>
           </div>
         </div>
-      </div>
 
-      <section class="controls">
-        <div class="file-row">
-          <button id="chooseBtn" class="btn primary" type="button">选择视频</button>
-          <div id="fileName" class="file-name">未选择视频</div>
-          <input id="fileInput" type="file" accept="video/*" />
+        <div class="top-controls">
+          <div class="video-title" id="videoTitle">未选择视频</div>
+          <div>
+            <button class="btn light enter-fullscreen" type="button" id="enterFullBtn">全屏</button>
+            <button class="btn light exit-fullscreen" type="button" id="exitFullBtn">完成</button>
+          </div>
         </div>
 
-        <div class="time-row">
-          <span id="currentTime">00:00</span>
-          <span id="duration">00:00</span>
-        </div>
-        <input id="progress" class="progress" type="range" min="0" max="100" value="0" step="0.1" />
+        <div class="control-panel">
+          <div class="time-row">
+            <span id="currentTime">00:00</span>
+            <span id="duration">00:00</span>
+          </div>
+          <input id="progress" class="progress" type="range" min="0" max="100" value="0" step="0.1" />
 
-        <div class="button-row">
-          <button class="btn ghost" type="button" data-seek="-5">-5s</button>
-          <button id="playBtn" class="btn primary" type="button">播放</button>
-          <button class="btn ghost" type="button" data-seek="5">+5s</button>
-          <button class="btn ghost" type="button" data-seek="10">+10s</button>
-          <button class="btn ghost" type="button" data-seek="30">+30s</button>
-          <button id="fullBtn" class="btn ghost" type="button">全屏</button>
+          <div class="button-row">
+            <button class="btn glass" type="button" data-seek="-5">-5s</button>
+            <button class="btn primary" type="button" id="playBtn">播放</button>
+            <button class="btn glass" type="button" data-seek="5">+5s</button>
+            <button class="btn glass" type="button" data-seek="10">+10s</button>
+            <button class="btn glass" type="button" data-seek="30">+30s</button>
+          </div>
+
+          <div class="speed-row" aria-label="播放速度">
+            <button class="speed-btn" type="button" data-speed="0.5">0.5x</button>
+            <button class="speed-btn active" type="button" data-speed="1">1x</button>
+            <button class="speed-btn" type="button" data-speed="1.5">1.5x</button>
+            <button class="speed-btn" type="button" data-speed="2">2x</button>
+            <button class="speed-btn" type="button" data-speed="4">4x</button>
+          </div>
         </div>
 
-        <div class="speed-row" aria-label="播放速度">
-          <button class="speed-btn" type="button" data-speed="0.5">0.5x</button>
-          <button class="speed-btn active" type="button" data-speed="1">1x</button>
-          <button class="speed-btn" type="button" data-speed="1.5">1.5x</button>
-          <button class="speed-btn" type="button" data-speed="2">2x</button>
-          <button class="speed-btn" type="button" data-speed="4">4x</button>
-        </div>
+        <input id="fileInput" type="file" accept="video/*" />
       </section>
-
-      <section class="fullscreen-panel">
-        <div class="time-row">
-          <span id="fullCurrentTime">00:00</span>
-          <span id="fullDuration">00:00</span>
-        </div>
-        <input id="fullProgress" class="progress" type="range" min="0" max="100" value="0" step="0.1" />
-        <div class="button-row">
-          <button class="btn ghost" type="button" data-seek="-5">-5s</button>
-          <button id="fullPlayBtn" class="btn primary" type="button">播放</button>
-          <button class="btn ghost" type="button" data-seek="5">+5s</button>
-          <button class="btn ghost" type="button" data-seek="10">+10s</button>
-          <button class="btn ghost" type="button" data-seek="30">+30s</button>
-          <button id="exitFullBtn" class="btn ghost" type="button">完成</button>
-        </div>
-        <div class="speed-row" aria-label="全屏播放速度">
-          <button class="speed-btn" type="button" data-speed="0.5">0.5x</button>
-          <button class="speed-btn active" type="button" data-speed="1">1x</button>
-          <button class="speed-btn" type="button" data-speed="1.5">1.5x</button>
-          <button class="speed-btn" type="button" data-speed="2">2x</button>
-          <button class="speed-btn" type="button" data-speed="4">4x</button>
-        </div>
-      </section>
+      <p class="hint">点“全屏”会进入页面内全屏，仍可使用倍速和快进按钮。iPad 上请用 Safari 打开。</p>
     </main>
   </div>
 
   <script>
     const body = document.body;
     const video = document.getElementById('video');
-    const empty = document.getElementById('empty');
     const fileInput = document.getElementById('fileInput');
-    const chooseBtn = document.getElementById('chooseBtn');
-    const fileName = document.getElementById('fileName');
+    const emptyState = document.getElementById('emptyState');
+    const emptyChooseBtn = document.getElementById('emptyChooseBtn');
+    const videoTitle = document.getElementById('videoTitle');
     const playBtn = document.getElementById('playBtn');
-    const fullPlayBtn = document.getElementById('fullPlayBtn');
-    const fullBtn = document.getElementById('fullBtn');
+    const enterFullBtn = document.getElementById('enterFullBtn');
     const exitFullBtn = document.getElementById('exitFullBtn');
     const progress = document.getElementById('progress');
-    const fullProgress = document.getElementById('fullProgress');
     const currentTimeEl = document.getElementById('currentTime');
     const durationEl = document.getElementById('duration');
-    const fullCurrentTimeEl = document.getElementById('fullCurrentTime');
-    const fullDurationEl = document.getElementById('fullDuration');
 
     let objectUrl = '';
     let currentSpeed = 1;
@@ -428,13 +482,11 @@
     }
 
     function hasVideo() {
-      return Boolean(video.src);
+      return Boolean(video.currentSrc || video.src);
     }
 
-    function syncButtons() {
-      const text = video.paused ? '播放' : '暂停';
-      playBtn.textContent = text;
-      fullPlayBtn.textContent = text;
+    function syncPlayButton() {
+      playBtn.textContent = video.paused ? '播放' : '暂停';
     }
 
     function syncTime() {
@@ -443,19 +495,30 @@
       const percent = duration ? (current / duration) * 100 : 0;
 
       currentTimeEl.textContent = formatTime(current);
-      fullCurrentTimeEl.textContent = formatTime(current);
       durationEl.textContent = formatTime(duration);
-      fullDurationEl.textContent = formatTime(duration);
       progress.value = String(percent);
-      fullProgress.value = String(percent);
     }
 
     function setSpeed(speed) {
       currentSpeed = speed;
+      video.defaultPlaybackRate = speed;
       video.playbackRate = speed;
+      syncSpeedButtons(speed);
+    }
+
+    function syncSpeedButtons(speed) {
       document.querySelectorAll('[data-speed]').forEach(button => {
         button.classList.toggle('active', Number(button.dataset.speed) === speed);
       });
+    }
+
+    async function playVideo() {
+      try {
+        video.playbackRate = currentSpeed;
+        await video.play();
+      } catch {
+        syncPlayButton();
+      }
     }
 
     function togglePlay() {
@@ -463,32 +526,48 @@
         fileInput.click();
         return;
       }
+
       if (video.paused) {
-        video.play().catch(() => {});
+        void playVideo();
       } else {
         video.pause();
       }
-      syncButtons();
+      syncPlayButton();
     }
 
     function seekBy(seconds) {
       if (!hasVideo()) return;
-      const duration = Number.isFinite(video.duration) ? video.duration : video.currentTime + seconds;
-      video.currentTime = Math.min(Math.max(video.currentTime + seconds, 0), duration);
+      const end = Number.isFinite(video.duration) ? video.duration : video.currentTime + seconds;
+      video.currentTime = Math.min(Math.max(video.currentTime + seconds, 0), end);
+      syncTime();
     }
 
     function seekToPercent(value) {
       if (!hasVideo() || !Number.isFinite(video.duration)) return;
       video.currentTime = (Number(value) / 100) * video.duration;
+      syncTime();
     }
 
-    chooseBtn.addEventListener('click', () => fileInput.click());
+    function enterFullScreen() {
+      if (!hasVideo()) {
+        fileInput.click();
+        return;
+      }
+      body.classList.add('is-fullscreen', 'no-scroll');
+    }
+
+    function exitFullScreen() {
+      body.classList.remove('is-fullscreen', 'no-scroll');
+    }
+
+    function chooseFile() {
+      fileInput.click();
+    }
+
+    emptyChooseBtn.addEventListener('click', chooseFile);
     playBtn.addEventListener('click', togglePlay);
-    fullPlayBtn.addEventListener('click', togglePlay);
-    fullBtn.addEventListener('click', () => {
-      if (hasVideo()) body.classList.add('fullscreen-mode');
-    });
-    exitFullBtn.addEventListener('click', () => body.classList.remove('fullscreen-mode'));
+    enterFullBtn.addEventListener('click', enterFullScreen);
+    exitFullBtn.addEventListener('click', exitFullScreen);
 
     fileInput.addEventListener('change', () => {
       const file = fileInput.files && fileInput.files[0];
@@ -497,11 +576,11 @@
       if (objectUrl) URL.revokeObjectURL(objectUrl);
       objectUrl = URL.createObjectURL(file);
       video.src = objectUrl;
-      video.playbackRate = currentSpeed;
-      fileName.textContent = file.name;
-      empty.hidden = true;
-      video.play().catch(() => {});
-      syncButtons();
+      videoTitle.textContent = file.name || '相册视频';
+      emptyState.hidden = true;
+      setSpeed(currentSpeed);
+      video.load();
+      void playVideo();
     });
 
     document.querySelectorAll('[data-seek]').forEach(button => {
@@ -513,19 +592,31 @@
     });
 
     progress.addEventListener('input', event => seekToPercent(event.target.value));
-    fullProgress.addEventListener('input', event => seekToPercent(event.target.value));
+    video.addEventListener('loadedmetadata', () => {
+      setSpeed(currentSpeed);
+      syncTime();
+    });
+    video.addEventListener('ratechange', () => {
+      currentSpeed = video.playbackRate || currentSpeed;
+      syncSpeedButtons(currentSpeed);
+    });
     video.addEventListener('timeupdate', syncTime);
-    video.addEventListener('loadedmetadata', syncTime);
-    video.addEventListener('play', syncButtons);
-    video.addEventListener('pause', syncButtons);
-    video.addEventListener('ended', syncButtons);
+    video.addEventListener('play', syncPlayButton);
+    video.addEventListener('pause', syncPlayButton);
+    video.addEventListener('ended', syncPlayButton);
 
     document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') body.classList.remove('fullscreen-mode');
+      if (event.key === 'Escape') exitFullScreen();
+      if (event.key === ' ') {
+        event.preventDefault();
+        togglePlay();
+      }
+      if (event.key === 'ArrowLeft') seekBy(-5);
+      if (event.key === 'ArrowRight') seekBy(5);
     });
 
     syncTime();
-    syncButtons();
+    syncPlayButton();
   </script>
 </body>
 </html>
