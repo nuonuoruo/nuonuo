@@ -208,6 +208,7 @@
       background: rgba(20, 20, 22, 0.72);
       backdrop-filter: saturate(180%) blur(18px);
       -webkit-backdrop-filter: saturate(180%) blur(18px);
+      transition: opacity .18s ease, transform .18s ease;
     }
 
     .time-row,
@@ -364,6 +365,16 @@
       display: inline-flex;
     }
 
+    .is-fullscreen.controls-hidden .top-controls,
+    .is-fullscreen.controls-hidden .control-panel {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .is-fullscreen.controls-hidden .control-panel {
+      transform: translateY(14px);
+    }
+
     @media (max-width: 720px) {
       body { padding: 12px; }
 
@@ -493,6 +504,9 @@
     const playBtn = document.getElementById('playBtn');
     const enterFullBtn = document.getElementById('enterFullBtn');
     const exitFullBtn = document.getElementById('exitFullBtn');
+    const player = document.getElementById('player');
+    const controlPanel = document.querySelector('.control-panel');
+    const topControls = document.querySelector('.top-controls');
     const progress = document.getElementById('progress');
     const currentTimeEl = document.getElementById('currentTime');
     const durationEl = document.getElementById('duration');
@@ -588,15 +602,27 @@
         return;
       }
       body.classList.add('is-fullscreen', 'no-scroll');
+      body.classList.remove('controls-hidden');
     }
 
     function exitFullScreen() {
-      body.classList.remove('is-fullscreen', 'no-scroll');
+      body.classList.remove('is-fullscreen', 'no-scroll', 'controls-hidden');
+    }
+
+    function toggleFullScreenControls() {
+      if (!body.classList.contains('is-fullscreen') || !hasVideo()) return;
+      body.classList.toggle('controls-hidden');
     }
 
     playBtn.addEventListener('click', togglePlay);
     enterFullBtn.addEventListener('click', enterFullScreen);
     exitFullBtn.addEventListener('click', exitFullScreen);
+    player.addEventListener('click', event => {
+      if (event.target.closest('.control-panel, .top-controls, input, button, label')) return;
+      toggleFullScreenControls();
+    });
+    controlPanel.addEventListener('click', event => event.stopPropagation());
+    topControls.addEventListener('click', event => event.stopPropagation());
     photoInput.addEventListener('click', () => {
       emptyCopy.textContent = '正在等待系统相册确认。如果不能返回网页，请用“从文件选择”。';
     });
