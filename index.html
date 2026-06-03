@@ -622,6 +622,10 @@
     }
 
     body.room-home {
+      --mx: 0;
+      --my: 0;
+      --cursor-x: 50vw;
+      --cursor-y: 50vh;
       padding: 0;
       min-height: 100dvh;
       background: #17110c;
@@ -654,6 +658,28 @@
       overflow: hidden;
       background: #17110c;
       scroll-snap-align: center;
+      perspective: 1100px;
+    }
+
+    .room-world {
+      position: absolute;
+      inset: 0;
+      transform:
+        rotateX(0deg)
+        rotateY(0deg)
+        translate3d(0, 0, 0)
+        scale(1);
+      transform-origin: 50% 48%;
+      transition: transform .18s ease-out;
+      will-change: transform;
+    }
+
+    .room-home.has-cursor .room-world {
+      transform:
+        rotateX(calc(var(--my) * -1.05deg))
+        rotateY(calc(var(--mx) * 1.35deg))
+        translate3d(calc(var(--mx) * -8px), calc(var(--my) * -5px), 0)
+        scale(1.012);
     }
 
     .room-scene {
@@ -667,26 +693,49 @@
       -webkit-user-drag: none;
     }
 
+    .room-depth-light,
+    .room-depth-shadow {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      transition: opacity .2s ease-out, transform .2s ease-out;
+    }
+
+    .room-depth-light {
+      background: radial-gradient(circle at calc(50% + var(--mx) * 18%) calc(34% + var(--my) * 10%), rgba(255,255,255,.22), transparent 34%);
+      mix-blend-mode: screen;
+      opacity: .45;
+    }
+
+    .room-depth-shadow {
+      background:
+        linear-gradient(calc(90deg + var(--mx) * 14deg), rgba(30, 20, 12, .18), transparent 22%, transparent 72%, rgba(30, 20, 12, .10)),
+        radial-gradient(circle at 50% 95%, rgba(24,16,10,.2), transparent 42%);
+      opacity: .58;
+    }
+
     .room-auth {
       position: fixed;
-      top: 14px;
-      right: 28px;
+      top: clamp(14px, 2.5vh, 26px);
+      right: clamp(18px, 3vw, 42px);
       z-index: 30;
       display: flex;
       align-items: center;
       justify-content: flex-end;
       gap: 8px;
-      width: 190px;
-      height: 48px;
+      min-height: 36px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 252, 245, .34);
+      border: 1px solid rgba(255,255,255,.38);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       color: #4d3826;
       font-family: Georgia, "Times New Roman", "Songti SC", serif;
       font-size: clamp(13px, 1.55vh, 16px);
       line-height: 1;
       text-shadow: 0 1px 0 rgba(255,255,255,.3);
-    }
-
-    .room-auth > * {
-      opacity: 0;
     }
 
     .room-auth .auth-status {
@@ -703,6 +752,7 @@
     .room-auth .btn {
       padding: 0 0 0 8px;
       min-width: 0;
+      width: auto;
       height: auto;
       border-radius: 0;
       background: transparent;
@@ -718,17 +768,17 @@
     }
 
     .room-auth .ghost-btn {
-      display: none;
+      display: inline-flex;
     }
 
     .room-hotspot {
       position: absolute;
       z-index: 10;
-      width: clamp(48px, 5.6vh, 68px);
-      height: clamp(48px, 5.6vh, 68px);
+      width: clamp(54px, 6.6vh, 78px);
+      height: clamp(54px, 6.6vh, 78px);
       border-radius: 999px;
       transform: translate(-50%, -50%);
-      cursor: pointer;
+      cursor: none;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
       outline: none;
@@ -772,13 +822,48 @@
       50% { opacity: .82; transform: translate(-50%, -50%) scale(1.12); }
     }
 
-    .hotspot-photo { left: 13.85%; top: 19.9%; }
-    .hotspot-days { left: 25.1%; top: 48.6%; }
-    .hotspot-message { left: 10.0%; top: 61.7%; }
-    .hotspot-game { left: 43.7%; top: 67.8%; }
-    .hotspot-pet { left: 69.5%; top: 69.2%; }
-    .hotspot-drink { left: 92.5%; top: 68.6%; }
-    .hotspot-video { left: 85.0%; top: 36.9%; }
+    .hotspot-photo { left: 12.25%; top: 19.45%; }
+    .hotspot-days { left: 23.95%; top: 47.85%; }
+    .hotspot-message { left: 8.55%; top: 60.1%; }
+    .hotspot-game { left: 42.15%; top: 66.15%; }
+    .hotspot-pet { left: 68.0%; top: 67.9%; }
+    .hotspot-drink { left: 91.0%; top: 67.15%; }
+    .hotspot-video { left: 83.5%; top: 35.7%; }
+
+    .room-cursor {
+      position: fixed;
+      left: var(--cursor-x);
+      top: var(--cursor-y);
+      z-index: 40;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      mix-blend-mode: screen;
+      background:
+        radial-gradient(circle, rgba(255,255,255,.98) 0 13%, rgba(255,255,255,.46) 14% 30%, transparent 62%);
+      box-shadow: 0 0 18px rgba(255,255,255,.72), 0 0 38px rgba(255,255,255,.38);
+      transition: opacity .16s ease, width .16s ease, height .16s ease;
+      animation: cursorBlink 1.25s ease-in-out infinite;
+    }
+
+    .room-home.has-cursor .room-cursor {
+      opacity: .86;
+    }
+
+    .room-home.hotspot-hover .room-cursor {
+      width: 46px;
+      height: 46px;
+      opacity: 1;
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { filter: brightness(1); }
+      45% { filter: brightness(1.38); }
+      62% { filter: brightness(.78); }
+    }
 
     .sr-only {
       position: absolute;
@@ -802,16 +887,61 @@
         width: calc(100dvh * 1.453125);
       }
 
+      .room-world {
+        inset: 0;
+        transform: none !important;
+      }
+
       .room-auth {
         top: 10px;
-        right: 12px;
-        width: 150px;
-        height: 42px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: auto;
+        min-width: 86px;
+        max-width: 132px;
+        font-size: 12px;
+        padding: 7px 9px;
+        min-height: 0;
+        gap: 7px;
+        justify-content: center;
+        overflow: visible;
+      }
+
+      .room-auth .auth-status {
+        display: none;
+      }
+
+      .room-auth .btn {
+        display: inline-flex !important;
+        flex: 0 0 auto !important;
+        width: auto !important;
+        padding: 0 0 0 7px;
+        line-height: 1;
+        white-space: nowrap;
       }
 
       .room-hotspot {
-        width: 64px;
-        height: 64px;
+        width: 74px;
+        height: 74px;
+        cursor: pointer;
+      }
+
+      .room-cursor,
+      .room-depth-light,
+      .room-depth-shadow {
+        display: none;
+      }
+    }
+
+    @media (min-width: 721px) and (max-width: 1180px) {
+      .room-stage {
+        min-width: 0;
+        width: calc(100dvh * 1.453125);
+      }
+
+      .room-world {
+        inset: 0;
       }
     }
   </style>
@@ -819,18 +949,27 @@
 <body class="room-home">
   <div class="room-viewport" id="roomViewport">
     <main class="room-stage" aria-label="nuonuo小窝海景客厅主页">
-      <img class="room-scene" src="./assets/room/sea-living-room.jpg" alt="" width="1488" height="1024" fetchpriority="high" decoding="async" />
-      <a class="app-link room-hotspot hotspot-photo" href="./photo.html" aria-label="照片墙"><span class="sr-only">照片墙</span></a>
-      <a class="app-link room-hotspot hotspot-days" href="./days.html" aria-label="在一起多少天"><span class="sr-only">在一起多少天</span></a>
-      <a class="app-link room-hotspot hotspot-message" href="./message.html" aria-label="留言墙"><span class="sr-only">留言墙</span></a>
-      <a class="app-link room-hotspot hotspot-game" href="./game.html" aria-label="爱心小游戏" data-requires-auth="true"><span class="sr-only">爱心小游戏</span></a>
-      <a class="app-link room-hotspot hotspot-pet" href="./pet.html" aria-label="CoCo日记" data-requires-auth="true"><span class="sr-only">CoCo日记</span></a>
-      <a class="app-link room-hotspot hotspot-drink" href="./drinkgame.html" aria-label="酒桌游戏"><span class="sr-only">酒桌游戏</span></a>
-      <a class="app-link room-hotspot hotspot-video" href="./video.html" aria-label="视频快放"><span class="sr-only">视频快放</span></a>
+      <div class="room-world" id="roomWorld">
+        <picture>
+          <source media="(max-width: 720px)" srcset="./assets/room/sea-living-room-960.jpg" />
+          <source media="(max-width: 1180px)" srcset="./assets/room/sea-living-room-1280.jpg" />
+          <img class="room-scene" src="./assets/room/sea-living-room.jpg" alt="" width="1488" height="1024" fetchpriority="high" decoding="async" />
+        </picture>
+        <div class="room-depth-light" aria-hidden="true"></div>
+        <div class="room-depth-shadow" aria-hidden="true"></div>
+        <a class="app-link room-hotspot hotspot-photo" href="./photo.html" aria-label="照片墙"><span class="sr-only">照片墙</span></a>
+        <a class="app-link room-hotspot hotspot-days" href="./days.html" aria-label="在一起多少天"><span class="sr-only">在一起多少天</span></a>
+        <a class="app-link room-hotspot hotspot-message" href="./message.html" aria-label="留言墙"><span class="sr-only">留言墙</span></a>
+        <a class="app-link room-hotspot hotspot-game" href="./game.html" aria-label="爱心小游戏" data-requires-auth="true"><span class="sr-only">爱心小游戏</span></a>
+        <a class="app-link room-hotspot hotspot-pet" href="./pet.html" aria-label="CoCo日记" data-requires-auth="true"><span class="sr-only">CoCo日记</span></a>
+        <a class="app-link room-hotspot hotspot-drink" href="./drinkgame.html" aria-label="酒桌游戏"><span class="sr-only">酒桌游戏</span></a>
+        <a class="app-link room-hotspot hotspot-video" href="./video.html" aria-label="视频快放"><span class="sr-only">视频快放</span></a>
+      </div>
     </main>
   </div>
 
   <div class="auth-box room-auth" id="authBox"></div>
+  <div class="room-cursor" id="roomCursor" aria-hidden="true"></div>
 
   <div id="authModal" class="auth-modal" aria-hidden="true">
     <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
@@ -1235,8 +1374,65 @@
       viewport.scrollLeft = (viewport.scrollWidth - viewport.clientWidth) / 2;
     }
 
+    function setupRoomDepth() {
+      const body = document.body;
+      const viewport = document.getElementById('roomViewport');
+      const stage = document.querySelector('.room-stage');
+      const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      if (!viewport || !stage || !finePointer) return;
+
+      let raf = 0;
+      let lastEvent = null;
+      let activeHotspot = null;
+
+      const applyDepth = () => {
+        raf = 0;
+        if (!lastEvent) return;
+        const rect = viewport.getBoundingClientRect();
+        const x = (lastEvent.clientX - rect.left) / rect.width;
+        const y = (lastEvent.clientY - rect.top) / rect.height;
+        const mx = Math.max(-1, Math.min(1, (x - .5) * 2));
+        const my = Math.max(-1, Math.min(1, (y - .5) * 2));
+        body.style.setProperty('--mx', mx.toFixed(3));
+        body.style.setProperty('--my', my.toFixed(3));
+        if (activeHotspot) {
+          const hotspotRect = activeHotspot.getBoundingClientRect();
+          body.style.setProperty('--cursor-x', `${hotspotRect.left + hotspotRect.width / 2}px`);
+          body.style.setProperty('--cursor-y', `${hotspotRect.top + hotspotRect.height / 2}px`);
+        } else {
+          body.style.setProperty('--cursor-x', `${lastEvent.clientX}px`);
+          body.style.setProperty('--cursor-y', `${lastEvent.clientY}px`);
+        }
+      };
+
+      viewport.addEventListener('pointermove', (event) => {
+        lastEvent = event;
+        body.classList.add('has-cursor');
+        if (!raf) raf = requestAnimationFrame(applyDepth);
+      });
+
+      viewport.addEventListener('pointerleave', () => {
+        body.classList.remove('has-cursor', 'hotspot-hover');
+        body.style.setProperty('--mx', '0');
+        body.style.setProperty('--my', '0');
+      });
+
+      document.querySelectorAll('.room-hotspot').forEach((hotspot) => {
+        hotspot.addEventListener('pointerenter', () => {
+          activeHotspot = hotspot;
+          body.classList.add('hotspot-hover');
+          if (!raf) raf = requestAnimationFrame(applyDepth);
+        });
+        hotspot.addEventListener('pointerleave', () => {
+          activeHotspot = null;
+          body.classList.remove('hotspot-hover');
+        });
+      });
+    }
+
     window.addEventListener('load', centerRoomViewport, { once: true });
     window.addEventListener('resize', centerRoomViewport);
+    setupRoomDepth();
     renderAuthState();
   </script>
 </body>
