@@ -152,6 +152,21 @@
       line-height: 1.7;
     }
 
+    .choose-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .picker-note {
+      margin: 12px auto 0;
+      max-width: 260px;
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
     .top-controls,
     .control-panel {
       position: absolute;
@@ -227,6 +242,7 @@
     }
 
     .btn,
+    .file-label,
     .speed-btn {
       border: none;
       cursor: pointer;
@@ -241,7 +257,11 @@
       transform: translateY(-1px);
     }
 
-    .btn {
+    .btn,
+    .file-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       min-height: 38px;
       border-radius: 999px;
       padding: 9px 13px;
@@ -408,19 +428,24 @@
 
     <main class="video-card" id="videoCard">
       <section class="player" id="player">
-        <video id="video" playsinline webkit-playsinline preload="metadata"></video>
+        <video id="video" playsinline webkit-playsinline x-webkit-airplay="deny" preload="metadata"></video>
 
         <div class="choose-empty" id="emptyState">
           <div>
             <h2 class="empty-title">选择一个视频</h2>
-            <p class="empty-copy">视频只在本机播放，不上传到网络。</p>
-            <button class="btn primary" type="button" id="emptyChooseBtn">选择视频</button>
+            <p class="empty-copy" id="emptyCopy">视频只在本机播放，不上传到网络。</p>
+            <div class="choose-actions">
+              <label class="file-label primary" for="photoInput">从相册选择</label>
+              <label class="file-label glass" for="fileInput">从文件选择</label>
+            </div>
+            <div class="picker-note">相册界面如果只出现缩略图对勾但不返回网页，请改用“从文件选择”。</div>
           </div>
         </div>
 
         <div class="top-controls">
           <div class="video-title" id="videoTitle">未选择视频</div>
           <div>
+            <label class="file-label light" for="photoInput">换视频</label>
             <button class="btn light enter-fullscreen" type="button" id="enterFullBtn">全屏</button>
             <button class="btn light exit-fullscreen" type="button" id="exitFullBtn">完成</button>
           </div>
@@ -450,7 +475,8 @@
           </div>
         </div>
 
-        <input id="fileInput" type="file" accept="video/*" />
+        <input id="photoInput" type="file" accept="video/mp4,video/quicktime,video/x-m4v,.mp4,.mov,.m4v" />
+        <input id="fileInput" type="file" />
       </section>
       <p class="hint">点“全屏”会进入页面内全屏，仍可使用倍速和快进按钮。iPad 上请用 Safari 打开。</p>
     </main>
@@ -459,9 +485,10 @@
   <script>
     const body = document.body;
     const video = document.getElementById('video');
+    const photoInput = document.getElementById('photoInput');
     const fileInput = document.getElementById('fileInput');
     const emptyState = document.getElementById('emptyState');
-    const emptyChooseBtn = document.getElementById('emptyChooseBtn');
+    const emptyCopy = document.getElementById('emptyCopy');
     const videoTitle = document.getElementById('videoTitle');
     const playBtn = document.getElementById('playBtn');
     const enterFullBtn = document.getElementById('enterFullBtn');
@@ -521,9 +548,16 @@
       }
     }
 
+    function requestVideoFile() {
+      photoInput.value = '';
+      fileInput.value = '';
+      emptyCopy.textContent = '正在等待系统相册确认。如果不能返回网页，请用“从文件选择”。';
+      photoInput.click();
+    }
+
     function togglePlay() {
       if (!hasVideo()) {
-        fileInput.click();
+        requestVideoFile();
         return;
       }
 
@@ -550,7 +584,7 @@
 
     function enterFullScreen() {
       if (!hasVideo()) {
-        fileInput.click();
+        requestVideoFile();
         return;
       }
       body.classList.add('is-fullscreen', 'no-scroll');
@@ -560,28 +594,42 @@
       body.classList.remove('is-fullscreen', 'no-scroll');
     }
 
-    function chooseFile() {
-      fileInput.click();
-    }
-
-    emptyChooseBtn.addEventListener('click', chooseFile);
     playBtn.addEventListener('click', togglePlay);
     enterFullBtn.addEventListener('click', enterFullScreen);
     exitFullBtn.addEventListener('click', exitFullScreen);
+    photoInput.addEventListener('click', () => {
+      emptyCopy.textContent = '正在等待系统相册确认。如果不能返回网页，请用“从文件选择”。';
+    });
 
-    fileInput.addEventListener('change', () => {
-      const file = fileInput.files && fileInput.files[0];
-      if (!file) return;
+    fileInput.addEventListener('click', () => {
+      emptyCopy.textContent = '正在等待文件选择。';
+    });
+
+    function loadSelectedFile(input) {
+      const file = input.files && input.files[0];
+      if (!file) {
+        emptyCopy.textContent = '视频只在本机播放，不上传到网络。';
+        return;
+      }
+
+      if (!file.type.startsWith('video/') && !/\.(mp4|mov|m4v)$/i.test(file.name || '')) {
+        emptyCopy.textContent = '请选择 MP4、MOV 或 M4V 视频文件。';
+        return;
+      }
 
       if (objectUrl) URL.revokeObjectURL(objectUrl);
       objectUrl = URL.createObjectURL(file);
       video.src = objectUrl;
       videoTitle.textContent = file.name || '相册视频';
+      emptyCopy.textContent = '正在载入视频...';
       emptyState.hidden = true;
       setSpeed(currentSpeed);
       video.load();
       void playVideo();
-    });
+    }
+
+    photoInput.addEventListener('change', () => loadSelectedFile(photoInput));
+    fileInput.addEventListener('change', () => loadSelectedFile(fileInput));
 
     document.querySelectorAll('[data-seek]').forEach(button => {
       button.addEventListener('click', () => seekBy(Number(button.dataset.seek)));
