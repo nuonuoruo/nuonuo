@@ -672,7 +672,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
+      display: none;
       user-select: none;
       -webkit-user-drag: none;
     }
@@ -685,7 +685,7 @@
       height: 100%;
       pointer-events: none;
       filter: saturate(.96);
-      opacity: .72;
+      opacity: 1;
     }
 
     .room-auth {
@@ -900,8 +900,7 @@
         cursor: pointer;
       }
 
-      .room-cursor,
-      .room-3d {
+      .room-cursor {
         display: none;
       }
     }
@@ -1406,6 +1405,14 @@
     setupRoomDepth();
     renderAuthState();
   </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+      }
+    }
+  </script>
   <script type="module">
     import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
 
@@ -1413,7 +1420,7 @@
     const stage = document.querySelector('.room-stage');
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-    if (canvas && stage && finePointer) {
+    if (false && canvas && stage && finePointer) {
       const renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: true,
@@ -1697,6 +1704,240 @@
         targetX = 0;
         targetY = 0;
       });
+
+      window.addEventListener('resize', resize);
+      resize();
+      animate();
+    }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const canvas3d = document.getElementById('room3d');
+    const stage3d = document.querySelector('.room-stage');
+
+    if (canvas3d && stage3d) {
+      const renderer = new THREE.WebGLRenderer({
+        canvas: canvas3d,
+        antialias: true,
+        alpha: false,
+        powerPreference: 'high-performance'
+      });
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.03;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xe9f4fb);
+      scene.fog = new THREE.Fog(0xe9f4fb, 26, 58);
+
+      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 90);
+      camera.position.set(0, 2.35, 8.8);
+      camera.lookAt(0, 1.25, 0);
+
+      const hemi = new THREE.HemisphereLight(0xffffff, 0x6b523e, 1.45);
+      scene.add(hemi);
+
+      const sun = new THREE.DirectionalLight(0xfff3df, 3.2);
+      sun.position.set(-6, 8, 8);
+      sun.castShadow = true;
+      sun.shadow.mapSize.set(1024, 1024);
+      sun.shadow.camera.near = 1;
+      sun.shadow.camera.far = 30;
+      sun.shadow.camera.left = -10;
+      sun.shadow.camera.right = 10;
+      sun.shadow.camera.top = 8;
+      sun.shadow.camera.bottom = -8;
+      scene.add(sun);
+
+      const warmLamp = new THREE.PointLight(0xffc98d, 1.15, 12);
+      warmLamp.position.set(5.7, 2.2, -1.1);
+      scene.add(warmLamp);
+
+      const mat = {
+        floor: new THREE.MeshStandardMaterial({ color: 0xb7aa9d, roughness: .62, metalness: .05 }),
+        wall: new THREE.MeshStandardMaterial({ color: 0xe9e2da, roughness: .84, metalness: .02 }),
+        ceiling: new THREE.MeshStandardMaterial({ color: 0xf2eee8, roughness: .9 }),
+        wood: new THREE.MeshStandardMaterial({ color: 0x8f6a45, roughness: .48, metalness: .08 }),
+        stone: new THREE.MeshStandardMaterial({ color: 0xcac3bb, roughness: .68, metalness: .04 }),
+        glass: new THREE.MeshPhysicalMaterial({ color: 0xdff4ff, roughness: .04, metalness: 0, transmission: .45, transparent: true, opacity: .36 }),
+        ocean: new THREE.MeshStandardMaterial({ color: 0x5d9fc2, roughness: .34, metalness: .02 }),
+        dark: new THREE.MeshStandardMaterial({ color: 0x151413, roughness: .5, metalness: .18 }),
+        paper: new THREE.MeshStandardMaterial({ color: 0xf4eadc, roughness: .75 }),
+        cork: new THREE.MeshStandardMaterial({ color: 0xb8a188, roughness: .88 }),
+        brass: new THREE.MeshStandardMaterial({ color: 0xb58a52, roughness: .34, metalness: .72 }),
+        glow: new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .82 })
+      };
+
+      function mesh(geometry, material, position, rotation = [0, 0, 0], scale = [1, 1, 1]) {
+        const object = new THREE.Mesh(geometry, material);
+        object.position.set(...position);
+        object.rotation.set(...rotation);
+        object.scale.set(...scale);
+        object.castShadow = true;
+        object.receiveShadow = true;
+        scene.add(object);
+        return object;
+      }
+
+      function box(w, h, d, material, position, rotation, scale) {
+        return mesh(new THREE.BoxGeometry(w, h, d), material, position, rotation, scale);
+      }
+
+      function addGlow(position, size = .13) {
+        const core = mesh(new THREE.SphereGeometry(size, 32, 16), mat.glow, position);
+        core.castShadow = false;
+        core.receiveShadow = false;
+        const halo = mesh(new THREE.SphereGeometry(size * 2.6, 32, 16), new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: .16,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        }), position);
+        halo.castShadow = false;
+        halo.receiveShadow = false;
+      }
+
+      function addRoomShell() {
+        box(15, .12, 12, mat.floor, [0, -.05, 0]);
+        box(15, .18, 12, mat.ceiling, [0, 5.05, 0]);
+        box(.16, 5.2, 12, mat.wall, [-7.45, 2.5, 0]);
+        box(.16, 5.2, 12, mat.wall, [7.45, 2.5, 0]);
+        box(15, 5.2, .16, mat.wall, [0, 2.5, -5.95]);
+        box(2.2, 4.2, .12, mat.wall, [-6.35, 2.3, -5.86]);
+        box(2.2, 4.2, .12, mat.wall, [6.35, 2.3, -5.86]);
+
+        const windowGlass = box(8.6, 3.25, .06, mat.glass, [0, 2.55, -5.76]);
+        windowGlass.castShadow = false;
+        box(.08, 3.42, .12, mat.stone, [-4.3, 2.55, -5.7]);
+        box(.08, 3.42, .12, mat.stone, [0, 2.55, -5.7]);
+        box(.08, 3.42, .12, mat.stone, [4.3, 2.55, -5.7]);
+        box(8.85, .08, .12, mat.stone, [0, 4.28, -5.7]);
+        box(8.85, .08, .12, mat.stone, [0, .86, -5.7]);
+
+        const ocean = mesh(new THREE.PlaneGeometry(28, 8, 48, 8), mat.ocean, [0, 1.25, -8.7], [-Math.PI / 2.8, 0, 0]);
+        ocean.castShadow = false;
+        ocean.receiveShadow = false;
+        for (let i = 0; i < 8; i++) {
+          const wave = box(2.2 + i * .25, .018, .015, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .23 }), [-5 + i * 1.4, 1.4 + Math.sin(i) * .18, -7.45 - i * .08]);
+          wave.castShadow = false;
+          wave.receiveShadow = false;
+        }
+
+        box(4.1, .12, 2.4, mat.wood, [0, .34, 1.75]);
+        box(3.1, .11, 1.2, mat.wood, [0, .5, 1.05]);
+      }
+
+      function addEntryObjects() {
+        const photoGroup = new THREE.Group();
+        photoGroup.position.set(-6.9, 2.9, -2.4);
+        photoGroup.rotation.y = Math.PI / 2;
+        for (let i = 0; i < 7; i++) {
+          const frame = new THREE.Mesh(new THREE.BoxGeometry(.44, .58, .045), mat.wood);
+          frame.position.set((i % 2) * .54, Math.floor(i / 2) * -.66, 0);
+          const face = new THREE.Mesh(new THREE.BoxGeometry(.34, .46, .052), mat.paper);
+          face.position.copy(frame.position);
+          face.position.z += .035;
+          photoGroup.add(frame, face);
+        }
+        scene.add(photoGroup);
+        addGlow([-6.82, 3.35, -2.05]);
+
+        box(1.18, 1.45, .08, mat.cork, [-7.18, 1.75, .5], [0, Math.PI / 2, 0]);
+        for (let i = 0; i < 5; i++) {
+          box(.28, .2, .05, mat.paper, [-7.1, 2.18 - Math.floor(i / 2) * .38, .17 + (i % 2) * .42], [0, Math.PI / 2, 0]);
+        }
+        addGlow([-6.96, 1.55, .72]);
+
+        box(.78, 1.18, .08, mat.paper, [-3.85, 2.25, -3.85], [0, -.25, 0]);
+        box(.88, .08, .12, mat.wood, [-3.85, 2.9, -3.85], [0, -.25, 0]);
+        box(.08, 1.2, .08, mat.wood, [-4.24, 1.68, -3.84], [0, -.25, 0]);
+        box(.08, 1.2, .08, mat.wood, [-3.46, 1.68, -3.84], [0, -.25, 0]);
+        addGlow([-3.85, 1.55, -3.55]);
+
+        box(.72, .06, .42, mat.dark, [-1.12, .78, 1.25], [0, .15, 0]);
+        mesh(new THREE.SphereGeometry(.09, 16, 10), mat.glow, [-1.38, .84, 1.02]);
+        mesh(new THREE.SphereGeometry(.07, 16, 10), mat.glow, [-.84, .84, 1.1]);
+        addGlow([-1.0, .88, 1.24], .09);
+
+        box(1.9, 1.05, .1, mat.dark, [5.3, 2.75, -3.82], [0, -.28, 0]);
+        addGlow([5.3, 2.75, -3.5]);
+
+        box(.85, .05, .55, mat.brass, [6.5, 1.0, 1.25], [0, -.35, 0]);
+        box(.85, .05, .55, mat.brass, [6.5, 1.55, 1.25], [0, -.35, 0]);
+        addGlow([6.48, 1.2, 1.0]);
+
+        const petBed = mesh(new THREE.TorusGeometry(.48, .14, 18, 48), mat.paper, [3.1, .66, 1.6], [Math.PI / 2, 0, .08]);
+        petBed.scale.set(1.15, .82, 1);
+        addGlow([3.1, .82, 1.58]);
+      }
+
+      const loader = new GLTFLoader();
+      function loadModel(url, position, scale, rotation = [0, 0, 0]) {
+        loader.load(url, (gltf) => {
+          const root = gltf.scene;
+          root.position.set(...position);
+          root.rotation.set(...rotation);
+          root.scale.setScalar(scale);
+          root.traverse((node) => {
+            if (node.isMesh) {
+              node.castShadow = true;
+              node.receiveShadow = true;
+              if (node.material) {
+                node.material.roughness = Math.min(1, (node.material.roughness ?? .6) + .08);
+              }
+            }
+          });
+          scene.add(root);
+        }, undefined, (error) => console.warn('模型加载失败', url, error));
+      }
+
+      addRoomShell();
+      addEntryObjects();
+      loadModel('./assets/models/polyhaven/Sofa_01/Sofa_01_1k.gltf', [-.25, .12, 3.75], .022, [0, Math.PI, 0]);
+      loadModel('./assets/models/polyhaven/coffee_table_round_01/coffee_table_round_01_1k.gltf', [.1, .42, 1.45], .017, [0, .15, 0]);
+      loadModel('./assets/models/polyhaven/CoffeeCart_01/CoffeeCart_01_1k.gltf', [6.35, .08, 1.35], .013, [0, -1.35, 0]);
+
+      let target = { x: 0, y: 0 };
+      let current = { x: 0, y: 0 };
+
+      function resize() {
+        const rect = stage3d.getBoundingClientRect();
+        const isSmall = rect.width < 720;
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isSmall ? 1.15 : 1.7));
+        renderer.setSize(rect.width, rect.height, false);
+        camera.aspect = rect.width / rect.height;
+        camera.position.set(0, isSmall ? 2.1 : 2.35, isSmall ? 9.7 : 8.8);
+        camera.updateProjectionMatrix();
+      }
+
+      function animate() {
+        current.x += (target.x - current.x) * .075;
+        current.y += (target.y - current.y) * .075;
+        camera.position.x = current.x * .7;
+        camera.position.y = 2.35 - current.y * .28;
+        camera.lookAt(current.x * .22, 1.25 - current.y * .16, -.8);
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+
+      const viewport = document.getElementById('roomViewport');
+      const motionOK = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      if (motionOK && viewport) {
+        viewport.addEventListener('pointermove', (event) => {
+          const rect = viewport.getBoundingClientRect();
+          target.x = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - .5) * 2));
+          target.y = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - .5) * 2));
+        });
+        viewport.addEventListener('pointerleave', () => {
+          target.x = 0;
+          target.y = 0;
+        });
+      }
 
       window.addEventListener('resize', resize);
       resize();
