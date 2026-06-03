@@ -664,22 +664,6 @@
     .room-world {
       position: absolute;
       inset: 0;
-      transform:
-        rotateX(0deg)
-        rotateY(0deg)
-        translate3d(0, 0, 0)
-        scale(1);
-      transform-origin: 50% 48%;
-      transition: transform .18s ease-out;
-      will-change: transform;
-    }
-
-    .room-home.has-cursor .room-world {
-      transform:
-        rotateX(calc(var(--my) * -1.05deg))
-        rotateY(calc(var(--mx) * 1.35deg))
-        translate3d(calc(var(--mx) * -8px), calc(var(--my) * -5px), 0)
-        scale(1.012);
     }
 
     .room-scene {
@@ -693,26 +677,15 @@
       -webkit-user-drag: none;
     }
 
-    .room-depth-light,
-    .room-depth-shadow {
+    .room-3d {
       position: absolute;
       inset: 0;
+      z-index: 4;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
-      z-index: 3;
-      transition: opacity .2s ease-out, transform .2s ease-out;
-    }
-
-    .room-depth-light {
-      background: radial-gradient(circle at calc(50% + var(--mx) * 18%) calc(34% + var(--my) * 10%), rgba(255,255,255,.22), transparent 34%);
-      mix-blend-mode: screen;
-      opacity: .45;
-    }
-
-    .room-depth-shadow {
-      background:
-        linear-gradient(calc(90deg + var(--mx) * 14deg), rgba(30, 20, 12, .18), transparent 22%, transparent 72%, rgba(30, 20, 12, .10)),
-        radial-gradient(circle at 50% 95%, rgba(24,16,10,.2), transparent 42%);
-      opacity: .58;
+      filter: saturate(.96);
+      opacity: .72;
     }
 
     .room-auth {
@@ -928,8 +901,7 @@
       }
 
       .room-cursor,
-      .room-depth-light,
-      .room-depth-shadow {
+      .room-3d {
         display: none;
       }
     }
@@ -955,8 +927,7 @@
           <source media="(max-width: 1180px)" srcset="./assets/room/sea-living-room-1280.jpg" />
           <img class="room-scene" src="./assets/room/sea-living-room.jpg" alt="" width="1488" height="1024" fetchpriority="high" decoding="async" />
         </picture>
-        <div class="room-depth-light" aria-hidden="true"></div>
-        <div class="room-depth-shadow" aria-hidden="true"></div>
+        <canvas class="room-3d" id="room3d" aria-hidden="true"></canvas>
         <a class="app-link room-hotspot hotspot-photo" href="./photo.html" aria-label="照片墙"><span class="sr-only">照片墙</span></a>
         <a class="app-link room-hotspot hotspot-days" href="./days.html" aria-label="在一起多少天"><span class="sr-only">在一起多少天</span></a>
         <a class="app-link room-hotspot hotspot-message" href="./message.html" aria-label="留言墙"><span class="sr-only">留言墙</span></a>
@@ -1434,6 +1405,303 @@
     window.addEventListener('resize', centerRoomViewport);
     setupRoomDepth();
     renderAuthState();
+  </script>
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
+
+    const canvas = document.getElementById('room3d');
+    const stage = document.querySelector('.room-stage');
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    if (canvas && stage && finePointer) {
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: 'high-performance'
+      });
+      renderer.setClearColor(0x000000, 0);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 120);
+      camera.position.set(0, 0, 18);
+
+      const ambient = new THREE.HemisphereLight(0xfff7ec, 0x2a1a12, 2.4);
+      scene.add(ambient);
+
+      const sun = new THREE.DirectionalLight(0xffffff, 2.8);
+      sun.position.set(-3, 8, 9);
+      scene.add(sun);
+
+      const warmSide = new THREE.PointLight(0xffd7a8, 1.2, 18);
+      warmSide.position.set(7, 2, 6);
+      scene.add(warmSide);
+
+      const white = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: .68
+      });
+      const glow = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: .16,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const wood = new THREE.MeshStandardMaterial({
+        color: 0x8c6848,
+        roughness: .54,
+        metalness: .08,
+        transparent: true,
+        opacity: .62
+      });
+      const fabric = new THREE.MeshStandardMaterial({
+        color: 0xd9c8b4,
+        roughness: .88,
+        metalness: .02,
+        transparent: true,
+        opacity: .58
+      });
+      const paper = new THREE.MeshStandardMaterial({
+        color: 0xf5eadb,
+        roughness: .72,
+        metalness: .01,
+        transparent: true,
+        opacity: .5
+      });
+      const dark = new THREE.MeshStandardMaterial({
+        color: 0x161412,
+        roughness: .48,
+        metalness: .18,
+        transparent: true,
+        opacity: .6
+      });
+      const brass = new THREE.MeshStandardMaterial({
+        color: 0xb28a55,
+        roughness: .36,
+        metalness: .72,
+        transparent: true,
+        opacity: .62
+      });
+
+      const hotspots = [
+        { id: 'photo', x: .1225, y: .1945, z: 1.2 },
+        { id: 'days', x: .2395, y: .4785, z: 1.8 },
+        { id: 'message', x: .0855, y: .601, z: 2.1 },
+        { id: 'game', x: .4215, y: .6615, z: 3.2 },
+        { id: 'pet', x: .68, y: .679, z: 3.0 },
+        { id: 'drink', x: .91, y: .6715, z: 2.7 },
+        { id: 'video', x: .835, y: .357, z: 1.6 }
+      ];
+
+      let view = { w: 16, h: 11 };
+      const groups = new Map();
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+
+      function toWorld(x, y, z = 0) {
+        return new THREE.Vector3((x - .5) * view.w, (.5 - y) * view.h, z);
+      }
+
+      function box(w, h, d, mat, x = 0, y = 0, z = 0) {
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+        mesh.position.set(x, y, z);
+        return mesh;
+      }
+
+      function dot(group) {
+        const core = new THREE.Mesh(new THREE.SphereGeometry(.07, 24, 16), white);
+        const halo = new THREE.Mesh(new THREE.SphereGeometry(.2, 32, 16), glow);
+        group.add(core, halo);
+      }
+
+      function makePhotoWall() {
+        const g = new THREE.Group();
+        for (let i = 0; i < 5; i++) {
+          const frame = box(.45, .58, .045, wood, (i % 2) * .38 - .18, Math.floor(i / 2) * -.38 + .36, 0);
+          const face = box(.34, .46, .052, paper, frame.position.x, frame.position.y, .035);
+          g.add(frame, face);
+        }
+        g.rotation.y = .32;
+        dot(g);
+        return g;
+      }
+
+      function makeMemoBoard() {
+        const g = new THREE.Group();
+        g.add(box(.88, .64, .06, fabric, 0, 0, 0));
+        for (let i = 0; i < 4; i++) {
+          g.add(box(.22, .18, .07, paper, (i % 2) * .28 - .14, Math.floor(i / 2) * -.22 + .12, .04));
+        }
+        g.rotation.y = .25;
+        dot(g);
+        return g;
+      }
+
+      function makeCalendar() {
+        const g = new THREE.Group();
+        g.add(box(.7, .98, .06, paper, 0, .05, 0));
+        g.add(box(.78, .08, .08, wood, 0, .58, .04));
+        g.add(box(.08, .9, .08, wood, -.46, -.18, -.05));
+        g.add(box(.08, .9, .08, wood, .46, -.18, -.05));
+        for (let i = 0; i < 3; i++) {
+          const ring = new THREE.Mesh(new THREE.TorusGeometry(.065, .012, 10, 20), brass);
+          ring.position.set((i - 1) * .18, .62, .08);
+          ring.rotation.x = Math.PI / 2;
+          g.add(ring);
+        }
+        g.rotation.y = -.18;
+        dot(g);
+        return g;
+      }
+
+      function makeGame() {
+        const g = new THREE.Group();
+        const pad = new THREE.Mesh(new THREE.CapsuleGeometry(.16, .38, 8, 16), dark);
+        pad.rotation.z = Math.PI / 2;
+        pad.scale.set(1.45, .75, .28);
+        g.add(pad);
+        g.add(box(.11, .025, .035, white, -.16, .02, .14));
+        g.add(box(.025, .11, .035, white, -.16, .02, .14));
+        const btn1 = new THREE.Mesh(new THREE.SphereGeometry(.045, 12, 8), white);
+        btn1.position.set(.2, .05, .14);
+        const btn2 = btn1.clone();
+        btn2.position.set(.28, -.02, .14);
+        g.add(btn1, btn2);
+        g.rotation.x = -.85;
+        g.rotation.z = -.03;
+        dot(g);
+        return g;
+      }
+
+      function makePet() {
+        const g = new THREE.Group();
+        const bed = new THREE.Mesh(new THREE.TorusGeometry(.38, .11, 14, 40), fabric);
+        bed.rotation.x = Math.PI / 2;
+        g.add(bed);
+        const cushion = new THREE.Mesh(new THREE.SphereGeometry(.28, 24, 14), fabric);
+        cushion.scale.set(1.1, .24, .82);
+        cushion.position.z = -.02;
+        g.add(cushion);
+        g.rotation.x = -.8;
+        dot(g);
+        return g;
+      }
+
+      function makeDrink() {
+        const g = new THREE.Group();
+        g.add(box(.82, .08, .42, brass, 0, .18, 0));
+        g.add(box(.82, .08, .42, brass, 0, -.18, 0));
+        for (const x of [-.35, .35]) {
+          for (const y of [-.22, .22]) g.add(box(.045, .72, .045, brass, x, 0, y));
+        }
+        for (let i = 0; i < 3; i++) {
+          const glass = new THREE.Mesh(new THREE.CylinderGeometry(.055, .075, .28, 16), new THREE.MeshPhysicalMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: .36,
+            roughness: .08,
+            transmission: .45
+          }));
+          glass.position.set((i - 1) * .18, .02, .08);
+          g.add(glass);
+        }
+        g.rotation.y = -.38;
+        dot(g);
+        return g;
+      }
+
+      function makeVideo() {
+        const g = new THREE.Group();
+        g.add(box(.95, .55, .055, new THREE.MeshStandardMaterial({ color: 0x1b1715, roughness: .34, metalness: .26 }), 0, 0, 0));
+        const play = new THREE.Shape();
+        play.moveTo(-.08, -.11);
+        play.lineTo(-.08, .11);
+        play.lineTo(.12, 0);
+        play.lineTo(-.08, -.11);
+        const mesh = new THREE.Mesh(new THREE.ShapeGeometry(play), white);
+        mesh.position.z = .04;
+        g.add(mesh);
+        g.rotation.y = -.28;
+        dot(g);
+        return g;
+      }
+
+      const makers = {
+        photo: makePhotoWall,
+        message: makeMemoBoard,
+        days: makeCalendar,
+        game: makeGame,
+        pet: makePet,
+        drink: makeDrink,
+        video: makeVideo
+      };
+
+      for (const item of hotspots) {
+        const group = makers[item.id]();
+        group.userData.baseScale = item.id === 'drink' ? .46 : item.id === 'video' ? .42 : .38;
+        group.userData.depth = item.z;
+        groups.set(item.id, group);
+        scene.add(group);
+      }
+
+      function resize() {
+        const rect = stage.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+        renderer.setPixelRatio(dpr);
+        renderer.setSize(rect.width, rect.height, false);
+        camera.aspect = rect.width / rect.height;
+        camera.updateProjectionMatrix();
+        view.h = 11;
+        view.w = view.h * camera.aspect;
+        for (const item of hotspots) {
+          const group = groups.get(item.id);
+          const pos = toWorld(item.x, item.y, item.z);
+          group.position.copy(pos);
+          group.userData.basePosition = pos.clone();
+          group.userData.baseRotationZ = group.rotation.z;
+          const s = group.userData.baseScale * Math.min(1.1, Math.max(.84, rect.height / 900));
+          group.scale.setScalar(s);
+        }
+      }
+
+      function animate() {
+        currentX += (targetX - currentX) * .08;
+        currentY += (targetY - currentY) * .08;
+        camera.position.x = currentX * .75;
+        camera.position.y = currentY * -.36;
+        camera.lookAt(currentX * .22, currentY * -.12, 0);
+        for (const [id, group] of groups) {
+          const depth = group.userData.depth || 1;
+          const base = group.userData.basePosition;
+          if (base) {
+            group.position.set(base.x + currentX * depth * .08, base.y - currentY * depth * .04, base.z);
+          }
+          group.rotation.z = (group.userData.baseRotationZ || 0) + Math.sin(performance.now() / 1200 + depth) * .015;
+        }
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+
+      const viewport = document.getElementById('roomViewport');
+      viewport.addEventListener('pointermove', (event) => {
+        const rect = viewport.getBoundingClientRect();
+        targetX = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - .5) * 2));
+        targetY = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - .5) * 2));
+      });
+      viewport.addEventListener('pointerleave', () => {
+        targetX = 0;
+        targetY = 0;
+      });
+
+      window.addEventListener('resize', resize);
+      resize();
+      animate();
+    }
   </script>
 </body>
 </html>
