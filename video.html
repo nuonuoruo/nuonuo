@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>视频快放</title>
+  <style>
+    :root {
+      --text: #1d1d1f;
+      --subtext: #6e6e73;
+      --primary: #0071e3;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+      --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.06);
+      --radius-xl: 28px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background:
+        radial-gradient(circle at top left, rgba(0, 113, 227, 0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(255, 59, 48, 0.08), transparent 24%),
+        linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 100%);
+    }
+
+    body { padding: 24px; }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: saturate(180%) blur(18px);
+      -webkit-backdrop-filter: saturate(180%) blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .back {
+      text-decoration: none;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.05);
+      transition: background .2s ease, transform .15s ease;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .back:hover {
+      background: rgba(0, 0, 0, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .title-wrap h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+    }
+
+    .title-wrap p {
+      margin: 6px 0 0;
+      color: var(--subtext);
+      font-size: 14px;
+    }
+
+    .card {
+      margin-top: 18px;
+      background: rgba(255, 255, 255, 0.54);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .player-shell {
+      overflow: hidden;
+      border-radius: 24px;
+      background: #000;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      aspect-ratio: 16 / 9;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .empty {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+      color: #f5f5f7;
+      background: #000;
+    }
+
+    .empty h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    .empty p {
+      margin: 8px 0 0;
+      color: rgba(255,255,255,.68);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .controls {
+      display: grid;
+      gap: 14px;
+      padding-top: 16px;
+    }
+
+    .file-row,
+    .button-row,
+    .speed-row,
+    .time-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .file-row { justify-content: space-between; }
+
+    .file-name {
+      color: var(--subtext);
+      font-size: 14px;
+      min-width: 0;
+      flex: 1 1 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      min-height: 42px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .15s ease, background .2s ease, opacity .2s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: .45; cursor: default; transform: none; }
+
+    .primary {
+      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(0, 113, 227, 0.20);
+    }
+
+    .ghost {
+      background: rgba(0, 0, 0, 0.06);
+      color: var(--text);
+    }
+
+    .speed-row {
+      padding: 3px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.06);
+      flex-wrap: nowrap;
+    }
+
+    .speed-btn {
+      flex: 1;
+      border: none;
+      border-radius: 9px;
+      height: 36px;
+      color: #3a3a3c;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .speed-btn.active {
+      background: rgba(255,255,255,.96);
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(0,0,0,.10);
+    }
+
+    .time-row {
+      justify-content: space-between;
+      color: var(--subtext);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress {
+      width: 100%;
+      accent-color: var(--primary);
+    }
+
+    input[type="file"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+
+    .fullscreen-mode {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      background: #000;
+    }
+
+    .fullscreen-mode .topbar,
+    .fullscreen-mode .card > .controls,
+    .fullscreen-mode .file-row {
+      display: none;
+    }
+
+    .fullscreen-mode .page,
+    .fullscreen-mode .card {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      min-height: 100%;
+      display: contents;
+    }
+
+    .fullscreen-mode .player-shell {
+      border-radius: 0;
+      box-shadow: none;
+      aspect-ratio: auto;
+      min-height: 0;
+    }
+
+    .fullscreen-panel { display: none; }
+
+    .fullscreen-mode .fullscreen-panel {
+      display: grid;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 22px;
+      background: rgba(20, 20, 22, 0.72);
+      backdrop-filter: saturate(180%) blur(18px);
+      -webkit-backdrop-filter: saturate(180%) blur(18px);
+    }
+
+    .fullscreen-mode .fullscreen-panel .time-row {
+      color: rgba(255,255,255,.74);
+    }
+
+    .fullscreen-mode .fullscreen-panel .ghost,
+    .fullscreen-mode .fullscreen-panel .speed-row {
+      background: rgba(255,255,255,.16);
+      color: #fff;
+    }
+
+    .fullscreen-mode .fullscreen-panel .speed-btn { color: #fff; }
+
+    .fullscreen-mode .fullscreen-panel .speed-btn.active {
+      color: #111;
+      background: #fff;
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 12px; }
+      .topbar {
+        border-radius: 22px;
+        padding: 14px 16px;
+      }
+      .title-wrap h1 { font-size: 21px; }
+      .card {
+        border-radius: 24px;
+        padding: 12px;
+      }
+      .player-shell {
+        border-radius: 20px;
+        aspect-ratio: 1 / 1;
+      }
+      .button-row .btn { flex: 1 1 72px; }
+      .speed-row { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="back" href="./index.html">返回主页</a>
+      <div class="title-wrap">
+        <h1>视频快放</h1>
+        <p>从相册选择视频，本地快放和快进，不上传文件。</p>
+      </div>
+    </header>
+
+    <main class="card">
+      <div class="player-shell">
+        <video id="video" playsinline webkit-playsinline></video>
+        <div id="empty" class="empty">
+          <div>
+            <h2>选择一个视频</h2>
+            <p>支持相册视频，本页只在本机播放。</p>
+          </div>
+        </div>
+      </div>
+
+      <section class="controls">
+        <div class="file-row">
+          <button id="chooseBtn" class="btn primary" type="button">选择视频</button>
+          <div id="fileName" class="file-name">未选择视频</div>
+          <input id="fileInput" type="file" accept="video/*" />
+        </div>
+
+        <div class="time-row">
+          <span id="currentTime">00:00</span>
+          <span id="duration">00:00</span>
+        </div>
+        <input id="progress" class="progress" type="range" min="0" max="100" value="0" step="0.1" />
+
+        <div class="button-row">
+          <button class="btn ghost" type="button" data-seek="-5">-5s</button>
+          <button id="playBtn" class="btn primary" type="button">播放</button>
+          <button class="btn ghost" type="button" data-seek="5">+5s</button>
+          <button class="btn ghost" type="button" data-seek="10">+10s</button>
+          <button class="btn ghost" type="button" data-seek="30">+30s</button>
+          <button id="fullBtn" class="btn ghost" type="button">全屏</button>
+        </div>
+
+        <div class="speed-row" aria-label="播放速度">
+          <button class="speed-btn" type="button" data-speed="0.5">0.5x</button>
+          <button class="speed-btn active" type="button" data-speed="1">1x</button>
+          <button class="speed-btn" type="button" data-speed="1.5">1.5x</button>
+          <button class="speed-btn" type="button" data-speed="2">2x</button>
+          <button class="speed-btn" type="button" data-speed="4">4x</button>
+        </div>
+      </section>
+
+      <section class="fullscreen-panel">
+        <div class="time-row">
+          <span id="fullCurrentTime">00:00</span>
+          <span id="fullDuration">00:00</span>
+        </div>
+        <input id="fullProgress" class="progress" type="range" min="0" max="100" value="0" step="0.1" />
+        <div class="button-row">
+          <button class="btn ghost" type="button" data-seek="-5">-5s</button>
+          <button id="fullPlayBtn" class="btn primary" type="button">播放</button>
+          <button class="btn ghost" type="button" data-seek="5">+5s</button>
+          <button class="btn ghost" type="button" data-seek="10">+10s</button>
+          <button class="btn ghost" type="button" data-seek="30">+30s</button>
+          <button id="exitFullBtn" class="btn ghost" type="button">完成</button>
+        </div>
+        <div class="speed-row" aria-label="全屏播放速度">
+          <button class="speed-btn" type="button" data-speed="0.5">0.5x</button>
+          <button class="speed-btn active" type="button" data-speed="1">1x</button>
+          <button class="speed-btn" type="button" data-speed="1.5">1.5x</button>
+          <button class="speed-btn" type="button" data-speed="2">2x</button>
+          <button class="speed-btn" type="button" data-speed="4">4x</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const body = document.body;
+    const video = document.getElementById('video');
+    const empty = document.getElementById('empty');
+    const fileInput = document.getElementById('fileInput');
+    const chooseBtn = document.getElementById('chooseBtn');
+    const fileName = document.getElementById('fileName');
+    const playBtn = document.getElementById('playBtn');
+    const fullPlayBtn = document.getElementById('fullPlayBtn');
+    const fullBtn = document.getElementById('fullBtn');
+    const exitFullBtn = document.getElementById('exitFullBtn');
+    const progress = document.getElementById('progress');
+    const fullProgress = document.getElementById('fullProgress');
+    const currentTimeEl = document.getElementById('currentTime');
+    const durationEl = document.getElementById('duration');
+    const fullCurrentTimeEl = document.getElementById('fullCurrentTime');
+    const fullDurationEl = document.getElementById('fullDuration');
+
+    let objectUrl = '';
+    let currentSpeed = 1;
+
+    function formatTime(seconds) {
+      if (!Number.isFinite(seconds) || seconds < 0) return '00:00';
+      const total = Math.floor(seconds);
+      const minutes = Math.floor(total / 60);
+      const rest = total % 60;
+      return `${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`;
+    }
+
+    function hasVideo() {
+      return Boolean(video.src);
+    }
+
+    function syncButtons() {
+      const text = video.paused ? '播放' : '暂停';
+      playBtn.textContent = text;
+      fullPlayBtn.textContent = text;
+    }
+
+    function syncTime() {
+      const duration = Number.isFinite(video.duration) ? video.duration : 0;
+      const current = Number.isFinite(video.currentTime) ? video.currentTime : 0;
+      const percent = duration ? (current / duration) * 100 : 0;
+
+      currentTimeEl.textContent = formatTime(current);
+      fullCurrentTimeEl.textContent = formatTime(current);
+      durationEl.textContent = formatTime(duration);
+      fullDurationEl.textContent = formatTime(duration);
+      progress.value = String(percent);
+      fullProgress.value = String(percent);
+    }
+
+    function setSpeed(speed) {
+      currentSpeed = speed;
+      video.playbackRate = speed;
+      document.querySelectorAll('[data-speed]').forEach(button => {
+        button.classList.toggle('active', Number(button.dataset.speed) === speed);
+      });
+    }
+
+    function togglePlay() {
+      if (!hasVideo()) {
+        fileInput.click();
+        return;
+      }
+      if (video.paused) {
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+      syncButtons();
+    }
+
+    function seekBy(seconds) {
+      if (!hasVideo()) return;
+      const duration = Number.isFinite(video.duration) ? video.duration : video.currentTime + seconds;
+      video.currentTime = Math.min(Math.max(video.currentTime + seconds, 0), duration);
+    }
+
+    function seekToPercent(value) {
+      if (!hasVideo() || !Number.isFinite(video.duration)) return;
+      video.currentTime = (Number(value) / 100) * video.duration;
+    }
+
+    chooseBtn.addEventListener('click', () => fileInput.click());
+    playBtn.addEventListener('click', togglePlay);
+    fullPlayBtn.addEventListener('click', togglePlay);
+    fullBtn.addEventListener('click', () => {
+      if (hasVideo()) body.classList.add('fullscreen-mode');
+    });
+    exitFullBtn.addEventListener('click', () => body.classList.remove('fullscreen-mode'));
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      objectUrl = URL.createObjectURL(file);
+      video.src = objectUrl;
+      video.playbackRate = currentSpeed;
+      fileName.textContent = file.name;
+      empty.hidden = true;
+      video.play().catch(() => {});
+      syncButtons();
+    });
+
+    document.querySelectorAll('[data-seek]').forEach(button => {
+      button.addEventListener('click', () => seekBy(Number(button.dataset.seek)));
+    });
+
+    document.querySelectorAll('[data-speed]').forEach(button => {
+      button.addEventListener('click', () => setSpeed(Number(button.dataset.speed)));
+    });
+
+    progress.addEventListener('input', event => seekToPercent(event.target.value));
+    fullProgress.addEventListener('input', event => seekToPercent(event.target.value));
+    video.addEventListener('timeupdate', syncTime);
+    video.addEventListener('loadedmetadata', syncTime);
+    video.addEventListener('play', syncButtons);
+    video.addEventListener('pause', syncButtons);
+    video.addEventListener('ended', syncButtons);
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') body.classList.remove('fullscreen-mode');
+    });
+
+    syncTime();
+    syncButtons();
+  </script>
+</body>
+</html>
