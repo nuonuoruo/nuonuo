@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>主页</title>
+  <title>nuonuo小窝</title>
   <style>
     :root {
-      --bg1: #f2f6ff;
-      --bg2: #fff7fb;
-      --bg3: #f7fff7;
+      --bg1: #f7f8fb;
+      --bg2: #eef5ff;
+      --bg3: #fff7fb;
       --text: #1d1d1f;
       --subtext: #6e6e73;
-      --panel: rgba(255, 255, 255, 0.72);
-      --panel-strong: rgba(255, 255, 255, 0.9);
-      --stroke: rgba(255, 255, 255, 0.8);
-      --shadow: 0 18px 48px rgba(0, 0, 0, 0.07);
-      --shadow-soft: 0 8px 22px rgba(0, 0, 0, 0.05);
+      --panel: rgba(255, 255, 255, 0.66);
+      --panel-strong: rgba(255, 255, 255, 0.88);
+      --stroke: rgba(255, 255, 255, 0.78);
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.10);
+      --shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.07);
       --primary: #0a84ff;
       --primary-2: #0071e3;
       --danger: #ff3b30;
@@ -36,14 +36,48 @@
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
       background:
-        radial-gradient(circle at 14% 10%, rgba(0, 113, 227, 0.08), transparent 20%),
-        radial-gradient(circle at 84% 16%, rgba(255, 80, 120, 0.07), transparent 18%),
-        radial-gradient(circle at 74% 92%, rgba(80, 200, 120, 0.06), transparent 20%),
-        linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 100%);
+        radial-gradient(circle at 18% 12%, rgba(10, 132, 255, 0.12), transparent 24%),
+        radial-gradient(circle at 82% 18%, rgba(191, 90, 242, 0.10), transparent 22%),
+        radial-gradient(circle at 74% 90%, rgba(48, 209, 88, 0.09), transparent 24%),
+        linear-gradient(180deg, #fbfbfd 0%, #f2f4f8 100%);
+      overflow-x: hidden;
     }
 
     body {
       padding: 18px;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -22vh -18vw auto -18vw;
+      height: 58vh;
+      background:
+        radial-gradient(circle at 28% 44%, rgba(10, 132, 255, 0.18), transparent 24%),
+        radial-gradient(circle at 58% 22%, rgba(255, 159, 10, 0.10), transparent 20%),
+        radial-gradient(circle at 76% 56%, rgba(255, 55, 95, 0.10), transparent 22%);
+      filter: blur(28px);
+      opacity: .82;
+      pointer-events: none;
+      animation: ambientDrift 13s ease-in-out infinite alternate;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.38) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.28) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.24), transparent 58%);
+      pointer-events: none;
+    }
+
+    @keyframes ambientDrift {
+      from { transform: translate3d(-2%, 0, 0) scale(1); }
+      to { transform: translate3d(2%, 4%, 0) scale(1.06); }
     }
 
     .page {
@@ -53,16 +87,24 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
+      position: relative;
+      z-index: 1;
+      animation: pageIn .55s ease both;
+    }
+
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .topbar {
-      background: rgba(255, 255, 255, 0.68);
-      backdrop-filter: saturate(180%) blur(22px);
-      -webkit-backdrop-filter: saturate(180%) blur(22px);
-      border: 1px solid rgba(255, 255, 255, 0.72);
-      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.54));
+      backdrop-filter: saturate(180%) blur(28px);
+      -webkit-backdrop-filter: saturate(180%) blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.82);
+      border-radius: 22px;
       box-shadow: var(--shadow-soft);
-      padding: 12px 16px;
+      padding: 11px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -78,17 +120,21 @@
     }
 
     .brand-dot {
-      width: 10px;
-      height: 10px;
+      width: 28px;
+      height: 28px;
       border-radius: 999px;
-      background: linear-gradient(180deg, #2c8cff 0%, #0066d6 100%);
-      box-shadow: 0 0 0 5px rgba(44, 140, 255, 0.10);
+      background:
+        radial-gradient(circle at 34% 28%, rgba(255,255,255,.92), rgba(255,255,255,.18) 24%, transparent 25%),
+        linear-gradient(145deg, #8ec5ff 0%, #b389ff 48%, #ff9fb8 100%);
+      box-shadow:
+        0 9px 18px rgba(84, 112, 255, 0.18),
+        inset 0 1px 0 rgba(255,255,255,.62);
       flex: 0 0 auto;
     }
 
     .brand-title {
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 760;
       color: var(--text);
       white-space: nowrap;
     }
@@ -103,13 +149,15 @@
 
     .hero {
       width: min(100%, 720px);
-      background: rgba(255, 255, 255, 0.70);
-      backdrop-filter: saturate(180%) blur(24px);
-      -webkit-backdrop-filter: saturate(180%) blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.82);
-      border-radius: 26px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,.58)),
+        radial-gradient(circle at 18% 12%, rgba(255,255,255,.72), transparent 28%);
+      backdrop-filter: saturate(190%) blur(30px);
+      -webkit-backdrop-filter: saturate(190%) blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.86);
+      border-radius: 30px;
       box-shadow: var(--shadow);
-      padding: 28px 28px 24px;
+      padding: 32px 30px 26px;
       overflow: hidden;
       position: relative;
     }
@@ -117,20 +165,45 @@
     .hero::before {
       content: "";
       position: absolute;
-      inset: auto -100px -110px auto;
-      width: 240px;
-      height: 240px;
+      inset: auto -80px -120px auto;
+      width: 280px;
+      height: 280px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,113,227,.09) 0%, rgba(0,113,227,0) 70%);
+      background:
+        radial-gradient(circle, rgba(10,132,255,.13) 0%, rgba(10,132,255,0) 68%);
       pointer-events: none;
+      animation: haloFloat 9s ease-in-out infinite alternate;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,.42) 42%, transparent 64%);
+      transform: translateX(-78%);
+      opacity: .42;
+      pointer-events: none;
+      animation: sheen 7s ease-in-out infinite;
+    }
+
+    @keyframes haloFloat {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(-16px, -10px, 0) scale(1.05); }
+    }
+
+    @keyframes sheen {
+      0%, 42% { transform: translateX(-82%); }
+      68%, 100% { transform: translateX(82%); }
     }
 
     .hero h1 {
       margin: 0;
-      font-size: 42px;
+      font-size: 44px;
       line-height: 1.12;
       letter-spacing: 0;
       font-weight: 850;
+      position: relative;
+      z-index: 1;
     }
 
     .hero p {
@@ -138,6 +211,8 @@
       color: var(--subtext);
       font-size: 15px;
       line-height: 1.7;
+      position: relative;
+      z-index: 1;
     }
 
     .app-grid {
@@ -146,6 +221,8 @@
       grid-template-columns: repeat(4, minmax(82px, 1fr));
       gap: 18px 12px;
       max-width: 620px;
+      position: relative;
+      z-index: 1;
     }
 
     .app-link {
@@ -157,21 +234,22 @@
       gap: 8px;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+      animation: appIn .5s ease both;
     }
 
     .app-icon {
-      width: 74px;
+      width: 70px;
       aspect-ratio: 1 / 1;
-      border-radius: 20px;
+      border-radius: 19px;
       display: grid;
       place-items: center;
       position: relative;
       overflow: hidden;
-      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
       box-shadow:
-        0 10px 22px rgba(0, 0, 0, 0.10),
-        inset 0 1px 0 rgba(255,255,255,.35);
-      border: 1px solid rgba(255,255,255,.35);
+        0 12px 26px rgba(15, 23, 42, 0.12),
+        inset 0 1px 0 rgba(255,255,255,.48);
+      border: 1px solid rgba(255,255,255,.42);
     }
 
     .app-icon::before {
@@ -194,10 +272,14 @@
     }
 
     .app-link:hover .app-icon {
-      transform: translateY(-2px) scale(1.015);
+      transform: translateY(-4px) scale(1.025);
       box-shadow:
-        0 14px 28px rgba(0, 0, 0, 0.12),
-        inset 0 1px 0 rgba(255,255,255,.38);
+        0 18px 34px rgba(15, 23, 42, 0.15),
+        inset 0 1px 0 rgba(255,255,255,.52);
+    }
+
+    .app-link:active .app-icon {
+      transform: translateY(-1px) scale(.98);
     }
 
     .app-icon svg {
@@ -210,35 +292,47 @@
       filter: drop-shadow(0 1px 1px rgba(0,0,0,.12));
     }
 
-    /* 保持蓝色风格 */
     .icon-photo {
-      background: linear-gradient(180deg, #79bcff 0%, #2f89f1 100%);
+      background: linear-gradient(160deg, #78c7ff 0%, #3b82f6 54%, #2563eb 100%);
     }
 
     .icon-days {
-      background: linear-gradient(180deg, #6fb0ff 0%, #2d7fe8 100%);
+      background: linear-gradient(160deg, #9ad7ff 0%, #54b4d3 52%, #2f80ed 100%);
     }
 
     .icon-message {
-      background: linear-gradient(180deg, #67b7ff 0%, #1f89e5 100%);
+      background: linear-gradient(160deg, #9de7d7 0%, #34c759 48%, #10a37f 100%);
     }
 
     .icon-game {
-      background: linear-gradient(180deg, #5ea8ff 0%, #1f79e0 100%);
+      background: linear-gradient(160deg, #ffc1d6 0%, #ff5f8f 50%, #d946ef 100%);
     }
 
     .icon-drink {
-      background: linear-gradient(180deg, #7ec2ff 0%, #3a92f2 100%);
+      background: linear-gradient(160deg, #ffe0a6 0%, #ff9f0a 48%, #ff6b35 100%);
     }
 
-    /* 追加：宠物入口，改成和其他图标一致的蓝色 */
     .icon-pet {
-      background: linear-gradient(180deg, #67b7ff 0%, #1f89e5 100%);
+      background: linear-gradient(160deg, #c7b9ff 0%, #8b5cf6 52%, #5e5ce6 100%);
     }
 
     .icon-video {
-      background: linear-gradient(180deg, #76bbff 0%, #2585ec 100%);
+      background: linear-gradient(160deg, #8ee9ff 0%, #0a84ff 48%, #0057d9 100%);
     }
+
+    @keyframes appIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .app-link:nth-child(1) { animation-delay: .04s; }
+    .app-link:nth-child(2) { animation-delay: .08s; }
+    .app-link:nth-child(3) { animation-delay: .12s; }
+    .app-link:nth-child(4) { animation-delay: .16s; }
+    .app-link:nth-child(5) { animation-delay: .20s; }
+    .app-link:nth-child(6) { animation-delay: .24s; }
+    .app-link:nth-child(7) { animation-delay: .28s; }
+
     .app-label {
       font-size: 13px;
       font-weight: 650;
@@ -270,6 +364,8 @@
       background: rgba(255, 255, 255, 0.42);
       border: 1px solid rgba(0, 0, 0, 0.05);
       white-space: nowrap;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .btn {
@@ -307,13 +403,12 @@
       box-shadow: 0 8px 18px rgba(255,59,48,.18);
     }
 
-    /* 只针对“退出登录”按钮：更短一点、文字左对齐 */
-   .logout-btn {
-  padding: 8px 12px;
-  min-width: 88px;
-  width: auto;
-  flex: 0 0 auto;
-}
+    .logout-btn {
+      padding: 8px 12px;
+      min-width: 88px;
+      width: auto;
+      flex: 0 0 auto;
+    }
     .auth-modal {
       position: fixed;
       inset: 0;
@@ -336,6 +431,12 @@
       border: 1px solid rgba(255,255,255,.3);
       box-shadow: 0 30px 80px rgba(0,0,0,.28);
       overflow: hidden;
+      animation: modalIn .22s ease both;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(8px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .auth-modal-head {
@@ -437,7 +538,7 @@
         padding: 24px 18px 22px;
       }
       .hero h1 {
-        font-size: 30px;
+        font-size: 32px;
       }
       .hero p {
         font-size: 14px;
@@ -448,7 +549,7 @@
         max-width: 100%;
       }
       .app-icon {
-        width: 64px;
+        width: 62px;
         max-width: none;
         margin: 0 auto;
         border-radius: 18px;
@@ -457,7 +558,7 @@
         width: 27px;
         height: 27px;
       }
-    .app-label {
+      .app-label {
         font-size: 12px;
       }
       .bottom-space {
@@ -487,6 +588,14 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -494,7 +603,7 @@
     <header class="topbar">
       <div class="brand-row">
         <div class="brand-dot" aria-hidden="true"></div>
-        <div class="brand-title">我们的桌面</div>
+        <div class="brand-title">nuonuo小窝</div>
       </div>
 
       <div class="auth-box" id="authBox"></div>
@@ -502,8 +611,8 @@
 
     <main class="hero-wrap">
       <section class="hero">
-        <h1>欢迎我家小宝！</h1>
-        <p>这是我们的小网页，记录我们的一点一滴</p>
+        <h1>nuonuo小窝</h1>
+        <p>把照片、留言、纪念日和小乐趣，都轻轻放在这里。</p>
 
         <div class="app-grid">
           <a class="app-link" href="./photo.html" aria-label="照片墙">
