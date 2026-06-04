@@ -1,18 +1,16 @@
-// ====== 请替换下面两行为你自己的密钥 ======
-const SECRET_ID = 'AKIDhojT7ey61jEkHhw0830qVyGUWSDpFnEW';
-const SECRET_KEY = 'GNIAMaieZyOehhWBi9QWUL4czCHAsQuG';
-// ====== 替换结束 ======
-
-const BUCKET = 'photoalbum-123456-1395234423';
-const REGION = 'ap-beijing';
-
-const AUTH_USER_PREFIX = 'users/';
-const LS_CURRENT_USER = 'site_current_user_v1';
-
-const cos = new COS({
-  SecretId: SECRET_ID,
-  SecretKey: SECRET_KEY,
-});
+﻿const shared = window.NuonuoShared;
+const BUCKET = shared.config.bucket;
+const REGION = shared.config.region;
+const getCurrentUser = shared.getCurrentUser;
+const getUserByName = shared.getUserByName;
+const createPasswordRecord = shared.createPasswordRecord;
+const verifyPassword = shared.verifyPassword;
+const upgradePasswordIfNeeded = shared.upgradePasswordIfNeeded;
+const putJsonToCos = shared.putJsonToCos;
+const uploadFileToCos = shared.uploadFileToCos;
+const deleteObjectFromCos = shared.deleteObject;
+const getObjectText = shared.getObjectText;
+const makeUserKey = shared.makeUserKey;
 
 const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');
@@ -44,72 +42,6 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-const PASSWORD_ITERATIONS = 120000;
-
-function bytesToBase64(bytes) {
-  let binary = '';
-  bytes.forEach((byte) => {
-    binary += String.fromCharCode(byte);
-  });
-  return btoa(binary);
-}
-
-function base64ToBytes(base64) {
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes;
-}
-
-async function hashPassword(password, saltBase64) {
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(password),
-    'PBKDF2',
-    false,
-    ['deriveBits']
-  );
-  const bits = await crypto.subtle.deriveBits({
-    name: 'PBKDF2',
-    hash: 'SHA-256',
-    salt: base64ToBytes(saltBase64),
-    iterations: PASSWORD_ITERATIONS,
-  }, keyMaterial, 256);
-  return bytesToBase64(new Uint8Array(bits));
-}
-
-async function createPasswordRecord(password) {
-  const salt = new Uint8Array(16);
-  crypto.getRandomValues(salt);
-  const passwordSalt = bytesToBase64(salt);
-  return {
-    passwordAlgo: 'PBKDF2-SHA256',
-    passwordIterations: PASSWORD_ITERATIONS,
-    passwordSalt,
-    passwordHash: await hashPassword(password, passwordSalt),
-  };
-}
-
-async function verifyPassword(user, password) {
-  if (!user) return false;
-  if (user.passwordHash && user.passwordSalt) {
-    return await hashPassword(password, user.passwordSalt) === user.passwordHash;
-  }
-  return typeof user.password === 'string' && user.password === password;
-}
-
-async function upgradePasswordIfNeeded(user, password) {
-  if (!user || user.passwordHash || user.password !== password) return;
-  const upgradedUser = {
-    ...user,
-    ...(await createPasswordRecord(password)),
-  };
-  delete upgradedUser.password;
-  await putJsonToCos(makeUserKey(user.username), upgradedUser);
-}
-
 function isImageKey(key) {
   return /\.(png|jpe?g|gif|webp|bmp|svg|heic|avif)$/i.test(String(key || ''));
 }
@@ -123,83 +55,9 @@ function updateChooseButtonText() {
   chooseBtn.textContent = count > 0 ? `已选择 ${count} 张` : '选择图片';
 }
 
-function getCurrentUser() {
-  try {
-    const raw = localStorage.getItem(LS_CURRENT_USER);
-    if (!raw) return null;
-    const user = JSON.parse(raw);
-    if (!user || !user.username) return null;
-    return user;
-  } catch {
-    return null;
-  }
-}
-
 function setCurrentUser(user) {
-  if (!user) {
-    localStorage.removeItem(LS_CURRENT_USER);
-  } else {
-    localStorage.setItem(LS_CURRENT_USER, JSON.stringify(user));
-  }
+  shared.setCurrentUser(user, { notify: false });
   renderAuthState();
-}
-
-function makeUserKey(username) {
-  return `${AUTH_USER_PREFIX}${encodeURIComponent(username)}.json`;
-}
-
-function putJsonToCos(key, obj) {
-  return new Promise((resolve, reject) => {
-    cos.putObject({
-      Bucket: BUCKET,
-      Region: REGION,
-      Key: key,
-      Body: JSON.stringify(obj, null, 2),
-      ContentType: 'application/json; charset=utf-8',
-    }, function (err, data) {
-      if (err) return reject(err);
-      resolve(data);
-    });
-  });
-}
-
-function getObjectText(key) {
-  return new Promise((resolve, reject) => {
-    cos.getObject({
-      Bucket: BUCKET,
-      Region: REGION,
-      Key: key,
-    }, async function (err, data) {
-      if (err) return reject(err);
-
-      try {
-        const body = data.Body;
-        if (typeof body === 'string') return resolve(body);
-        if (body instanceof Blob) return resolve(await body.text());
-        if (body && typeof body.text === 'function') return resolve(await body.text());
-        if (body instanceof ArrayBuffer) {
-          return resolve(new TextDecoder('utf-8').decode(body));
-        }
-        if (ArrayBuffer.isView(body)) {
-          return resolve(new TextDecoder('utf-8').decode(body));
-        }
-        resolve(String(body || ''));
-      } catch (e) {
-        reject(e);
-      }
-    });
-  });
-}
-
-async function getUserByName(username) {
-  try {
-    const text = await getObjectText(makeUserKey(username));
-    return JSON.parse(text);
-  } catch (err) {
-    if (err && (err.statusCode === 404 || err.error && err.error.Code === 'NoSuchKey')) return null;
-    if (String(err && err.message || '').includes('404')) return null;
-    throw err;
-  }
 }
 
 function ensureAuthStyles() {
@@ -623,7 +481,6 @@ function ensureAuthModal() {
   modalEl.__setMode = renderModeExtern;
   renderMode();
 }
-
 function openAuthModal(mode = 'login') {
   ensureAuthModal();
   const modal = document.getElementById('authModal');
@@ -690,11 +547,10 @@ function renderAuthState() {
     loadList();
   };
 }
-
 function requireLogin() {
   const user = getCurrentUser();
   if (!user) {
-    alert('请先登录后再操作');
+    alert('璇峰厛鐧诲綍鍚庡啀鎿嶄綔');
     openAuthModal('login');
     return null;
   }
@@ -704,7 +560,7 @@ function requireLogin() {
 function openPreview(url, caption) {
   if (!previewModal || !previewImage || !previewCaption) return;
   previewImage.src = url;
-  previewImage.alt = caption || '预览图片';
+  previewImage.alt = caption || '棰勮鍥剧墖';
   previewCaption.textContent = caption || '';
   previewModal.classList.add('show');
   previewModal.setAttribute('aria-hidden', 'false');
@@ -745,14 +601,7 @@ function uploadSingleFile(file) {
 
     const key = `photos/${Date.now()}-${randomId()}-${sanitizeFileName(file.name)}`;
 
-    cos.uploadFile({
-      Bucket: BUCKET,
-      Region: REGION,
-      Key: key,
-      Body: file,
-    }, async function (err, data) {
-      if (err) return reject(err);
-
+    uploadFileToCos(file, key).then(async (data) => {
       try {
         const meta = {
           photoKey: key,
@@ -767,19 +616,11 @@ function uploadSingleFile(file) {
         resolve({ ...data, meta });
       } catch (metaErr) {
         try {
-          await new Promise((res) => {
-            cos.deleteObject({
-              Bucket: BUCKET,
-              Region: REGION,
-              Key: key,
-            }, function () {
-              res();
-            });
-          });
+          await deleteObjectFromCos(key);
         } catch {}
         reject(metaErr);
       }
-    });
+    }).catch(reject);
   });
 }
 
@@ -789,7 +630,7 @@ async function uploadFiles() {
 
   const files = getSelectedFiles();
   if (!files.length) {
-    alert('请选择一张或多张图片');
+    alert('璇烽€夋嫨涓€寮犳垨澶氬紶鍥剧墖');
     return;
   }
 
@@ -807,7 +648,7 @@ async function uploadFiles() {
     updateChooseButtonText();
     loadList();
   } catch (err) {
-    console.error('上传失败:', err);
+    console.error('涓婁紶澶辫触:', err);
     if (String(err && err.message) !== 'NOT_LOGGED_IN') {
       alert('上传失败，请检查密钥、Bucket、Region 或网络');
     }
@@ -820,16 +661,7 @@ async function uploadFiles() {
 }
 
 function deleteObject(key) {
-  return new Promise((resolve, reject) => {
-    cos.deleteObject({
-      Bucket: BUCKET,
-      Region: REGION,
-      Key: key,
-    }, function (err, data) {
-      if (err) return reject(err);
-      resolve(data);
-    });
-  });
+  return deleteObjectFromCos(key);
 }
 
 async function loadList() {
@@ -841,23 +673,14 @@ async function loadList() {
             <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
           </svg>
         </div>
-        <h2 class="state-title">正在加载照片</h2>
-        <p class="state-desc">请稍候，正在从云端获取相册内容。</p>
+        <h2 class="state-title">姝ｅ湪鍔犺浇鐓х墖</h2>
+        <p class="state-desc">璇风◢鍊欙紝姝ｅ湪浠庝簯绔幏鍙栫浉鍐屽唴瀹广€?/p>
       </div>
     </div>
   `;
 
   try {
-    const data = await new Promise((resolve, reject) => {
-      cos.getBucket({
-        Bucket: BUCKET,
-        Region: REGION,
-        Prefix: 'photos/',
-      }, function (err, res) {
-        if (err) return reject(err);
-        resolve(res);
-      });
-    });
+    const data = await shared.getBucket({ Prefix: 'photos/' });
 
     const items = (data.Contents || [])
       .filter(item => item && item.Key && isImageKey(item.Key))
@@ -874,8 +697,8 @@ async function loadList() {
                 <path d="M9 10.5A1.5 1.5 0 1 0 9 7.5a1.5 1.5 0 0 0 0 3Z" fill="currentColor"/>
               </svg>
             </div>
-            <h2 class="state-title">暂无照片</h2>
-            <p class="state-desc">还没有上传内容，登录后点击上方“选择图片”并上传第一张照片吧。</p>
+            <h2 class="state-title">鏆傛棤鐓х墖</h2>
+            <p class="state-desc">杩樻病鏈変笂浼犲唴瀹癸紝鐧诲綍鍚庣偣鍑讳笂鏂光€滈€夋嫨鍥剧墖鈥濆苟涓婁紶绗竴寮犵収鐗囧惂銆?/p>
           </div>
         </div>
       `;
@@ -900,7 +723,7 @@ async function loadList() {
     gallery.innerHTML = enriched.map(({ item, meta }) => {
       const url = `https://${BUCKET}.cos.${REGION}.myqcloud.com/${item.Key}`;
       const originalName = meta?.originalName || item.Key;
-      const uploader = meta?.uploader || '未知用户';
+      const uploader = meta?.uploader || '鏈煡鐢ㄦ埛';
       const createdAt = meta?.createdAt ? new Date(meta.createdAt) : null;
       const timeText = createdAt && !Number.isNaN(createdAt.getTime())
         ? createdAt.toLocaleString('zh-CN', { hour12: false })
@@ -912,7 +735,7 @@ async function loadList() {
       const safeTime = escapeHtml(timeText);
 
       const deleteBtn = getCurrentUser()
-        ? `<button class="photo-action delete-btn" type="button" data-key="${escapeHtml(item.Key)}" aria-label="删除" title="删除">×</button>`
+        ? `<button class="photo-action delete-btn" type="button" data-key="${escapeHtml(item.Key)}" aria-label="鍒犻櫎" title="鍒犻櫎">脳</button>`
         : '';
 
       return `
@@ -929,7 +752,7 @@ async function loadList() {
           </div>
 
           <div class="photo-meta photo-owner" data-uploader="${safeUploader}" data-date="${safeTime}">
-            <div>上传者：<strong>${safeUploader}</strong></div>
+            <div>涓婁紶鑰咃細<strong>${safeUploader}</strong></div>
             <div>${safeTime}</div>
           </div>
 
@@ -938,7 +761,7 @@ async function loadList() {
       `;
     }).join('');
 
-    // 只给删除按钮做一次委托，不影响图片预览（预览由 photo.html 处理）
+    // 鍙粰鍒犻櫎鎸夐挳鍋氫竴娆″鎵橈紝涓嶅奖鍝嶅浘鐗囬瑙堬紙棰勮鐢?photo.html 澶勭悊锛?
     if (!gallery.__deleteBound) {
       gallery.__deleteBound = true;
       gallery.addEventListener('click', (e) => {
@@ -951,7 +774,7 @@ async function loadList() {
       });
     }
   } catch (err) {
-    console.error('列表加载失败:', err);
+    console.error('鍒楄〃鍔犺浇澶辫触:', err);
     gallery.innerHTML = `
       <div class="empty-state" style="grid-column: 1 / -1;">
         <div class="state-card">
@@ -962,8 +785,8 @@ async function loadList() {
               <path d="M10.3 4.9 2.8 18a2 2 0 0 0 1.73 3h15a2 2 0 0 0 1.73-3l-7.5-13.1a2 2 0 0 0-3.46 0Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
             </svg>
           </div>
-          <h2 class="state-title">加载失败</h2>
-          <p class="state-desc">请检查密钥、Bucket、Region 或 CORS 配置后重试。</p>
+          <h2 class="state-title">鍔犺浇澶辫触</h2>
+          <p class="state-desc">璇锋鏌ュ瘑閽ャ€丅ucket銆丷egion 鎴?CORS 閰嶇疆鍚庨噸璇曘€?/p>
         </div>
       </div>
     `;
@@ -985,7 +808,7 @@ async function deleteFile(key) {
     alert('删除成功');
     loadList();
   } catch (err) {
-    console.error('删除失败:', err);
+    console.error('鍒犻櫎澶辫触:', err);
     alert('删除失败');
   }
 }

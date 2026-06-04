@@ -840,14 +840,20 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
+  <script src="./assets/site-auth.js"></script>
   <script>
-    const SECRET_ID = 'AKIDhojT7ey61jEkHhw0830qVyGUWSDpFnEW';
-    const SECRET_KEY = 'GNIAMaieZyOehhWBi9QWUL4czCHAsQuG';
-    const BUCKET = 'photoalbum-123456-1395234423';
-    const REGION = 'ap-beijing';
-    const AUTH_USER_PREFIX = 'users/';
-    const LS_CURRENT_USER = 'site_current_user_v1';
-    const cos = window.COS ? new COS({ SecretId: SECRET_ID, SecretKey: SECRET_KEY }) : null;
+    const shared = window.NuonuoShared;
+    const getCurrentUser = shared.getCurrentUser;
+    const getUserByName = shared.getUserByName;
+    const createPasswordRecord = shared.createPasswordRecord;
+    const verifyPassword = shared.verifyPassword;
+    const upgradePasswordIfNeeded = shared.upgradePasswordIfNeeded;
+    const putJsonToCos = shared.putJsonToCos;
+    const makeUserKey = shared.makeUserKey;
+    const setCurrentUser = (user) => {
+      shared.setCurrentUser(user, { notify: false });
+      renderAuthState();
+    };
 
     const sectionImageSources = [
       './assets/work/photo-wall.webp',
@@ -911,149 +917,6 @@
 
     function sanitizeUsername(name) {
       return String(name || '').trim();
-    }
-
-    const PASSWORD_ITERATIONS = 120000;
-
-    function bytesToBase64(bytes) {
-      let binary = '';
-      bytes.forEach((byte) => {
-        binary += String.fromCharCode(byte);
-      });
-      return btoa(binary);
-    }
-
-    function base64ToBytes(base64) {
-      const binary = atob(base64);
-      const bytes = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-      }
-      return bytes;
-    }
-
-    async function hashPassword(password, saltBase64) {
-      const keyMaterial = await crypto.subtle.importKey(
-        'raw',
-        new TextEncoder().encode(password),
-        'PBKDF2',
-        false,
-        ['deriveBits']
-      );
-      const bits = await crypto.subtle.deriveBits({
-        name: 'PBKDF2',
-        hash: 'SHA-256',
-        salt: base64ToBytes(saltBase64),
-        iterations: PASSWORD_ITERATIONS,
-      }, keyMaterial, 256);
-      return bytesToBase64(new Uint8Array(bits));
-    }
-
-    async function createPasswordRecord(password) {
-      const salt = new Uint8Array(16);
-      crypto.getRandomValues(salt);
-      const passwordSalt = bytesToBase64(salt);
-      return {
-        passwordAlgo: 'PBKDF2-SHA256',
-        passwordIterations: PASSWORD_ITERATIONS,
-        passwordSalt,
-        passwordHash: await hashPassword(password, passwordSalt),
-      };
-    }
-
-    async function verifyPassword(user, password) {
-      if (!user) return false;
-      if (user.passwordHash && user.passwordSalt) {
-        return await hashPassword(password, user.passwordSalt) === user.passwordHash;
-      }
-      return typeof user.password === 'string' && user.password === password;
-    }
-
-    async function upgradePasswordIfNeeded(user, password) {
-      if (!user || user.passwordHash || user.password !== password) return;
-      const upgradedUser = {
-        ...user,
-        ...(await createPasswordRecord(password)),
-      };
-      delete upgradedUser.password;
-      await putJsonToCos(makeUserKey(user.username), upgradedUser);
-    }
-
-    function getCurrentUser() {
-      try {
-        const raw = localStorage.getItem(LS_CURRENT_USER);
-        if (!raw) return null;
-        const user = JSON.parse(raw);
-        if (!user || !user.username) return null;
-        return user;
-      } catch {
-        return null;
-      }
-    }
-
-    function setCurrentUser(user) {
-      if (!user) {
-        localStorage.removeItem(LS_CURRENT_USER);
-      } else {
-        localStorage.setItem(LS_CURRENT_USER, JSON.stringify(user));
-      }
-      renderAuthState();
-    }
-
-    function makeUserKey(username) {
-      return `${AUTH_USER_PREFIX}${encodeURIComponent(username)}.json`;
-    }
-
-    function putJsonToCos(key, obj) {
-      if (!cos) return Promise.reject(new Error('COS SDK 未加载'));
-      return new Promise((resolve, reject) => {
-        cos.putObject({
-          Bucket: BUCKET,
-          Region: REGION,
-          Key: key,
-          Body: JSON.stringify(obj, null, 2),
-          ContentType: 'application/json; charset=utf-8',
-        }, function (err, data) {
-          if (err) return reject(err);
-          resolve(data);
-        });
-      });
-    }
-
-    function getObjectText(key) {
-      if (!cos) return Promise.reject(new Error('COS SDK 未加载'));
-      return new Promise((resolve, reject) => {
-        cos.getObject({
-          Bucket: BUCKET,
-          Region: REGION,
-          Key: key,
-        }, async function (err, data) {
-          if (err) return reject(err);
-          try {
-            const body = data.Body;
-            if (typeof body === 'string') return resolve(body);
-            if (body instanceof Blob) return resolve(await body.text());
-            if (body && typeof body.text === 'function') return resolve(await body.text());
-            if (body instanceof ArrayBuffer) return resolve(new TextDecoder('utf-8').decode(body));
-            if (ArrayBuffer.isView(body)) return resolve(new TextDecoder('utf-8').decode(body));
-            resolve(String(body || ''));
-          } catch (e) {
-            reject(e);
-          }
-        });
-      });
-    }
-
-    async function getUserByName(username) {
-      const key = makeUserKey(username);
-      try {
-        const text = await getObjectText(key);
-        return JSON.parse(text);
-      } catch (err) {
-        if (err && (err.statusCode === 404 || (err.error && err.error.Code === 'NoSuchKey'))) return null;
-        if (String(err && err.message || '').includes('404')) return null;
-        throw err;
-      }
     }
 
     function setAuthMode(mode) {
