@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>nuonuo小窝</title>
+  <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="18" fill="%23eaf4ff"/%3E%3Cpath fill="%237199c9" d="M32 49 15 32c-6-6-2-17 7-17 5 0 8 3 10 7 2-4 5-7 10-7 9 0 13 11 7 17L32 49z"/%3E%3C/svg%3E' />
   <link rel="preload" href="./assets/work/photo-wall.webp" as="image" />
   <link rel="preload" href="./assets/work/anniversary.webp" as="image" />
   <link rel="preload" href="./assets/work/message-wall.webp" as="image" />
@@ -298,8 +299,16 @@
       background: rgba(255,255,255,.54);
     }
 
+    .story-pin {
+      position: relative;
+      z-index: 2;
+      min-height: 100svh;
+      overflow: hidden;
+      pointer-events: auto;
+    }
+
     .scroll-stage {
-      position: fixed;
+      position: absolute;
       inset: 0;
       z-index: 1;
       overflow: hidden;
@@ -323,6 +332,12 @@
     .text-track {
       position: relative;
       z-index: 4;
+    }
+
+    .story-copy-stage {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
       pointer-events: none;
     }
 
@@ -349,6 +364,50 @@
     .text-copy {
       grid-column: 1;
       color: var(--ink);
+    }
+
+    .story-copy {
+      position: absolute;
+      inset: 0;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: clamp(94px, 13vh, 136px) clamp(18px, 5vw, 70px) clamp(36px, 8vh, 78px);
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(360px, 1.08fr);
+      gap: clamp(30px, 6vw, 86px);
+      align-items: center;
+      color: var(--ink);
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .story-copy-inner {
+      grid-column: 1;
+      max-width: 620px;
+    }
+
+    .story-copy p {
+      max-width: 520px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: clamp(16px, 1.45vw, 20px);
+      line-height: 1.75;
+    }
+
+    .story-copy .story-detail {
+      display: inline-flex;
+      margin-bottom: 16px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,.78);
+      border-radius: 999px;
+      background: rgba(255,255,255,.48);
+      color: rgba(23,32,51,.58);
+      font-size: 13px;
+      font-weight: 720;
+      line-height: 1;
+      box-shadow: 0 12px 34px rgba(77, 97, 123, .1);
+      backdrop-filter: blur(18px) saturate(145%);
+      -webkit-backdrop-filter: blur(18px) saturate(145%);
     }
 
     .entry-layer {
@@ -531,6 +590,26 @@
       opacity: 1;
     }
 
+    body.gsap-story .entry-layer,
+    body.gsap-story .visual,
+    body.gsap-story .visual::before,
+    body.gsap-story .story-copy {
+      transition: none;
+    }
+
+    body.gsap-story .story-copy {
+      will-change: transform, opacity;
+    }
+
+    body.gsap-story .visual {
+      will-change: transform, opacity;
+    }
+
+    body.gsap-story .entry-layer.is-active,
+    body.gsap-story .entry-layer.is-active .visual {
+      pointer-events: auto;
+    }
+
     .section-image-1 { --section-image: url("./assets/work/photo-wall.webp"); }
     .section-image-2 { --section-image: url("./assets/work/anniversary.webp"); }
     .section-image-3 { --section-image: url("./assets/work/message-wall.webp"); }
@@ -654,7 +733,8 @@
         display: none;
       }
 
-      .text-scene {
+      .text-scene,
+      .story-copy {
         grid-template-columns: 1fr;
         gap: 28px;
       }
@@ -736,6 +816,15 @@
         padding: 112px 16px 60svh;
       }
 
+      .story-copy {
+        padding: 106px 16px 55svh;
+        align-items: start;
+      }
+
+      .story-copy-inner {
+        max-width: 100%;
+      }
+
       .hero-text {
         padding-top: 104px;
         padding-bottom: 34px;
@@ -755,6 +844,19 @@
         margin-top: 18px;
         font-size: 15px;
         line-height: 1.72;
+      }
+
+      .story-copy p {
+        max-width: 88vw;
+        margin-top: 15px;
+        font-size: 14px;
+        line-height: 1.62;
+      }
+
+      .story-copy .story-detail {
+        margin-bottom: 12px;
+        padding: 7px 10px;
+        font-size: 12px;
       }
 
       .visual {
@@ -813,12 +915,15 @@
       </div>
     </header>
 
-    <div class="scroll-stage" id="scrollStage" aria-label="入口图片舞台"></div>
     <main class="text-track" id="textTrack">
       <section class="text-scene hero-text" id="top">
         <div class="text-copy">
           <h1><span>nuonuo</span><span>小窝</span></h1>
         </div>
+      </section>
+      <section class="story-pin" id="storyPin" aria-label="入口故事舞台">
+        <div class="scroll-stage" id="scrollStage" aria-label="入口图片舞台"></div>
+        <div class="story-copy-stage" id="storyCopyStage"></div>
       </section>
     </main>
   </div>
@@ -853,6 +958,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
   <script src="./assets/site-auth.js"></script>
+  <script src="./assets/vendor/gsap/gsap.min.js"></script>
+  <script src="./assets/vendor/gsap/ScrollTrigger.min.js"></script>
   <script>
     const shared = window.NuonuoShared;
     const getCurrentUser = shared.getCurrentUser;
@@ -899,6 +1006,8 @@
     const authCancelBtn = document.getElementById('authCancelBtn');
     const authSwitchBtn = document.getElementById('authSwitchBtn');
     const scrollStage = document.getElementById('scrollStage');
+    const storyPin = document.getElementById('storyPin');
+    const storyCopyStage = document.getElementById('storyCopyStage');
     const textTrack = document.getElementById('textTrack');
     const sectionNav = document.getElementById('sectionNav');
     const loader = document.getElementById('loader');
@@ -906,6 +1015,8 @@
     const loaderPercent = document.getElementById('loaderPercent');
     let pendingRedirect = null;
     let progress = 0;
+    let storyScrollTrigger = null;
+    let storyNavProgress = null;
 
     function setProgress(value) {
       progress = Math.max(progress, Math.min(100, value));
@@ -916,7 +1027,12 @@
     function finishLoading() {
       setProgress(100);
       setTimeout(() => loader.classList.add('is-done'), 180);
-      setTimeout(() => document.body.classList.add('site-ready'), 760);
+      setTimeout(() => {
+        document.body.classList.add('site-ready');
+        if (window.ScrollTrigger) {
+          setTimeout(() => ScrollTrigger.refresh(), 80);
+        }
+      }, 760);
     }
 
     function escapeHtml(str) {
@@ -1020,14 +1136,16 @@
         scrollStage.appendChild(layer);
 
         const textScene = document.createElement('section');
-        textScene.className = 'text-scene';
+        textScene.className = 'story-copy';
         textScene.dataset.key = section.key;
         textScene.innerHTML = `
-          <div class="text-copy section-copy">
+          <div class="story-copy-inner section-copy">
+            <div class="story-detail">${section.detail}</div>
             <h2>${section.title}</h2>
+            <p>${section.lead}</p>
           </div>
         `;
-        textTrack.appendChild(textScene);
+        storyCopyStage.appendChild(textScene);
 
         const dot = document.createElement('button');
         dot.className = 'nav-dot';
@@ -1035,7 +1153,7 @@
         dot.textContent = String(index + 1);
         dot.setAttribute('aria-label', section.title);
         dot.addEventListener('click', () => {
-          textScene.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          scrollToStoryIndex(index);
         });
         sectionNav.appendChild(dot);
         section.layer = layer;
@@ -1100,6 +1218,211 @@
       window.addEventListener('scroll', requestUpdate, { passive: true });
       window.addEventListener('resize', requestUpdate, { passive: true });
       window.addEventListener('load', requestUpdate, { once: true });
+    }
+
+    function setActiveStory(index) {
+      const activeIndex = Math.max(0, Math.min(sections.length - 1, index));
+      sections.forEach((section, sectionIndex) => {
+        const isActive = sectionIndex === activeIndex;
+        section.layer.classList.toggle('is-active', isActive);
+        section.layer.style.setProperty('--layer-z', isActive ? '100' : String(sectionIndex + 1));
+        section.visual.tabIndex = isActive ? 0 : -1;
+        section.visual.setAttribute('aria-hidden', String(!isActive));
+        section.textScene.setAttribute('aria-hidden', String(!isActive));
+        section.dot.classList.toggle('is-active', isActive);
+      });
+    }
+
+    function scrollToStoryIndex(index) {
+      if (storyScrollTrigger) {
+        const clamped = Math.max(0, Math.min(sections.length - 1, index));
+        const progressTarget = sections.length <= 1 ? 0 : clamped / (sections.length - 1);
+        const y = storyScrollTrigger.start + (storyScrollTrigger.end - storyScrollTrigger.start) * progressTarget;
+        storyNavProgress = progressTarget;
+        window.scrollTo({ top: y, left: 0, behavior: 'auto' });
+        requestAnimationFrame(() => {
+          storyScrollTrigger.update();
+          setActiveStory(clamped);
+        });
+        setActiveStory(clamped);
+        return;
+      }
+      setActiveStory(index);
+      storyPin.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setupGsapStory() {
+      if (!window.gsap || !window.ScrollTrigger) {
+        setupScrollStory();
+        return;
+      }
+
+      gsap.registerPlugin(ScrollTrigger);
+      document.body.classList.add('gsap-story');
+
+      const mm = gsap.matchMedia();
+      const layerItems = sections.map(section => section.layer);
+      const visualItems = sections.map(section => section.visual);
+      const copyItems = sections.map(section => section.textScene);
+      const cardItems = sections.map(section => section.visual.querySelector('.visual-card'));
+      mm.add({
+        isDesktop: '(min-width: 921px)',
+        isMobile: '(max-width: 920px)',
+        reduceMotion: '(prefers-reduced-motion: reduce)'
+      }, (context) => {
+        const { isDesktop, isMobile, reduceMotion } = context.conditions;
+        const sceneCount = sections.length;
+        const lastIndex = sceneCount - 1;
+        const travel = () => Math.max(window.innerHeight * lastIndex, 1);
+
+        gsap.set(layerItems, { autoAlpha: 0, zIndex: 1 });
+        gsap.set(visualItems, {
+          autoAlpha: 0,
+          y: isMobile ? 34 : 70,
+          scale: isMobile ? 0.965 : 0.92,
+          rotationX: 0,
+          rotationY: 0,
+          transformOrigin: '50% 58%'
+        });
+        gsap.set(copyItems, {
+          autoAlpha: 0,
+          y: isMobile ? 34 : 86,
+          scale: isMobile ? 0.985 : 0.94,
+          transformOrigin: '0% 50%'
+        });
+        gsap.set(cardItems, {
+          autoAlpha: 0,
+          y: isMobile ? 16 : 28,
+          scale: 0.96
+        });
+
+        gsap.set(layerItems[0], { autoAlpha: 1, zIndex: 100 });
+        gsap.set(visualItems[0], { autoAlpha: 1, y: 0, scale: 1, rotationX: 0, rotationY: 0 });
+        gsap.set(copyItems[0], { autoAlpha: 1, y: 0, scale: 1 });
+        gsap.set(cardItems[0], { autoAlpha: 1, y: 0, scale: 1 });
+        setActiveStory(0);
+
+        if (reduceMotion) {
+          return () => {};
+        }
+
+        const tl = gsap.timeline({
+          defaults: { ease: 'power2.inOut' },
+          scrollTrigger: {
+            trigger: storyPin,
+            start: 'top top',
+            end: () => `+=${travel()}`,
+            pin: true,
+            scrub: 0.8,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            snap: {
+              snapTo: (value) => {
+                if (storyNavProgress !== null) {
+                  const target = storyNavProgress;
+                  storyNavProgress = null;
+                  return target;
+                }
+                return lastIndex > 0 ? Math.round(value * lastIndex) / lastIndex : 0;
+              },
+              duration: { min: 0.18, max: 0.42 },
+              delay: 0.04,
+              directional: false,
+              inertia: false,
+              ease: 'power2.inOut'
+            },
+            onUpdate: (self) => {
+              setActiveStory(Math.round(self.progress * lastIndex));
+            },
+            onRefresh: (self) => {
+              storyScrollTrigger = self;
+              setActiveStory(Math.round(self.progress * lastIndex));
+            }
+          }
+        });
+
+        for (let i = 0; i < lastIndex; i += 1) {
+          const current = sections[i];
+          const next = sections[i + 1];
+          const at = i + 0.16;
+          const nextTilt = isDesktop ? (i % 2 === 0 ? -4 : 4) : 0;
+
+          tl.set(next.layer, { zIndex: 100 + i + 1 }, at - 0.02)
+            .to(current.textScene, {
+              autoAlpha: 0,
+              y: isMobile ? -28 : -70,
+              scale: isMobile ? 0.985 : 0.94,
+              duration: 0.42
+            }, at)
+            .to(current.visual, {
+              autoAlpha: 0,
+              y: isMobile ? -16 : -54,
+              scale: isMobile ? 1.045 : 1.09,
+              rotationY: isDesktop ? -nextTilt : 0,
+              duration: 0.48
+            }, at + 0.02)
+            .to(current.layer, { autoAlpha: 0, duration: 0.38 }, at + 0.1)
+            .fromTo(next.layer,
+              { autoAlpha: 0 },
+              { autoAlpha: 1, duration: 0.5 },
+              at + 0.08
+            )
+            .fromTo(next.visual,
+              {
+                autoAlpha: 0,
+                y: isMobile ? 38 : 76,
+                scale: isMobile ? 0.955 : 0.9,
+                rotationX: isDesktop ? 2 : 0,
+                rotationY: isDesktop ? nextTilt : 0
+              },
+              {
+                autoAlpha: 1,
+                y: 0,
+                scale: 1,
+                rotationX: 0,
+                rotationY: 0,
+                duration: 0.62
+              },
+              at + 0.1
+            )
+            .fromTo(next.textScene,
+              {
+                autoAlpha: 0,
+                y: isMobile ? 36 : 92,
+                scale: isMobile ? 0.985 : 0.93
+              },
+              {
+                autoAlpha: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.56
+              },
+              at + 0.18
+            )
+            .fromTo(next.visual.querySelector('.visual-card'),
+              {
+                autoAlpha: 0,
+                y: isMobile ? 16 : 30,
+                scale: 0.96
+              },
+              {
+                autoAlpha: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.46
+              },
+              at + 0.34
+            );
+        }
+
+        tl.to({}, { duration: 0.01 }, lastIndex);
+        storyScrollTrigger = tl.scrollTrigger;
+
+        return () => {
+          storyScrollTrigger = null;
+          tl.kill();
+        };
+      });
     }
 
     function setupMotion() {
@@ -1215,7 +1538,7 @@
     buildSections();
     setProgress(42);
     renderAuthState();
-    setupScrollStory();
+    setupGsapStory();
     setupMotion();
     setProgress(68);
 
