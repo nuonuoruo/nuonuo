@@ -92,8 +92,8 @@
       place-items: center;
       padding: 24px;
       background:
-        radial-gradient(circle at 34% 30%, rgba(255,255,255,.96), transparent 28%),
-        linear-gradient(135deg, rgba(246,250,255,.94), rgba(232,241,251,.88));
+        radial-gradient(circle at 34% 30%, rgba(255,255,255,1), transparent 28%),
+        linear-gradient(135deg, #f8fbff, #e8f1fb);
       transition: opacity .55s ease, visibility .55s ease;
     }
 
@@ -148,6 +148,14 @@
     .site-shell {
       position: relative;
       min-height: 100dvh;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .45s ease;
+    }
+
+    body.site-ready .site-shell {
+      opacity: 1;
+      visibility: visible;
     }
 
     .topbar {
@@ -725,7 +733,7 @@
       .text-scene {
         min-height: 100svh;
         align-items: start;
-        padding: 142px 16px 52svh;
+        padding: 112px 16px 60svh;
       }
 
       .hero-text {
@@ -738,7 +746,9 @@
       }
 
       h2 {
-        font-size: clamp(44px, 16vw, 74px);
+        max-width: 92vw;
+        font-size: clamp(42px, 14.5vw, 64px);
+        line-height: .98;
       }
 
       .copy {
@@ -748,7 +758,9 @@
       }
 
       .visual {
-        min-height: min(330px, 39svh);
+        top: 39svh;
+        bottom: auto;
+        min-height: min(300px, 35svh);
       }
 
       .visual-card {
@@ -903,7 +915,8 @@
 
     function finishLoading() {
       setProgress(100);
-      setTimeout(() => loader.classList.add('is-done'), 260);
+      setTimeout(() => loader.classList.add('is-done'), 180);
+      setTimeout(() => document.body.classList.add('site-ready'), 760);
     }
 
     function escapeHtml(str) {
@@ -1207,9 +1220,26 @@
     setProgress(68);
 
     let loadedImages = 0;
+    let loadFinished = false;
+
+    function finishLoadingOnce() {
+      if (loadFinished) return;
+      loadFinished = true;
+      finishLoading();
+    }
+
     const imagePreloads = sectionImageSources.map((src) => new Promise((resolve) => {
       const image = new Image();
-      image.onload = image.onerror = () => {
+      image.decoding = 'async';
+      image.onload = async () => {
+        try {
+          if (image.decode) await image.decode();
+        } catch {}
+        loadedImages += 1;
+        setProgress(68 + Math.round((loadedImages / sectionImageSources.length) * 22));
+        resolve();
+      };
+      image.onerror = () => {
         loadedImages += 1;
         setProgress(68 + Math.round((loadedImages / sectionImageSources.length) * 22));
         resolve();
@@ -1217,9 +1247,8 @@
       image.src = src;
     }));
 
-    Promise.all(imagePreloads).then(finishLoading);
+    Promise.all(imagePreloads).then(finishLoadingOnce);
     window.addEventListener('load', () => setProgress(86), { once: true });
-    setTimeout(finishLoading, 4200);
   </script>
 </body>
 </html>

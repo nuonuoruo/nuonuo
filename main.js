@@ -550,7 +550,7 @@ function renderAuthState() {
 function requireLogin() {
   const user = getCurrentUser();
   if (!user) {
-    alert('璇峰厛鐧诲綍鍚庡啀鎿嶄綔');
+    alert('请先登录后再操作');
     openAuthModal('login');
     return null;
   }
@@ -560,7 +560,7 @@ function requireLogin() {
 function openPreview(url, caption) {
   if (!previewModal || !previewImage || !previewCaption) return;
   previewImage.src = url;
-  previewImage.alt = caption || '棰勮鍥剧墖';
+  previewImage.alt = caption || '预览图片';
   previewCaption.textContent = caption || '';
   previewModal.classList.add('show');
   previewModal.setAttribute('aria-hidden', 'false');
@@ -630,7 +630,7 @@ async function uploadFiles() {
 
   const files = getSelectedFiles();
   if (!files.length) {
-    alert('璇烽€夋嫨涓€寮犳垨澶氬紶鍥剧墖');
+    alert('请选择一张或多张图片');
     return;
   }
 
@@ -648,7 +648,7 @@ async function uploadFiles() {
     updateChooseButtonText();
     loadList();
   } catch (err) {
-    console.error('涓婁紶澶辫触:', err);
+    console.error('上传失败:', err);
     if (String(err && err.message) !== 'NOT_LOGGED_IN') {
       alert('上传失败，请检查密钥、Bucket、Region 或网络');
     }
@@ -673,8 +673,8 @@ async function loadList() {
             <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
           </svg>
         </div>
-        <h2 class="state-title">姝ｅ湪鍔犺浇鐓х墖</h2>
-        <p class="state-desc">璇风◢鍊欙紝姝ｅ湪浠庝簯绔幏鍙栫浉鍐屽唴瀹广€?/p>
+        <h2 class="state-title">正在加载照片</h2>
+        <p class="state-desc">请稍候，正在从云端获取相册内容。</p>
       </div>
     </div>
   `;
@@ -697,8 +697,8 @@ async function loadList() {
                 <path d="M9 10.5A1.5 1.5 0 1 0 9 7.5a1.5 1.5 0 0 0 0 3Z" fill="currentColor"/>
               </svg>
             </div>
-            <h2 class="state-title">鏆傛棤鐓х墖</h2>
-            <p class="state-desc">杩樻病鏈変笂浼犲唴瀹癸紝鐧诲綍鍚庣偣鍑讳笂鏂光€滈€夋嫨鍥剧墖鈥濆苟涓婁紶绗竴寮犵収鐗囧惂銆?/p>
+            <h2 class="state-title">暂无照片</h2>
+            <p class="state-desc">还没有上传内容，登录后点击上方“选择图片”并上传第一张照片吧。</p>
           </div>
         </div>
       `;
@@ -723,7 +723,7 @@ async function loadList() {
     gallery.innerHTML = enriched.map(({ item, meta }) => {
       const url = `https://${BUCKET}.cos.${REGION}.myqcloud.com/${item.Key}`;
       const originalName = meta?.originalName || item.Key;
-      const uploader = meta?.uploader || '鏈煡鐢ㄦ埛';
+      const uploader = meta?.uploader || '未知用户';
       const createdAt = meta?.createdAt ? new Date(meta.createdAt) : null;
       const timeText = createdAt && !Number.isNaN(createdAt.getTime())
         ? createdAt.toLocaleString('zh-CN', { hour12: false })
@@ -735,7 +735,7 @@ async function loadList() {
       const safeTime = escapeHtml(timeText);
 
       const deleteBtn = getCurrentUser()
-        ? `<button class="photo-action delete-btn" type="button" data-key="${escapeHtml(item.Key)}" aria-label="鍒犻櫎" title="鍒犻櫎">脳</button>`
+        ? `<button class="photo-action delete-btn" type="button" data-key="${escapeHtml(item.Key)}" aria-label="删除" title="删除">×</button>`
         : '';
 
       return `
@@ -752,7 +752,7 @@ async function loadList() {
           </div>
 
           <div class="photo-meta photo-owner" data-uploader="${safeUploader}" data-date="${safeTime}">
-            <div>涓婁紶鑰咃細<strong>${safeUploader}</strong></div>
+            <div>上传者：<strong>${safeUploader}</strong></div>
             <div>${safeTime}</div>
           </div>
 
@@ -761,7 +761,7 @@ async function loadList() {
       `;
     }).join('');
 
-    // 鍙粰鍒犻櫎鎸夐挳鍋氫竴娆″鎵橈紝涓嶅奖鍝嶅浘鐗囬瑙堬紙棰勮鐢?photo.html 澶勭悊锛?
+    // 只给删除按钮做一次委托，不影响图片预览（预览由 photo.html 处理）
     if (!gallery.__deleteBound) {
       gallery.__deleteBound = true;
       gallery.addEventListener('click', (e) => {
@@ -774,7 +774,7 @@ async function loadList() {
       });
     }
   } catch (err) {
-    console.error('鍒楄〃鍔犺浇澶辫触:', err);
+    console.error('列表加载失败:', err);
     gallery.innerHTML = `
       <div class="empty-state" style="grid-column: 1 / -1;">
         <div class="state-card">
@@ -785,8 +785,8 @@ async function loadList() {
               <path d="M10.3 4.9 2.8 18a2 2 0 0 0 1.73 3h15a2 2 0 0 0 1.73-3l-7.5-13.1a2 2 0 0 0-3.46 0Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
             </svg>
           </div>
-          <h2 class="state-title">鍔犺浇澶辫触</h2>
-          <p class="state-desc">璇锋鏌ュ瘑閽ャ€丅ucket銆丷egion 鎴?CORS 閰嶇疆鍚庨噸璇曘€?/p>
+          <h2 class="state-title">加载失败</h2>
+          <p class="state-desc">请检查密钥、Bucket、Region 或 CORS 配置后重试。</p>
         </div>
       </div>
     `;
@@ -808,7 +808,7 @@ async function deleteFile(key) {
     alert('删除成功');
     loadList();
   } catch (err) {
-    console.error('鍒犻櫎澶辫触:', err);
+    console.error('删除失败:', err);
     alert('删除失败');
   }
 }
