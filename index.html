@@ -215,32 +215,57 @@
     }
 
     .section-nav {
+      position: fixed;
+      top: 50%;
+      right: max(18px, env(safe-area-inset-right));
+      z-index: 42;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 5px;
-      min-height: 42px;
-      padding: 0 9px;
+      gap: 10px;
+      min-height: auto;
+      padding: 14px 8px;
       border-radius: 999px;
+      transform: translateY(-50%);
+    }
+
+    .section-nav::before {
+      content: "";
+      position: absolute;
+      top: 22px;
+      bottom: 22px;
+      left: 50%;
+      width: 1px;
+      background: linear-gradient(180deg, transparent, rgba(23, 32, 51, .22), transparent);
+      transform: translateX(-50%);
+      pointer-events: none;
     }
 
     .nav-dot {
-      width: 26px;
-      height: 26px;
+      position: relative;
+      z-index: 1;
+      width: 10px;
+      height: 10px;
       border: 0;
       border-radius: 50%;
       padding: 0;
-      color: rgba(23, 32, 51, .48);
-      background: transparent;
+      color: transparent;
+      background: rgba(23, 32, 51, .3);
       cursor: pointer;
-      font-size: 11px;
+      font-size: 0;
       line-height: 1;
-      transition: background .2s ease, color .2s ease, transform .2s ease;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.62);
+      transition: width .24s ease, border-radius .24s ease, background .24s ease, transform .24s ease, box-shadow .24s ease;
     }
 
     .nav-dot.is-active {
-      color: #fff;
-      background: rgba(23, 32, 51, .78);
-      transform: scale(1.04);
+      width: 28px;
+      border-radius: 999px;
+      background: rgba(23, 32, 51, .84);
+      transform: scale(1.02);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.82),
+        0 10px 24px rgba(73, 92, 118, .22);
     }
 
     .auth-box {
@@ -305,6 +330,86 @@
       min-height: 100svh;
       overflow: hidden;
       pointer-events: auto;
+      background:
+        linear-gradient(115deg, rgba(255,255,255,.18), transparent 34%),
+        radial-gradient(circle at 74% 21%, rgba(255,255,255,.58), transparent 30%),
+        linear-gradient(180deg, rgba(232,243,255,.18), rgba(235,244,253,.34));
+    }
+
+    .exhibit-space {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .exhibit-space::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(113,153,201,.105) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(113,153,201,.08) 1px, transparent 1px);
+      background-size: 92px 92px, 92px 92px;
+      mask-image: radial-gradient(circle at 62% 42%, black, transparent 72%);
+      opacity: .42;
+    }
+
+    .exhibit-space::after {
+      content: "";
+      position: absolute;
+      inset: 12vh 7vw 10vh 8vw;
+      border-left: 1px solid rgba(255,255,255,.68);
+      border-right: 1px solid rgba(113,153,201,.14);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.34), transparent 14%, transparent 84%, rgba(255,255,255,.18)),
+        linear-gradient(180deg, transparent, rgba(255,255,255,.32), transparent);
+      box-shadow:
+        inset 1px 0 0 rgba(113,153,201,.12),
+        0 0 80px rgba(255,255,255,.2);
+      opacity: .48;
+    }
+
+    .exhibit-line {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.88), rgba(113,153,201,.22), transparent);
+      opacity: .62;
+    }
+
+    .exhibit-line.line-a {
+      top: 25vh;
+      left: 12vw;
+      width: 44vw;
+    }
+
+    .exhibit-line.line-b {
+      right: 9vw;
+      bottom: 21vh;
+      width: 38vw;
+    }
+
+    .exhibit-column {
+      position: absolute;
+      top: 13vh;
+      bottom: 10vh;
+      width: min(13vw, 160px);
+      border: 1px solid rgba(255,255,255,.42);
+      border-top: 0;
+      border-bottom: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,.22), rgba(255,255,255,.04), rgba(113,153,201,.07));
+      filter: blur(.2px);
+      opacity: .42;
+    }
+
+    .exhibit-column.column-a {
+      left: 6vw;
+    }
+
+    .exhibit-column.column-b {
+      right: 5vw;
+      opacity: .32;
     }
 
     .scroll-stage {
@@ -326,6 +431,21 @@
       filter: blur(8px);
       transform: translate3d(calc(var(--mx, 0) * 22px), calc(var(--my, 0) * 18px), 0);
       opacity: .8;
+      pointer-events: none;
+    }
+
+    .scroll-stage::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 9vh;
+      width: min(760px, 58vw);
+      height: 18px;
+      border-radius: 999px;
+      background: radial-gradient(ellipse at center, rgba(73, 92, 118, .18), rgba(73, 92, 118, 0) 68%);
+      transform: translateX(-2%);
+      filter: blur(8px);
+      opacity: .55;
       pointer-events: none;
     }
 
@@ -386,30 +506,6 @@
       max-width: 620px;
     }
 
-    .story-copy p {
-      max-width: 520px;
-      margin: 22px 0 0;
-      color: var(--muted);
-      font-size: clamp(16px, 1.45vw, 20px);
-      line-height: 1.75;
-    }
-
-    .story-copy .story-detail {
-      display: inline-flex;
-      margin-bottom: 16px;
-      padding: 8px 12px;
-      border: 1px solid rgba(255,255,255,.78);
-      border-radius: 999px;
-      background: rgba(255,255,255,.48);
-      color: rgba(23,32,51,.58);
-      font-size: 13px;
-      font-weight: 720;
-      line-height: 1;
-      box-shadow: 0 12px 34px rgba(77, 97, 123, .1);
-      backdrop-filter: blur(18px) saturate(145%);
-      -webkit-backdrop-filter: blur(18px) saturate(145%);
-    }
-
     .entry-layer {
       position: absolute;
       inset: 0;
@@ -461,6 +557,9 @@
 
     h2 {
       font-size: clamp(50px, 8.4vw, 122px);
+      text-shadow:
+        0 18px 58px rgba(73, 92, 118, .18),
+        0 1px 0 rgba(255,255,255,.5);
     }
 
     .copy {
@@ -478,8 +577,14 @@
       padding: 0;
       border: 1px solid rgba(255,255,255,.84);
       border-radius: var(--radius);
-      background: rgba(255,255,255,.45);
-      box-shadow: var(--shadow-strong);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.58), rgba(255,255,255,.22)),
+        rgba(255,255,255,.45);
+      box-shadow:
+        0 42px 120px rgba(73, 92, 118, .25),
+        0 8px 0 rgba(255,255,255,.28),
+        inset 0 0 0 1px rgba(255,255,255,.45),
+        inset 0 -40px 70px rgba(23,32,51,.08);
       overflow: hidden;
       backdrop-filter: blur(28px) saturate(145%);
       -webkit-backdrop-filter: blur(28px) saturate(145%);
@@ -500,7 +605,8 @@
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(135deg, rgba(255,255,255,.48), transparent 42%),
+        linear-gradient(135deg, rgba(255,255,255,.48), transparent 34%),
+        linear-gradient(90deg, rgba(255,255,255,.2), transparent 20%, transparent 78%, rgba(255,255,255,.22)),
         var(--section-image) center / cover no-repeat;
       transform: scale(1.06);
       transition: transform 1.2s cubic-bezier(.19, 1, .22, 1), filter .75s ease;
@@ -516,7 +622,8 @@
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.15), transparent 44%, rgba(255,255,255,.26)),
+        linear-gradient(180deg, rgba(255,255,255,.24), transparent 36%, rgba(255,255,255,.34)),
+        linear-gradient(108deg, transparent 0 34%, rgba(255,255,255,.34) 35%, transparent 47%),
         radial-gradient(circle at 22% 20%, rgba(255,255,255,.74), transparent 24%);
       pointer-events: none;
     }
@@ -557,10 +664,14 @@
       padding: 18px;
       border: 1px solid rgba(255,255,255,.78);
       border-radius: var(--radius);
-      background: rgba(255,255,255,.56);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.8), rgba(255,255,255,.5)),
+        rgba(255,255,255,.56);
       backdrop-filter: blur(20px) saturate(150%);
       -webkit-backdrop-filter: blur(20px) saturate(150%);
-      box-shadow: 0 18px 50px rgba(73, 92, 118, .16);
+      box-shadow:
+        0 22px 58px rgba(73, 92, 118, .18),
+        inset 0 1px 0 rgba(255,255,255,.72);
     }
 
     .visual-card strong {
@@ -730,7 +841,10 @@
 
     @media (max-width: 920px) {
       .section-nav {
-        display: none;
+        right: 10px;
+        gap: 8px;
+        padding: 10px 6px;
+        background: rgba(255,255,255,.36);
       }
 
       .text-scene,
@@ -846,23 +960,28 @@
         line-height: 1.72;
       }
 
-      .story-copy p {
-        max-width: 88vw;
-        margin-top: 15px;
-        font-size: 14px;
-        line-height: 1.62;
-      }
-
-      .story-copy .story-detail {
-        margin-bottom: 12px;
-        padding: 7px 10px;
-        font-size: 12px;
-      }
-
       .visual {
-        top: 39svh;
+        top: 36svh;
         bottom: auto;
-        min-height: min(300px, 35svh);
+        min-height: min(320px, 38svh);
+      }
+
+      .exhibit-space::before {
+        background-size: 68px 68px, 68px 68px;
+        opacity: .26;
+      }
+
+      .exhibit-space::after {
+        inset: 15vh 7vw 18vh 7vw;
+        opacity: .28;
+      }
+
+      .exhibit-column {
+        opacity: .22;
+      }
+
+      .exhibit-line {
+        opacity: .38;
       }
 
       .visual-card {
@@ -922,6 +1041,12 @@
         </div>
       </section>
       <section class="story-pin" id="storyPin" aria-label="入口故事舞台">
+        <div class="exhibit-space" aria-hidden="true">
+          <span class="exhibit-column column-a"></span>
+          <span class="exhibit-column column-b"></span>
+          <span class="exhibit-line line-a"></span>
+          <span class="exhibit-line line-b"></span>
+        </div>
         <div class="scroll-stage" id="scrollStage" aria-label="入口图片舞台"></div>
         <div class="story-copy-stage" id="storyCopyStage"></div>
       </section>
@@ -985,13 +1110,13 @@
     ];
 
     const sections = [
-      { key: 'photo', title: '照片墙', lead: '把喜欢的瞬间铺成一面会发光的墙。', href: './photo.html', detail: '影像收藏', image: 1 },
-      { key: 'days', title: '纪念日', lead: '记录在一起的天数，也记录每一次被想起的日期。', href: './days.html', detail: '时间纪念', image: 2 },
-      { key: 'message', title: '留言墙', lead: '把想说的话留在这里，像一张张贴在玻璃上的便签。', href: './message.html', detail: '留言收集', image: 3 },
-      { key: 'game', title: '爱心小游戏', lead: '进入轻松一点的互动，把心情变成游戏里的分数。', href: './game.html', detail: '互动游戏', image: 4, requiresAuth: true },
-      { key: 'pet', title: 'CoCo日记', lead: '给 CoCo 留一页柔软的日记，放下那些小小的日常。', href: './pet.html', detail: '日常记录', image: 5, requiresAuth: true },
-      { key: 'drink', title: '酒桌游戏', lead: '聚会时打开，规则、节奏和气氛都放在同一屏里。', href: './drinkgame.html', detail: '聚会玩法', image: 6 },
-      { key: 'video', title: 'nuonuo学堂', lead: '把学习、资料和视频课程收进一块轻薄的玻璃屏幕。', href: './video.html', detail: '学习空间', image: 7 }
+      { key: 'photo', title: '照片墙', href: './photo.html', image: 1 },
+      { key: 'days', title: '纪念日', href: './days.html', image: 2 },
+      { key: 'message', title: '留言墙', href: './message.html', image: 3 },
+      { key: 'game', title: '爱心小游戏', href: './game.html', image: 4, requiresAuth: true },
+      { key: 'pet', title: 'CoCo日记', href: './pet.html', image: 5, requiresAuth: true },
+      { key: 'drink', title: '酒桌游戏', href: './drinkgame.html', image: 6 },
+      { key: 'video', title: 'nuonuo学堂', href: './video.html', image: 7 }
     ];
 
     const authBox = document.getElementById('authBox');
@@ -1140,9 +1265,7 @@
         textScene.dataset.key = section.key;
         textScene.innerHTML = `
           <div class="story-copy-inner section-copy">
-            <div class="story-detail">${section.detail}</div>
             <h2>${section.title}</h2>
-            <p>${section.lead}</p>
           </div>
         `;
         storyCopyStage.appendChild(textScene);
@@ -1265,6 +1388,7 @@
       const visualItems = sections.map(section => section.visual);
       const copyItems = sections.map(section => section.textScene);
       const cardItems = sections.map(section => section.visual.querySelector('.visual-card'));
+      const exhibitItems = gsap.utils.toArray('.exhibit-column, .exhibit-line');
       mm.add({
         isDesktop: '(min-width: 921px)',
         isMobile: '(max-width: 920px)',
@@ -1295,6 +1419,11 @@
           y: isMobile ? 16 : 28,
           scale: 0.96
         });
+        gsap.set(exhibitItems, {
+          autoAlpha: isMobile ? 0.42 : 0.62,
+          y: 0,
+          x: 0
+        });
 
         gsap.set(layerItems[0], { autoAlpha: 1, zIndex: 100 });
         gsap.set(visualItems[0], { autoAlpha: 1, y: 0, scale: 1, rotationX: 0, rotationY: 0 });
@@ -1305,6 +1434,17 @@
         if (reduceMotion) {
           return () => {};
         }
+
+        gsap.to(exhibitItems, {
+          x: (index) => (index % 2 === 0 ? 10 : -8),
+          y: (index) => (index % 2 === 0 ? -8 : 8),
+          autoAlpha: isMobile ? 0.34 : 0.52,
+          duration: 5.5,
+          ease: 'sine.inOut',
+          repeat: -1,
+          yoyo: true,
+          stagger: 0.32
+        });
 
         const tl = gsap.timeline({
           defaults: { ease: 'power2.inOut' },
@@ -1420,6 +1560,7 @@
 
         return () => {
           storyScrollTrigger = null;
+          gsap.killTweensOf(exhibitItems);
           tl.kill();
         };
       });
