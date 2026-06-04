@@ -1,841 +1,327 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>nuonuo小窝</title>
   <style>
     :root {
-      --bg1: #f7f8fb;
-      --bg2: #eef5ff;
-      --bg3: #fff7fb;
-      --text: #1d1d1f;
-      --subtext: #6e6e73;
-      --panel: rgba(255, 255, 255, 0.66);
-      --panel-strong: rgba(255, 255, 255, 0.88);
-      --stroke: rgba(255, 255, 255, 0.78);
-      --shadow: 0 24px 70px rgba(15, 23, 42, 0.10);
-      --shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.07);
-      --primary: #0a84ff;
-      --primary-2: #0071e3;
-      --danger: #ff3b30;
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
+      color-scheme: dark;
+      --bg: #030508;
+      --text: #f7fbff;
+      --muted: rgba(226, 238, 255, .64);
+      --line: rgba(255, 255, 255, .15);
+      --glass: rgba(5, 9, 16, .42);
+      --glass-strong: rgba(10, 16, 26, .78);
+      --cyan: #8fe9ff;
+      --gold: #f4c982;
+      --danger: #ff6978;
+      --shadow: 0 24px 80px rgba(0, 0, 0, .38);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    html, body {
-      margin: 0;
+    html,
+    body {
+      width: 100%;
       min-height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
-      background:
-        radial-gradient(circle at 18% 12%, rgba(10, 132, 255, 0.12), transparent 24%),
-        radial-gradient(circle at 82% 18%, rgba(191, 90, 242, 0.10), transparent 22%),
-        radial-gradient(circle at 74% 90%, rgba(48, 209, 88, 0.09), transparent 24%),
-        linear-gradient(180deg, #fbfbfd 0%, #f2f4f8 100%);
-      overflow-x: hidden;
     }
 
     body {
-      padding: 18px;
+      min-height: 100dvh;
       position: relative;
+      isolation: isolate;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: -22vh -18vw auto -18vw;
-      height: 58vh;
-      background:
-        radial-gradient(circle at 28% 44%, rgba(10, 132, 255, 0.18), transparent 24%),
-        radial-gradient(circle at 58% 22%, rgba(255, 159, 10, 0.10), transparent 20%),
-        radial-gradient(circle at 76% 56%, rgba(255, 55, 95, 0.10), transparent 22%);
-      filter: blur(28px);
-      opacity: .82;
-      pointer-events: none;
-      animation: ambientDrift 13s ease-in-out infinite alternate;
+    button,
+    input {
+      font: inherit;
     }
 
-    body::after {
-      content: "";
+    .experience {
       position: fixed;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.38) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.28) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: linear-gradient(180deg, rgba(0,0,0,.24), transparent 58%);
-      pointer-events: none;
-    }
-
-    @keyframes ambientDrift {
-      from { transform: translate3d(-2%, 0, 0) scale(1); }
-      to { transform: translate3d(2%, 4%, 0) scale(1.06); }
-    }
-
-    .page {
-      max-width: 880px;
-      margin: 0 auto;
-      min-height: calc(100vh - 36px);
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      position: relative;
-      z-index: 1;
-      animation: pageIn .55s ease both;
-    }
-
-    @keyframes pageIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .topbar {
-      background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.54));
-      backdrop-filter: saturate(180%) blur(28px);
-      -webkit-backdrop-filter: saturate(180%) blur(28px);
-      border: 1px solid rgba(255, 255, 255, 0.82);
-      border-radius: 22px;
-      box-shadow: var(--shadow-soft);
-      padding: 11px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .brand-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .brand-dot {
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      background:
-        radial-gradient(circle at 34% 28%, rgba(255,255,255,.92), rgba(255,255,255,.18) 24%, transparent 25%),
-        linear-gradient(145deg, #8ec5ff 0%, #b389ff 48%, #ff9fb8 100%);
-      box-shadow:
-        0 9px 18px rgba(84, 112, 255, 0.18),
-        inset 0 1px 0 rgba(255,255,255,.62);
-      flex: 0 0 auto;
-    }
-
-    .brand-title {
-      font-size: 14px;
-      font-weight: 760;
-      color: var(--text);
-      white-space: nowrap;
-    }
-
-    .hero-wrap {
-      flex: 1;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 2px;
-    }
-
-    .hero {
-      width: min(100%, 720px);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,.58)),
-        radial-gradient(circle at 18% 12%, rgba(255,255,255,.72), transparent 28%);
-      backdrop-filter: saturate(190%) blur(30px);
-      -webkit-backdrop-filter: saturate(190%) blur(30px);
-      border: 1px solid rgba(255, 255, 255, 0.86);
-      border-radius: 30px;
-      box-shadow: var(--shadow);
-      padding: 32px 30px 26px;
       overflow: hidden;
-      position: relative;
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: auto -80px -120px auto;
-      width: 280px;
-      height: 280px;
-      border-radius: 50%;
       background:
-        radial-gradient(circle, rgba(10,132,255,.13) 0%, rgba(10,132,255,0) 68%);
-      pointer-events: none;
-      animation: haloFloat 9s ease-in-out infinite alternate;
+        radial-gradient(circle at 50% 52%, rgba(63, 199, 255, .18), transparent 34%),
+        radial-gradient(circle at 78% 22%, rgba(244, 201, 130, .1), transparent 28%),
+        linear-gradient(180deg, #03050a 0%, #05070d 48%, #010205 100%);
     }
 
-    .hero::after {
+    .experience::before,
+    .experience::after {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,.42) 42%, transparent 64%);
-      transform: translateX(-78%);
-      opacity: .42;
       pointer-events: none;
-      animation: sheen 7s ease-in-out infinite;
+      z-index: 2;
     }
 
-    @keyframes haloFloat {
-      from { transform: translate3d(0, 0, 0) scale(1); }
-      to { transform: translate3d(-16px, -10px, 0) scale(1.05); }
-    }
-
-    @keyframes sheen {
-      0%, 42% { transform: translateX(-82%); }
-      68%, 100% { transform: translateX(82%); }
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-size: 44px;
-      line-height: 1.12;
-      letter-spacing: 0;
-      font-weight: 850;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero p {
-      margin: 10px 0 0;
-      color: var(--subtext);
-      font-size: 15px;
-      line-height: 1.7;
-      position: relative;
-      z-index: 1;
-    }
-
-    .app-grid {
-      margin-top: 24px;
-      display: grid;
-      grid-template-columns: repeat(4, minmax(82px, 1fr));
-      gap: 18px 12px;
-      max-width: 620px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .app-link {
-      text-decoration: none;
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      animation: appIn .5s ease both;
-    }
-
-    .app-icon {
-      width: 70px;
-      aspect-ratio: 1 / 1;
-      border-radius: 19px;
-      display: grid;
-      place-items: center;
-      position: relative;
-      overflow: hidden;
-      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
-      box-shadow:
-        0 12px 26px rgba(15, 23, 42, 0.12),
-        inset 0 1px 0 rgba(255,255,255,.48);
-      border: 1px solid rgba(255,255,255,.42);
-    }
-
-    .app-icon::before {
-      content: "";
-      position: absolute;
-      inset: 0;
+    .experience::before {
       background:
-        radial-gradient(circle at 25% 18%, rgba(255,255,255,.52), transparent 28%),
-        radial-gradient(circle at 75% 88%, rgba(255,255,255,.14), transparent 26%);
-      pointer-events: none;
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size: 74px 74px;
+      mask-image: radial-gradient(circle at 50% 52%, rgba(0,0,0,.7), transparent 66%);
+      opacity: .55;
+      transform: translate3d(calc(var(--mx, 0) * -10px), calc(var(--my, 0) * -8px), 0);
     }
 
-    .app-icon::after {
-      content: "";
-      position: absolute;
-      inset: auto 0 0 0;
-      height: 42%;
-      background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.12));
-      pointer-events: none;
+    .experience::after {
+      background:
+        radial-gradient(circle at 50% 52%, transparent 0 46%, rgba(0,0,0,.42) 78%, rgba(0,0,0,.82) 100%),
+        linear-gradient(180deg, rgba(255,255,255,.05), transparent 18%, transparent 75%, rgba(255,255,255,.04));
+      mix-blend-mode: normal;
     }
 
-    .app-link:hover .app-icon {
-      transform: translateY(-4px) scale(1.025);
-      box-shadow:
-        0 18px 34px rgba(15, 23, 42, 0.15),
-        inset 0 1px 0 rgba(255,255,255,.52);
-    }
-
-    .app-link:active .app-icon {
-      transform: translateY(-1px) scale(.98);
-    }
-
-    .app-icon svg {
-      width: 30px;
-      height: 30px;
-      display: block;
-      color: #fff;
-      position: relative;
-      z-index: 1;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,.12));
-    }
-
-    .app-icon.has-image {
-      background: transparent;
-      border: none;
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
-    }
-
-    .app-icon.has-image::before,
-    .app-icon.has-image::after {
-      display: none;
-    }
-
-    .app-icon.has-image img {
+    .webgl {
       position: absolute;
       inset: 0;
+      z-index: 1;
       width: 100%;
       height: 100%;
-      object-fit: cover;
       display: block;
+      touch-action: none;
     }
 
-    .app-icon.has-image svg {
-      display: none;
+    .ui-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
     }
 
-    .icon-photo {
-      background: linear-gradient(160deg, #78c7ff 0%, #3b82f6 54%, #2563eb 100%);
-    }
-
-    .icon-days {
-      background: linear-gradient(160deg, #9ad7ff 0%, #54b4d3 52%, #2f80ed 100%);
-    }
-
-    .icon-message {
-      background: linear-gradient(160deg, #9de7d7 0%, #34c759 48%, #10a37f 100%);
-    }
-
-    .icon-game {
-      background: linear-gradient(160deg, #ffc1d6 0%, #ff5f8f 50%, #d946ef 100%);
-    }
-
-    .icon-drink {
-      background: linear-gradient(160deg, #ffe0a6 0%, #ff9f0a 48%, #ff6b35 100%);
-    }
-
-    .icon-pet {
-      background: linear-gradient(160deg, #c7b9ff 0%, #8b5cf6 52%, #5e5ce6 100%);
-    }
-
-    .icon-video {
-      background: linear-gradient(160deg, #8ee9ff 0%, #0a84ff 48%, #0057d9 100%);
-    }
-
-    @keyframes appIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .app-link:nth-child(1) { animation-delay: .04s; }
-    .app-link:nth-child(2) { animation-delay: .08s; }
-    .app-link:nth-child(3) { animation-delay: .12s; }
-    .app-link:nth-child(4) { animation-delay: .16s; }
-    .app-link:nth-child(5) { animation-delay: .20s; }
-    .app-link:nth-child(6) { animation-delay: .24s; }
-    .app-link:nth-child(7) { animation-delay: .28s; }
-
-    .app-label {
-      font-size: 13px;
-      font-weight: 650;
-      color: #1f2328;
+    .brand {
+      position: fixed;
+      top: max(18px, env(safe-area-inset-top));
+      left: max(18px, env(safe-area-inset-left));
+      z-index: 8;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+      color: rgba(247, 251, 255, .9);
       letter-spacing: 0;
-      text-align: center;
+      text-shadow: 0 1px 22px rgba(143, 233, 255, .18);
     }
 
-    .bottom-space {
-      flex: 1;
-      min-height: 120px;
-      background:
-        radial-gradient(circle at 50% 85%, rgba(170, 255, 200, 0.10), transparent 25%);
-      border-radius: 24px;
+    .brand-mark {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow:
+        0 0 10px rgba(255, 255, 255, .95),
+        0 0 34px rgba(143, 233, 255, .66),
+        0 0 72px rgba(244, 201, 130, .3);
+    }
+
+    .brand-name {
+      font-size: clamp(15px, 1.4vw, 18px);
+      font-weight: 650;
     }
 
     .auth-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .auth-status {
-      font-size: 13px;
-      color: var(--subtext);
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.42);
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      white-space: nowrap;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .btn {
-      border: none;
-      border-radius: 999px;
-      font-weight: 700;
-      cursor: pointer;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 18px;
-      font-size: 14px;
-    }
-
-    .btn:hover { transform: translateY(-1px); }
-
-    .primary-btn {
-      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
-      color: #fff;
-      box-shadow: 0 10px 22px rgba(0,113,227,.24);
-    }
-
-    .ghost-btn {
-      background: rgba(0,0,0,.06);
-      color: var(--text);
-    }
-
-    .danger-btn {
-      background: rgba(255,59,48,.92);
-      color: #fff;
-      box-shadow: 0 8px 18px rgba(255,59,48,.18);
-    }
-
-    .logout-btn {
-      padding: 8px 12px;
-      min-width: 88px;
-      width: auto;
-      flex: 0 0 auto;
-    }
-    .auth-modal {
       position: fixed;
-      inset: 0;
-      z-index: 200;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(0,0,0,.65);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-
-    .auth-modal.show { display: flex; }
-
-    .auth-modal-card {
-      width: min(92vw, 420px);
-      border-radius: 24px;
-      background: rgba(255,255,255,.95);
-      border: 1px solid rgba(255,255,255,.3);
-      box-shadow: 0 30px 80px rgba(0,0,0,.28);
-      overflow: hidden;
-      animation: modalIn .22s ease both;
-    }
-
-    @keyframes modalIn {
-      from { opacity: 0; transform: translateY(8px) scale(.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .auth-modal-head {
-      padding: 18px 20px 12px;
-      border-bottom: 1px solid rgba(0,0,0,.06);
-    }
-
-    .auth-modal-head h3 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: -0.02em;
-    }
-
-    .auth-modal-head p {
-      margin: 8px 0 0;
-      color: var(--subtext);
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
-    .auth-modal-body {
-      padding: 18px 20px 20px;
-      display: grid;
-      gap: 12px;
-    }
-
-    .auth-field {
-      display: grid;
-      gap: 8px;
-    }
-
-    .auth-field label {
-      font-size: 13px;
-      color: var(--subtext);
-      font-weight: 700;
-    }
-
-    .auth-input {
-      height: 46px;
-      border-radius: 14px;
-      border: 1px solid rgba(0,0,0,.08);
-      padding: 0 14px;
-      font-size: 14px;
-      outline: none;
-      background: rgba(255,255,255,.96);
-    }
-
-    .auth-input:focus {
-      border-color: rgba(0,113,227,.28);
-      box-shadow: 0 0 0 4px rgba(0,113,227,.10);
-    }
-
-    .auth-modal-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 6px;
-    }
-
-    .auth-modal-actions button {
-      flex: 1 1 0;
-      min-width: 120px;
-      height: 44px;
-      border: none;
-      border-radius: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .auth-modal-actions .ok {
-      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
-      color: #fff;
-    }
-
-    .auth-modal-actions .cancel {
-      background: rgba(0,0,0,.06);
-      color: var(--text);
-    }
-
-    .auth-switch {
-      font-size: 13px;
-      color: var(--subtext);
-      cursor: pointer;
-      user-select: none;
-      text-decoration: underline;
-    }
-
-    @media (max-width: 720px) {
-      body { padding: 12px; }
-      .page {
-        min-height: calc(100vh - 24px);
-      }
-      .topbar {
-        border-radius: 22px;
-        padding: 14px 16px;
-      }
-      .hero {
-        border-radius: 24px;
-        padding: 24px 18px 22px;
-      }
-      .hero h1 {
-        font-size: 32px;
-      }
-      .hero p {
-        font-size: 14px;
-      }
-      .app-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px 10px;
-        max-width: 100%;
-      }
-      .app-icon {
-        width: 62px;
-        max-width: none;
-        margin: 0 auto;
-        border-radius: 18px;
-      }
-      .app-icon svg {
-        width: 27px;
-        height: 27px;
-      }
-      .app-label {
-        font-size: 12px;
-      }
-      .bottom-space {
-        min-height: 90px;
-      }
-      .auth-box {
-        width: 100%;
-      }
-      .btn {
-        width: 100%;
-      }
-      /* 手机上也保持“退出登录”按钮更短 */
-      .auth-box .logout-btn {
-        width: auto;
-      }
-    }
-
-    @media (min-width: 721px) and (max-width: 900px) {
-      .app-grid {
-        grid-template-columns: repeat(4, minmax(80px, 1fr));
-        max-width: 100%;
-      }
-    }
-
-    @media (max-width: 380px) {
-      .app-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-      }
-    }
-
-    body.room-home {
-      --mx: 0;
-      --my: 0;
-      --cursor-x: 50vw;
-      --cursor-y: 50vh;
-      padding: 0;
-      min-height: 100dvh;
-      background: #17110c;
-      overflow: hidden;
-    }
-
-    .room-viewport {
-      width: 100vw;
-      height: 100dvh;
-      overflow-x: auto;
-      overflow-y: hidden;
-      overscroll-behavior-x: contain;
-      scroll-snap-type: x proximity;
-      scrollbar-width: none;
-      background: #17110c;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .room-viewport::-webkit-scrollbar {
-      display: none;
-    }
-
-    .room-stage {
-      width: max(100vw, calc(100dvh * 1.453125));
-      height: 100dvh;
-      min-width: 1180px;
-      position: relative;
-      margin: 0 auto;
-      isolation: isolate;
-      overflow: hidden;
-      background: #17110c;
-      scroll-snap-align: center;
-      perspective: 1100px;
-    }
-
-    .room-world {
-      position: absolute;
-      inset: 0;
-    }
-
-    .room-scene {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: none;
-      user-select: none;
-      -webkit-user-drag: none;
-    }
-
-    .room-3d {
-      position: absolute;
-      inset: 0;
-      z-index: 4;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      filter: saturate(.96);
-      opacity: 1;
-    }
-
-    .room-auth {
-      position: fixed;
-      top: clamp(14px, 2.5vh, 26px);
-      right: clamp(18px, 3vw, 42px);
-      z-index: 30;
+      top: max(14px, env(safe-area-inset-top));
+      right: max(14px, env(safe-area-inset-right));
+      z-index: 20;
+      min-height: 42px;
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 8px;
-      min-height: 36px;
-      padding: 6px 10px;
+      gap: 9px;
+      padding: 7px;
+      border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(255, 252, 245, .34);
-      border: 1px solid rgba(255,255,255,.38);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: #4d3826;
-      font-family: Georgia, "Times New Roman", "Songti SC", serif;
-      font-size: clamp(13px, 1.55vh, 16px);
+      background: rgba(7, 12, 20, .44);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+      pointer-events: auto;
+    }
+
+    .auth-status {
+      max-width: min(34vw, 190px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 0 4px 0 10px;
+      color: rgba(247, 251, 255, .72);
+      font-size: 13px;
       line-height: 1;
-      text-shadow: 0 1px 0 rgba(255,255,255,.3);
     }
 
-    .room-auth .auth-status {
-      padding: 0;
+    .btn {
+      min-height: 28px;
       border: 0;
-      border-radius: 0;
-      background: transparent;
-      color: inherit;
-      font-size: inherit;
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
-    }
-
-    .room-auth .btn {
-      padding: 0 0 0 8px;
-      min-width: 0;
-      width: auto;
-      height: auto;
-      border-radius: 0;
-      background: transparent;
-      box-shadow: none;
-      color: inherit;
-      font: inherit;
-      border-left: 1px solid rgba(77,56,38,.46);
-    }
-
-    .room-auth .btn:hover {
-      transform: none;
-      opacity: .72;
-    }
-
-    .room-auth .ghost-btn {
-      display: inline-flex;
-    }
-
-    .room-hotspot {
-      position: absolute;
-      z-index: 10;
-      width: clamp(54px, 6.6vh, 78px);
-      height: clamp(54px, 6.6vh, 78px);
       border-radius: 999px;
-      transform: translate(-50%, -50%);
-      cursor: none;
-      -webkit-tap-highlight-color: transparent;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      cursor: pointer;
+      background: rgba(255, 255, 255, .1);
+      transition: transform .18s ease, background .18s ease, opacity .18s ease;
+      white-space: nowrap;
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .18);
+    }
+
+    .primary-btn {
+      background: rgba(255, 255, 255, .9);
+      color: #07101b;
+    }
+
+    .ghost-btn {
+      border: 1px solid rgba(255,255,255,.16);
+    }
+
+    .danger-btn {
+      color: #ffeef1;
+      background: rgba(255, 105, 120, .16);
+    }
+
+    .portal {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 9;
+      width: 64px;
+      height: 64px;
+      border: 0;
+      border-radius: 50%;
+      padding: 0;
+      background: transparent;
+      color: var(--text);
+      pointer-events: auto;
+      cursor: pointer;
       touch-action: manipulation;
+      transform: translate(-50%, -50%) scale(var(--portal-scale, 1));
+      opacity: var(--portal-opacity, 1);
+      transition: opacity .18s ease, filter .18s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .portal::before,
+    .portal::after {
+      content: "";
+      position: absolute;
+      inset: 50% auto auto 50%;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .portal::before {
+      width: 12px;
+      height: 12px;
+      background: rgba(255, 255, 255, .98);
+      box-shadow:
+        0 0 12px rgba(255, 255, 255, 1),
+        0 0 34px rgba(143, 233, 255, .82),
+        0 0 76px rgba(244, 201, 130, .34);
+      animation: blink 1.7s ease-in-out infinite;
+    }
+
+    .portal::after {
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(255, 255, 255, .28);
+      box-shadow: inset 0 0 20px rgba(143, 233, 255, .08);
+      opacity: .76;
+      animation: ring 2.4s ease-in-out infinite;
+    }
+
+    .portal:hover,
+    .portal.is-active,
+    .portal:focus-visible {
+      filter: brightness(1.35);
       outline: none;
     }
 
-    .room-hotspot::before {
-      content: "";
+    .portal:hover::after,
+    .portal.is-active::after,
+    .portal:focus-visible::after {
+      border-color: rgba(255, 255, 255, .72);
+      box-shadow:
+        inset 0 0 22px rgba(143, 233, 255, .16),
+        0 0 34px rgba(255, 255, 255, .18);
+    }
+
+    .portal-label {
       position: absolute;
-      inset: 50% auto auto 50%;
-      width: 16px;
-      height: 16px;
+      left: 50%;
+      top: calc(50% + 34px);
+      transform: translate(-50%, 10px);
+      min-width: max-content;
+      max-width: 132px;
+      padding: 7px 10px;
       border-radius: 999px;
-      transform: translate(-50%, -50%);
-      background: transparent;
-      box-shadow: none;
-      transition: transform .18s ease, opacity .18s ease;
-    }
-
-    .room-hotspot::after {
-      content: "";
-      position: absolute;
-      inset: 50% auto auto 50%;
-      width: 42px;
-      height: 42px;
-      border-radius: 999px;
-      transform: translate(-50%, -50%);
-      border: 1px solid transparent;
-    }
-
-    .room-hotspot:focus-visible::after {
-      border-color: rgba(255,255,255,.9);
-      box-shadow: 0 0 0 6px rgba(255,255,255,.24);
-    }
-
-    .room-hotspot:active::after {
-      background: rgba(255,255,255,.16);
-    }
-
-    @keyframes roomPulse {
-      0%, 100% { opacity: .42; transform: translate(-50%, -50%) scale(.86); }
-      50% { opacity: .82; transform: translate(-50%, -50%) scale(1.12); }
-    }
-
-    .hotspot-photo { left: 12.25%; top: 19.45%; }
-    .hotspot-days { left: 23.95%; top: 47.85%; }
-    .hotspot-message { left: 8.55%; top: 60.1%; }
-    .hotspot-game { left: 42.15%; top: 66.15%; }
-    .hotspot-pet { left: 68.0%; top: 67.9%; }
-    .hotspot-drink { left: 91.0%; top: 67.15%; }
-    .hotspot-video { left: 83.5%; top: 35.7%; }
-
-    .room-cursor {
-      position: fixed;
-      left: var(--cursor-x);
-      top: var(--cursor-y);
-      z-index: 40;
-      width: 34px;
-      height: 34px;
-      border-radius: 999px;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(6, 10, 17, .64);
+      color: rgba(247, 251, 255, .92);
+      box-shadow: 0 14px 42px rgba(0, 0, 0, .32);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      font-size: 13px;
+      line-height: 1;
       opacity: 0;
-      mix-blend-mode: screen;
-      background:
-        radial-gradient(circle, rgba(255,255,255,.98) 0 13%, rgba(255,255,255,.46) 14% 30%, transparent 62%);
-      box-shadow: 0 0 18px rgba(255,255,255,.72), 0 0 38px rgba(255,255,255,.38);
-      transition: opacity .16s ease, width .16s ease, height .16s ease;
-      animation: cursorBlink 1.25s ease-in-out infinite;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      white-space: nowrap;
     }
 
-    .room-home.has-cursor .room-cursor {
-      opacity: .86;
-    }
-
-    .room-home.hotspot-hover .room-cursor {
-      width: 46px;
-      height: 46px;
+    .portal:hover .portal-label,
+    .portal.is-active .portal-label,
+    .portal:focus-visible .portal-label {
       opacity: 1;
+      transform: translate(-50%, 0);
     }
 
-    @keyframes cursorBlink {
-      0%, 100% { filter: brightness(1); }
-      45% { filter: brightness(1.38); }
-      62% { filter: brightness(.78); }
+    @keyframes blink {
+      0%, 100% { opacity: .72; transform: translate(-50%, -50%) scale(.88); }
+      45% { opacity: 1; transform: translate(-50%, -50%) scale(1.12); }
+      62% { opacity: .5; transform: translate(-50%, -50%) scale(.78); }
+    }
+
+    @keyframes ring {
+      0%, 100% { opacity: .34; transform: translate(-50%, -50%) scale(.9); }
+      50% { opacity: .76; transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    .scene-caption {
+      position: fixed;
+      left: 50%;
+      bottom: max(22px, env(safe-area-inset-bottom));
+      z-index: 7;
+      width: min(420px, calc(100vw - 36px));
+      transform: translateX(-50%);
+      pointer-events: none;
+      text-align: center;
+      color: rgba(247, 251, 255, .48);
+      font-size: clamp(12px, 1.2vw, 14px);
+      line-height: 1.5;
+    }
+
+    .scene-caption span {
+      color: rgba(247, 251, 255, .82);
     }
 
     .sr-only {
@@ -850,102 +336,203 @@
       border: 0;
     }
 
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, .62);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .auth-modal.show {
+      display: flex;
+    }
+
+    .auth-modal-card {
+      width: min(420px, 100%);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, .16);
+      background:
+        linear-gradient(180deg, rgba(16, 24, 36, .96), rgba(7, 10, 17, .94));
+      color: var(--text);
+      box-shadow: 0 30px 110px rgba(0, 0, 0, .58);
+      overflow: hidden;
+    }
+
+    .auth-modal-head {
+      padding: 24px 24px 10px;
+    }
+
+    .auth-modal-head h3 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 720;
+    }
+
+    .auth-modal-head p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .auth-modal-body {
+      padding: 12px 24px 24px;
+    }
+
+    .auth-field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .auth-field label {
+      color: rgba(247, 251, 255, .72);
+      font-size: 13px;
+    }
+
+    .auth-input {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 8px;
+      min-height: 43px;
+      padding: 0 12px;
+      background: rgba(255, 255, 255, .08);
+      color: var(--text);
+      outline: none;
+    }
+
+    .auth-input:focus {
+      border-color: rgba(143, 233, 255, .64);
+      box-shadow: 0 0 0 4px rgba(143, 233, 255, .12);
+    }
+
+    .auth-modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .auth-modal-actions button {
+      flex: 1;
+      min-height: 42px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .auth-modal-actions .ok {
+      background: rgba(255, 255, 255, .92);
+      color: #07101b;
+    }
+
+    .auth-modal-actions .cancel {
+      background: rgba(255, 255, 255, .1);
+    }
+
+    .auth-switch {
+      margin-top: 14px;
+      color: rgba(143, 233, 255, .86);
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .fallback {
+      position: fixed;
+      inset: 0;
+      z-index: 4;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      background:
+        radial-gradient(circle at 50% 48%, rgba(143, 233, 255, .2), transparent 30%),
+        #030508;
+      color: rgba(247, 251, 255, .75);
+      line-height: 1.7;
+    }
+
+    .no-webgl .fallback {
+      display: flex;
+    }
+
     @media (max-width: 720px) {
-      body.room-home {
-        background: #14100d;
+      .brand {
+        top: max(12px, env(safe-area-inset-top));
+        left: max(14px, env(safe-area-inset-left));
       }
 
-      .room-stage {
-        min-width: 0;
-        width: calc(100dvh * 1.453125);
+      .auth-box {
+        top: max(10px, env(safe-area-inset-top));
+        right: max(10px, env(safe-area-inset-right));
+        gap: 6px;
+        padding: 6px;
       }
 
-      .room-world {
-        inset: 0;
-        transform: none !important;
-      }
-
-      .room-auth {
-        top: 10px;
-        left: 50%;
-        right: auto;
-        transform: translateX(-50%);
-        width: auto;
-        min-width: 86px;
-        max-width: 132px;
-        font-size: 12px;
-        padding: 7px 9px;
-        min-height: 0;
-        gap: 7px;
-        justify-content: center;
-        overflow: visible;
-      }
-
-      .room-auth .auth-status {
+      .auth-status {
         display: none;
       }
 
-      .room-auth .btn {
-        display: inline-flex !important;
-        flex: 0 0 auto !important;
-        width: auto !important;
-        padding: 0 0 0 7px;
-        line-height: 1;
-        white-space: nowrap;
+      .btn {
+        min-height: 30px;
+        padding: 0 10px;
+        font-size: 12px;
       }
 
-      .room-hotspot {
-        width: 74px;
-        height: 74px;
-        cursor: pointer;
+      .portal {
+        width: 70px;
+        height: 70px;
       }
 
-      .room-cursor {
+      .portal-label {
+        top: calc(50% + 38px);
+        font-size: 12px;
+        max-width: 116px;
+      }
+
+      .scene-caption {
         display: none;
       }
     }
 
-    @media (min-width: 721px) and (max-width: 1180px) {
-      .room-stage {
-        min-width: 0;
-        width: calc(100dvh * 1.453125);
-      }
-
-      .room-world {
-        inset: 0;
+    @media (prefers-reduced-motion: reduce) {
+      .portal::before,
+      .portal::after {
+        animation: none;
       }
     }
   </style>
 </head>
-<body class="room-home">
-  <div class="room-viewport" id="roomViewport">
-    <main class="room-stage" aria-label="nuonuo小窝海景客厅主页">
-      <div class="room-world" id="roomWorld">
-        <picture>
-          <source media="(max-width: 720px)" srcset="./assets/room/sea-living-room-960.jpg" />
-          <source media="(max-width: 1180px)" srcset="./assets/room/sea-living-room-1280.jpg" />
-          <img class="room-scene" src="./assets/room/sea-living-room.jpg" alt="" width="1488" height="1024" fetchpriority="high" decoding="async" />
-        </picture>
-        <canvas class="room-3d" id="room3d" aria-hidden="true"></canvas>
-        <a class="app-link room-hotspot hotspot-photo" href="./photo.html" aria-label="照片墙"><span class="sr-only">照片墙</span></a>
-        <a class="app-link room-hotspot hotspot-days" href="./days.html" aria-label="在一起多少天"><span class="sr-only">在一起多少天</span></a>
-        <a class="app-link room-hotspot hotspot-message" href="./message.html" aria-label="留言墙"><span class="sr-only">留言墙</span></a>
-        <a class="app-link room-hotspot hotspot-game" href="./game.html" aria-label="爱心小游戏" data-requires-auth="true"><span class="sr-only">爱心小游戏</span></a>
-        <a class="app-link room-hotspot hotspot-pet" href="./pet.html" aria-label="CoCo日记" data-requires-auth="true"><span class="sr-only">CoCo日记</span></a>
-        <a class="app-link room-hotspot hotspot-drink" href="./drinkgame.html" aria-label="酒桌游戏"><span class="sr-only">酒桌游戏</span></a>
-        <a class="app-link room-hotspot hotspot-video" href="./video.html" aria-label="视频快放"><span class="sr-only">视频快放</span></a>
-      </div>
-    </main>
+<body>
+  <main class="experience" id="experience" aria-label="nuonuo小窝主页">
+    <canvas class="webgl" id="webgl" aria-hidden="true"></canvas>
+    <div class="fallback">你的设备暂时无法打开 3D 首页，仍可以通过页面入口进入功能。</div>
+  </main>
+
+  <div class="ui-layer" id="portalLayer" aria-label="功能入口"></div>
+
+  <div class="brand" aria-hidden="true">
+    <span class="brand-mark"></span>
+    <span class="brand-name">nuonuo</span>
   </div>
 
-  <div class="auth-box room-auth" id="authBox"></div>
-  <div class="room-cursor" id="roomCursor" aria-hidden="true"></div>
+  <div class="auth-box" id="authBox"></div>
+  <div class="scene-caption"><span>move</span> to bend the field · <span>tap</span> a light point</div>
 
   <div id="authModal" class="auth-modal" aria-hidden="true">
     <div class="auth-modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
       <div class="auth-modal-head">
         <h3 id="authTitle">登录</h3>
-        <p id="authDesc">登录后进入照片墙、留言板等内容就不用再次登录了。</p>
+        <p id="authDesc">登录后进入需要权限的内容就不用再次登录了。</p>
       </div>
       <div class="auth-modal-body">
         <div class="auth-field">
@@ -964,15 +551,20 @@
           <button class="ok" id="authSubmitBtn" type="button">登录</button>
           <button class="cancel" id="authCancelBtn" type="button">取消</button>
         </div>
-        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-          <div class="auth-switch" id="authSwitchBtn">没有账号？去注册</div>
-          <div class="auth-switch"></div>
-        </div>
+        <div class="auth-switch" id="authSwitchBtn">没有账号？去注册</div>
       </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+      }
+    }
+  </script>
   <script>
     const SECRET_ID = 'AKIDhojT7ey61jEkHhw0830qVyGUWSDpFnEW';
     const SECRET_KEY = 'GNIAMaieZyOehhWBi9QWUL4czCHAsQuG';
@@ -981,11 +573,18 @@
 
     const AUTH_USER_PREFIX = 'users/';
     const LS_CURRENT_USER = 'site_current_user_v1';
+    const cos = window.COS ? new COS({ SecretId: SECRET_ID, SecretKey: SECRET_KEY }) : null;
 
-    const cos = new COS({
-      SecretId: SECRET_ID,
-      SecretKey: SECRET_KEY,
-    });
+    const entries = [
+      { key: 'photo', label: '照片墙', href: './photo.html', position: [-3.8, .82, .15], accent: 0x8fe9ff },
+      { key: 'days', label: '纪念日', href: './days.html', position: [-2.15, 1.64, -.45], accent: 0xf4c982 },
+      { key: 'message', label: '留言墙', href: './message.html', position: [-.68, .2, .45], accent: 0xffffff },
+      { key: 'game', label: '爱心小游戏', href: './game.html', requiresAuth: true, position: [.82, 1.74, -.38], accent: 0xff9fb4 },
+      { key: 'pet', label: 'CoCo日记', href: './pet.html', requiresAuth: true, position: [2.28, .34, .18], accent: 0xc8f7ff },
+      { key: 'drink', label: '酒桌游戏', href: './drinkgame.html', position: [3.55, 1.14, -.18], accent: 0xf8ddaa },
+      { key: 'video', label: '视频快放', href: './video.html', position: [.18, 2.62, -.72], accent: 0x9ea8ff }
+    ];
+    window.homeEntries = entries;
 
     const authBox = document.getElementById('authBox');
     const authModal = document.getElementById('authModal');
@@ -998,7 +597,7 @@
     const authSubmitBtn = document.getElementById('authSubmitBtn');
     const authCancelBtn = document.getElementById('authCancelBtn');
     const authSwitchBtn = document.getElementById('authSwitchBtn');
-
+    const portalLayer = document.getElementById('portalLayer');
     let pendingRedirect = null;
 
     function escapeHtml(str) {
@@ -1106,6 +705,7 @@
     }
 
     function putJsonToCos(key, obj) {
+      if (!cos) return Promise.reject(new Error('COS SDK 未加载'));
       return new Promise((resolve, reject) => {
         cos.putObject({
           Bucket: BUCKET,
@@ -1121,6 +721,7 @@
     }
 
     function getObjectText(key) {
+      if (!cos) return Promise.reject(new Error('COS SDK 未加载'));
       return new Promise((resolve, reject) => {
         cos.getObject({
           Bucket: BUCKET,
@@ -1189,7 +790,6 @@
 
     function renderAuthState() {
       const user = getCurrentUser();
-
       if (user) {
         authBox.innerHTML = `
           <div class="auth-status">当前登录：${escapeHtml(user.username)}</div>
@@ -1218,15 +818,50 @@
       }
     }
 
-    // 只有标记了 data-requires-auth="true" 的入口才需要登录
-    document.querySelectorAll('.app-link[data-requires-auth="true"]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        if (getCurrentUser()) return;
-        e.preventDefault();
-        pendingRedirect = link.getAttribute('href');
+    function navigateEntry(entry) {
+      if (entry.requiresAuth && !getCurrentUser()) {
+        pendingRedirect = entry.href;
         openAuthModal('login');
+        return;
+      }
+      location.href = entry.href;
+    }
+
+    function createPortals() {
+      const coarse = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+      let activeKey = '';
+      let activeTimer = 0;
+
+      entries.forEach((entry) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'portal';
+        button.dataset.key = entry.key;
+        button.setAttribute('aria-label', entry.label);
+        if (entry.requiresAuth) button.dataset.requiresAuth = 'true';
+        button.innerHTML = `<span class="sr-only">${entry.label}</span><span class="portal-label">${entry.label}</span>`;
+        button.addEventListener('pointerenter', () => button.classList.add('is-active'));
+        button.addEventListener('pointerleave', () => button.classList.remove('is-active'));
+        button.addEventListener('focus', () => button.classList.add('is-active'));
+        button.addEventListener('blur', () => button.classList.remove('is-active'));
+        button.addEventListener('click', () => {
+          if (coarse && activeKey !== entry.key) {
+            activeKey = entry.key;
+            document.querySelectorAll('.portal.is-active').forEach((item) => item.classList.remove('is-active'));
+            button.classList.add('is-active');
+            clearTimeout(activeTimer);
+            activeTimer = window.setTimeout(() => {
+              activeKey = '';
+              button.classList.remove('is-active');
+            }, 1300);
+            return;
+          }
+          navigateEntry(entry);
+        });
+        portalLayer.appendChild(button);
+        entry.element = button;
       });
-    });
+    }
 
     authCancelBtn.addEventListener('click', () => {
       pendingRedirect = null;
@@ -1338,610 +973,300 @@
       }
     });
 
-    function centerRoomViewport() {
-      const viewport = document.getElementById('roomViewport');
-      if (!viewport || viewport.scrollWidth <= viewport.clientWidth) return;
-      viewport.scrollLeft = (viewport.scrollWidth - viewport.clientWidth) / 2;
-    }
-
-    function setupRoomDepth() {
-      const body = document.body;
-      const viewport = document.getElementById('roomViewport');
-      const stage = document.querySelector('.room-stage');
-      const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-      if (!viewport || !stage || !finePointer) return;
-
-      let raf = 0;
-      let lastEvent = null;
-      let activeHotspot = null;
-
-      const applyDepth = () => {
-        raf = 0;
-        if (!lastEvent) return;
-        const rect = viewport.getBoundingClientRect();
-        const x = (lastEvent.clientX - rect.left) / rect.width;
-        const y = (lastEvent.clientY - rect.top) / rect.height;
-        const mx = Math.max(-1, Math.min(1, (x - .5) * 2));
-        const my = Math.max(-1, Math.min(1, (y - .5) * 2));
-        body.style.setProperty('--mx', mx.toFixed(3));
-        body.style.setProperty('--my', my.toFixed(3));
-        if (activeHotspot) {
-          const hotspotRect = activeHotspot.getBoundingClientRect();
-          body.style.setProperty('--cursor-x', `${hotspotRect.left + hotspotRect.width / 2}px`);
-          body.style.setProperty('--cursor-y', `${hotspotRect.top + hotspotRect.height / 2}px`);
-        } else {
-          body.style.setProperty('--cursor-x', `${lastEvent.clientX}px`);
-          body.style.setProperty('--cursor-y', `${lastEvent.clientY}px`);
-        }
-      };
-
-      viewport.addEventListener('pointermove', (event) => {
-        lastEvent = event;
-        body.classList.add('has-cursor');
-        if (!raf) raf = requestAnimationFrame(applyDepth);
-      });
-
-      viewport.addEventListener('pointerleave', () => {
-        body.classList.remove('has-cursor', 'hotspot-hover');
-        body.style.setProperty('--mx', '0');
-        body.style.setProperty('--my', '0');
-      });
-
-      document.querySelectorAll('.room-hotspot').forEach((hotspot) => {
-        hotspot.addEventListener('pointerenter', () => {
-          activeHotspot = hotspot;
-          body.classList.add('hotspot-hover');
-          if (!raf) raf = requestAnimationFrame(applyDepth);
-        });
-        hotspot.addEventListener('pointerleave', () => {
-          activeHotspot = null;
-          body.classList.remove('hotspot-hover');
-        });
-      });
-    }
-
-    window.addEventListener('load', centerRoomViewport, { once: true });
-    window.addEventListener('resize', centerRoomViewport);
-    setupRoomDepth();
     renderAuthState();
-  </script>
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
-      }
-    }
+    createPortals();
   </script>
   <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-    const canvas = document.getElementById('room3d');
-    const stage = document.querySelector('.room-stage');
-    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const canvas = document.getElementById('webgl');
+    const experience = document.getElementById('experience');
+    const canWebGL = (() => {
+      try {
+        const test = document.createElement('canvas');
+        return !!(window.WebGLRenderingContext && (test.getContext('webgl') || test.getContext('experimental-webgl')));
+      } catch {
+        return false;
+      }
+    })();
 
-    if (false && canvas && stage && finePointer) {
+    if (!canWebGL) {
+      document.body.classList.add('no-webgl');
+    } else {
+      const coarse = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+      const small = window.matchMedia('(max-width: 720px)').matches;
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const memory = navigator.deviceMemory || 4;
+      const cores = navigator.hardwareConcurrency || 4;
+      const quality = small || memory <= 3 || cores <= 4
+        ? 'low'
+        : coarse
+          ? 'medium'
+          : 'high';
+
+      const profile = {
+        low: { pixelRatio: 1.05, particles: 900, bloom: false, strands: 5 },
+        medium: { pixelRatio: 1.35, particles: 1500, bloom: true, strands: 7 },
+        high: { pixelRatio: 1.75, particles: 2400, bloom: true, strands: 9 }
+      }[quality];
+
       const renderer = new THREE.WebGLRenderer({
         canvas,
-        alpha: true,
-        antialias: true,
-        powerPreference: 'high-performance'
+        antialias: quality !== 'low',
+        alpha: false,
+        powerPreference: quality === 'low' ? 'default' : 'high-performance'
       });
-      renderer.setClearColor(0x000000, 0);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.08;
 
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 120);
-      camera.position.set(0, 0, 18);
+      scene.background = new THREE.Color(0x030508);
+      scene.fog = new THREE.FogExp2(0x030508, .055);
 
-      const ambient = new THREE.HemisphereLight(0xfff7ec, 0x2a1a12, 2.4);
+      const camera = new THREE.PerspectiveCamera(42, 1, .1, 80);
+      camera.position.set(0, 1.15, 8.2);
+
+      const renderPass = new RenderPass(scene, camera);
+      const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), .72, .56, .06);
+      bloomPass.enabled = profile.bloom;
+      const composer = new EffectComposer(renderer);
+      composer.addPass(renderPass);
+      composer.addPass(bloomPass);
+
+      const group = new THREE.Group();
+      scene.add(group);
+
+      const ambient = new THREE.HemisphereLight(0x9fefff, 0x0b0712, 1.28);
       scene.add(ambient);
 
-      const sun = new THREE.DirectionalLight(0xffffff, 2.8);
-      sun.position.set(-3, 8, 9);
-      scene.add(sun);
+      const key = new THREE.PointLight(0x8fe9ff, 34, 18);
+      key.position.set(-2.8, 2.2, 3.8);
+      scene.add(key);
 
-      const warmSide = new THREE.PointLight(0xffd7a8, 1.2, 18);
-      warmSide.position.set(7, 2, 6);
-      scene.add(warmSide);
+      const gold = new THREE.PointLight(0xf4c982, 18, 14);
+      gold.position.set(3.2, -.4, 2.7);
+      scene.add(gold);
 
-      const white = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
+      const coreMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xd9fbff,
+        emissive: 0x6edcff,
+        emissiveIntensity: .42,
+        roughness: .18,
+        metalness: .36,
+        transmission: .18,
         transparent: true,
-        opacity: .68
+        opacity: .78
       });
-      const glow = new THREE.MeshBasicMaterial({
+      const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.05, 6), coreMaterial);
+      group.add(core);
+
+      const wire = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(1.25, 2),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: .08 })
+      );
+      group.add(wire);
+
+      const particleGeometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(profile.particles * 3);
+      const colors = new Float32Array(profile.particles * 3);
+      const colorA = new THREE.Color(0x8fe9ff);
+      const colorB = new THREE.Color(0xf4c982);
+      const colorC = new THREE.Color(0xffffff);
+      for (let i = 0; i < profile.particles; i++) {
+        const t = i / profile.particles;
+        const angle = t * Math.PI * 12.8;
+        const band = Math.sin(t * Math.PI * 6);
+        const radius = 1.85 + Math.sin(t * Math.PI * 15) * .42 + Math.random() * 1.35;
+        positions[i * 3] = Math.cos(angle) * radius + (Math.random() - .5) * .45;
+        positions[i * 3 + 1] = band * 1.35 + (Math.random() - .5) * 2.35;
+        positions[i * 3 + 2] = Math.sin(angle) * radius * .62 + (Math.random() - .5) * 1.1;
+
+        const mixed = (i % 5 === 0 ? colorB : i % 7 === 0 ? colorC : colorA).clone();
+        mixed.multiplyScalar(.62 + Math.random() * .38);
+        colors[i * 3] = mixed.r;
+        colors[i * 3 + 1] = mixed.g;
+        colors[i * 3 + 2] = mixed.b;
+      }
+      particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      const particles = new THREE.Points(
+        particleGeometry,
+        new THREE.PointsMaterial({
+          size: quality === 'low' ? .026 : .022,
+          vertexColors: true,
+          transparent: true,
+          opacity: .86,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending
+        })
+      );
+      group.add(particles);
+
+      const strandGroup = new THREE.Group();
+      group.add(strandGroup);
+      for (let i = 0; i < profile.strands; i++) {
+        const points = [];
+        const phase = i / profile.strands * Math.PI * 2;
+        for (let j = 0; j < 150; j++) {
+          const t = j / 149;
+          const angle = t * Math.PI * 2.4 + phase;
+          const radius = 1.55 + Math.sin(t * Math.PI * 4 + phase) * .38;
+          points.push(new THREE.Vector3(
+            Math.cos(angle) * radius * (1.15 + i * .018),
+            (t - .5) * 4.4 + Math.sin(angle * 1.7) * .22,
+            Math.sin(angle) * radius * .55
+          ));
+        }
+        const curve = new THREE.CatmullRomCurve3(points);
+        const tube = new THREE.Mesh(
+          new THREE.TubeGeometry(curve, 160, i % 3 === 0 ? .012 : .008, 8, false),
+          new THREE.MeshBasicMaterial({
+            color: i % 3 === 0 ? 0xf4c982 : 0x8fe9ff,
+            transparent: true,
+            opacity: i % 3 === 0 ? .24 : .34,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          })
+        );
+        strandGroup.add(tube);
+      }
+
+      const portalObjects = [];
+      const glowMaterial = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: .16,
+        opacity: .94,
         blending: THREE.AdditiveBlending,
         depthWrite: false
       });
-      const wood = new THREE.MeshStandardMaterial({
-        color: 0x8c6848,
-        roughness: .54,
-        metalness: .08,
-        transparent: true,
-        opacity: .62
-      });
-      const fabric = new THREE.MeshStandardMaterial({
-        color: 0xd9c8b4,
-        roughness: .88,
-        metalness: .02,
-        transparent: true,
-        opacity: .58
-      });
-      const paper = new THREE.MeshStandardMaterial({
-        color: 0xf5eadb,
-        roughness: .72,
-        metalness: .01,
-        transparent: true,
-        opacity: .5
-      });
-      const dark = new THREE.MeshStandardMaterial({
-        color: 0x161412,
-        roughness: .48,
-        metalness: .18,
-        transparent: true,
-        opacity: .6
-      });
-      const brass = new THREE.MeshStandardMaterial({
-        color: 0xb28a55,
-        roughness: .36,
-        metalness: .72,
-        transparent: true,
-        opacity: .62
+      const haloGeometry = new THREE.SphereGeometry(.16, 32, 16);
+      const ringGeometry = new THREE.TorusGeometry(.32, .006, 8, 80);
+      window.homeEntries.forEach((entry) => {
+        const anchor = new THREE.Group();
+        anchor.position.set(...entry.position);
+        const glow = new THREE.Mesh(haloGeometry, glowMaterial.clone());
+        glow.material.color.setHex(entry.accent);
+        const ring = new THREE.Mesh(
+          ringGeometry,
+          new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: .32,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+          })
+        );
+        ring.rotation.x = Math.PI / 2.8;
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(...entry.position).multiplyScalar(.72)]);
+        const line = new THREE.Line(
+          lineGeometry,
+          new THREE.LineBasicMaterial({ color: entry.accent, transparent: true, opacity: .22, blending: THREE.AdditiveBlending })
+        );
+        anchor.add(glow, ring);
+        group.add(anchor, line);
+        portalObjects.push({ entry, anchor, glow, ring });
       });
 
-      const hotspots = [
-        { id: 'photo', x: .1225, y: .1945, z: 1.2 },
-        { id: 'days', x: .2395, y: .4785, z: 1.8 },
-        { id: 'message', x: .0855, y: .601, z: 2.1 },
-        { id: 'game', x: .4215, y: .6615, z: 3.2 },
-        { id: 'pet', x: .68, y: .679, z: 3.0 },
-        { id: 'drink', x: .91, y: .6715, z: 2.7 },
-        { id: 'video', x: .835, y: .357, z: 1.6 }
-      ];
-
-      let view = { w: 16, h: 11 };
-      const groups = new Map();
       let targetX = 0;
       let targetY = 0;
       let currentX = 0;
       let currentY = 0;
-
-      function toWorld(x, y, z = 0) {
-        return new THREE.Vector3((x - .5) * view.w, (.5 - y) * view.h, z);
-      }
-
-      function box(w, h, d, mat, x = 0, y = 0, z = 0) {
-        const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-        mesh.position.set(x, y, z);
-        return mesh;
-      }
-
-      function dot(group) {
-        const core = new THREE.Mesh(new THREE.SphereGeometry(.07, 24, 16), white);
-        const halo = new THREE.Mesh(new THREE.SphereGeometry(.2, 32, 16), glow);
-        group.add(core, halo);
-      }
-
-      function makePhotoWall() {
-        const g = new THREE.Group();
-        for (let i = 0; i < 5; i++) {
-          const frame = box(.45, .58, .045, wood, (i % 2) * .38 - .18, Math.floor(i / 2) * -.38 + .36, 0);
-          const face = box(.34, .46, .052, paper, frame.position.x, frame.position.y, .035);
-          g.add(frame, face);
-        }
-        g.rotation.y = .32;
-        dot(g);
-        return g;
-      }
-
-      function makeMemoBoard() {
-        const g = new THREE.Group();
-        g.add(box(.88, .64, .06, fabric, 0, 0, 0));
-        for (let i = 0; i < 4; i++) {
-          g.add(box(.22, .18, .07, paper, (i % 2) * .28 - .14, Math.floor(i / 2) * -.22 + .12, .04));
-        }
-        g.rotation.y = .25;
-        dot(g);
-        return g;
-      }
-
-      function makeCalendar() {
-        const g = new THREE.Group();
-        g.add(box(.7, .98, .06, paper, 0, .05, 0));
-        g.add(box(.78, .08, .08, wood, 0, .58, .04));
-        g.add(box(.08, .9, .08, wood, -.46, -.18, -.05));
-        g.add(box(.08, .9, .08, wood, .46, -.18, -.05));
-        for (let i = 0; i < 3; i++) {
-          const ring = new THREE.Mesh(new THREE.TorusGeometry(.065, .012, 10, 20), brass);
-          ring.position.set((i - 1) * .18, .62, .08);
-          ring.rotation.x = Math.PI / 2;
-          g.add(ring);
-        }
-        g.rotation.y = -.18;
-        dot(g);
-        return g;
-      }
-
-      function makeGame() {
-        const g = new THREE.Group();
-        const pad = new THREE.Mesh(new THREE.CapsuleGeometry(.16, .38, 8, 16), dark);
-        pad.rotation.z = Math.PI / 2;
-        pad.scale.set(1.45, .75, .28);
-        g.add(pad);
-        g.add(box(.11, .025, .035, white, -.16, .02, .14));
-        g.add(box(.025, .11, .035, white, -.16, .02, .14));
-        const btn1 = new THREE.Mesh(new THREE.SphereGeometry(.045, 12, 8), white);
-        btn1.position.set(.2, .05, .14);
-        const btn2 = btn1.clone();
-        btn2.position.set(.28, -.02, .14);
-        g.add(btn1, btn2);
-        g.rotation.x = -.85;
-        g.rotation.z = -.03;
-        dot(g);
-        return g;
-      }
-
-      function makePet() {
-        const g = new THREE.Group();
-        const bed = new THREE.Mesh(new THREE.TorusGeometry(.38, .11, 14, 40), fabric);
-        bed.rotation.x = Math.PI / 2;
-        g.add(bed);
-        const cushion = new THREE.Mesh(new THREE.SphereGeometry(.28, 24, 14), fabric);
-        cushion.scale.set(1.1, .24, .82);
-        cushion.position.z = -.02;
-        g.add(cushion);
-        g.rotation.x = -.8;
-        dot(g);
-        return g;
-      }
-
-      function makeDrink() {
-        const g = new THREE.Group();
-        g.add(box(.82, .08, .42, brass, 0, .18, 0));
-        g.add(box(.82, .08, .42, brass, 0, -.18, 0));
-        for (const x of [-.35, .35]) {
-          for (const y of [-.22, .22]) g.add(box(.045, .72, .045, brass, x, 0, y));
-        }
-        for (let i = 0; i < 3; i++) {
-          const glass = new THREE.Mesh(new THREE.CylinderGeometry(.055, .075, .28, 16), new THREE.MeshPhysicalMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: .36,
-            roughness: .08,
-            transmission: .45
-          }));
-          glass.position.set((i - 1) * .18, .02, .08);
-          g.add(glass);
-        }
-        g.rotation.y = -.38;
-        dot(g);
-        return g;
-      }
-
-      function makeVideo() {
-        const g = new THREE.Group();
-        g.add(box(.95, .55, .055, new THREE.MeshStandardMaterial({ color: 0x1b1715, roughness: .34, metalness: .26 }), 0, 0, 0));
-        const play = new THREE.Shape();
-        play.moveTo(-.08, -.11);
-        play.lineTo(-.08, .11);
-        play.lineTo(.12, 0);
-        play.lineTo(-.08, -.11);
-        const mesh = new THREE.Mesh(new THREE.ShapeGeometry(play), white);
-        mesh.position.z = .04;
-        g.add(mesh);
-        g.rotation.y = -.28;
-        dot(g);
-        return g;
-      }
-
-      const makers = {
-        photo: makePhotoWall,
-        message: makeMemoBoard,
-        days: makeCalendar,
-        game: makeGame,
-        pet: makePet,
-        drink: makeDrink,
-        video: makeVideo
-      };
-
-      for (const item of hotspots) {
-        const group = makers[item.id]();
-        group.userData.baseScale = item.id === 'drink' ? .46 : item.id === 'video' ? .42 : .38;
-        group.userData.depth = item.z;
-        groups.set(item.id, group);
-        scene.add(group);
-      }
+      const pointer = new THREE.Vector2();
+      const viewport = new THREE.Vector3();
+      let last = performance.now();
 
       function resize() {
-        const rect = stage.getBoundingClientRect();
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
-        renderer.setPixelRatio(dpr);
-        renderer.setSize(rect.width, rect.height, false);
-        camera.aspect = rect.width / rect.height;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const portrait = height > width;
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, profile.pixelRatio));
+        renderer.setSize(width, height, false);
+        composer.setSize(width, height);
+        bloomPass.setSize(width, height);
+        camera.aspect = width / height;
+        camera.position.z = portrait ? (width < 500 ? 11.8 : 10.4) : 8.2;
+        camera.fov = portrait ? (width < 500 ? 44 : 42) : 42;
+        group.scale.setScalar(portrait ? (width < 500 ? .7 : .86) : 1);
         camera.updateProjectionMatrix();
-        view.h = 11;
-        view.w = view.h * camera.aspect;
-        for (const item of hotspots) {
-          const group = groups.get(item.id);
-          const pos = toWorld(item.x, item.y, item.z);
-          group.position.copy(pos);
-          group.userData.basePosition = pos.clone();
-          group.userData.baseRotationZ = group.rotation.z;
-          const s = group.userData.baseScale * Math.min(1.1, Math.max(.84, rect.height / 900));
-          group.scale.setScalar(s);
-        }
       }
 
-      function animate() {
-        currentX += (targetX - currentX) * .08;
-        currentY += (targetY - currentY) * .08;
-        camera.position.x = currentX * .75;
-        camera.position.y = currentY * -.36;
-        camera.lookAt(currentX * .22, currentY * -.12, 0);
-        for (const [id, group] of groups) {
-          const depth = group.userData.depth || 1;
-          const base = group.userData.basePosition;
-          if (base) {
-            group.position.set(base.x + currentX * depth * .08, base.y - currentY * depth * .04, base.z);
+      function updatePortals(time) {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        portalObjects.forEach(({ entry, anchor, glow, ring }, index) => {
+          const pulse = .5 + Math.sin(time * 2.2 + index) * .5;
+          glow.scale.setScalar(1 + pulse * .2);
+          ring.rotation.z += .006 + index * .0004;
+          anchor.getWorldPosition(viewport);
+          viewport.project(camera);
+          const visible = viewport.z > -1 && viewport.z < 1;
+          if (entry.element) {
+            const x = (viewport.x * .5 + .5) * width;
+            const y = (-viewport.y * .5 + .5) * height;
+            const scale = THREE.MathUtils.clamp(1.12 - viewport.z * .34, .72, 1.18);
+            entry.element.style.left = `${x}px`;
+            entry.element.style.top = `${y}px`;
+            entry.element.style.setProperty('--portal-scale', scale.toFixed(3));
+            entry.element.style.setProperty('--portal-opacity', visible ? '1' : '0');
+            entry.element.style.pointerEvents = visible ? 'auto' : 'none';
           }
-          group.rotation.z = (group.userData.baseRotationZ || 0) + Math.sin(performance.now() / 1200 + depth) * .015;
-        }
-        renderer.render(scene, camera);
-        requestAnimationFrame(animate);
+        });
       }
 
-      const viewport = document.getElementById('roomViewport');
-      viewport.addEventListener('pointermove', (event) => {
-        const rect = viewport.getBoundingClientRect();
-        targetX = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - .5) * 2));
-        targetY = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - .5) * 2));
-      });
-      viewport.addEventListener('pointerleave', () => {
+      function animate(now) {
+        const dt = Math.min(.04, (now - last) / 1000);
+        last = now;
+        const time = now * .001;
+        currentX += (targetX - currentX) * .055;
+        currentY += (targetY - currentY) * .055;
+
+        group.rotation.y = time * .085 + currentX * .34;
+        group.rotation.x = Math.sin(time * .32) * .035 + currentY * .12;
+        particles.rotation.y -= dt * .055;
+        particles.rotation.z = Math.sin(time * .2) * .08;
+        strandGroup.rotation.y = -time * .055;
+        core.rotation.x += dt * .18;
+        core.rotation.y += dt * .24;
+        wire.rotation.y -= dt * .12;
+
+        camera.position.x = currentX * .64;
+        camera.position.y = 1.12 - currentY * .36;
+        camera.lookAt(currentX * .28, .74 - currentY * .22, 0);
+
+        updatePortals(time);
+        if (profile.bloom) {
+          composer.render();
+        } else {
+          renderer.render(scene, camera);
+        }
+        if (!reducedMotion) requestAnimationFrame(animate);
+      }
+
+      experience.addEventListener('pointermove', (event) => {
+        pointer.x = (event.clientX / window.innerWidth - .5) * 2;
+        pointer.y = (event.clientY / window.innerHeight - .5) * 2;
+        targetX = THREE.MathUtils.clamp(pointer.x, -1, 1);
+        targetY = THREE.MathUtils.clamp(pointer.y, -1, 1);
+        document.body.style.setProperty('--mx', targetX.toFixed(3));
+        document.body.style.setProperty('--my', targetY.toFixed(3));
+      }, { passive: true });
+
+      experience.addEventListener('pointerleave', () => {
         targetX = 0;
         targetY = 0;
+        document.body.style.setProperty('--mx', '0');
+        document.body.style.setProperty('--my', '0');
       });
 
       window.addEventListener('resize', resize);
       resize();
-      animate();
-    }
-  </script>
-  <script type="module">
-    import * as THREE from 'three';
-    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
-    const canvas3d = document.getElementById('room3d');
-    const stage3d = document.querySelector('.room-stage');
-
-    if (canvas3d && stage3d) {
-      const renderer = new THREE.WebGLRenderer({
-        canvas: canvas3d,
-        antialias: true,
-        alpha: false,
-        powerPreference: 'high-performance'
-      });
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.03;
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xe9f4fb);
-      scene.fog = new THREE.Fog(0xe9f4fb, 26, 58);
-
-      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 90);
-      camera.position.set(0, 2.35, 8.8);
-      camera.lookAt(0, 1.25, 0);
-
-      const hemi = new THREE.HemisphereLight(0xffffff, 0x6b523e, 1.45);
-      scene.add(hemi);
-
-      const sun = new THREE.DirectionalLight(0xfff3df, 3.2);
-      sun.position.set(-6, 8, 8);
-      sun.castShadow = true;
-      sun.shadow.mapSize.set(1024, 1024);
-      sun.shadow.camera.near = 1;
-      sun.shadow.camera.far = 30;
-      sun.shadow.camera.left = -10;
-      sun.shadow.camera.right = 10;
-      sun.shadow.camera.top = 8;
-      sun.shadow.camera.bottom = -8;
-      scene.add(sun);
-
-      const warmLamp = new THREE.PointLight(0xffc98d, 1.15, 12);
-      warmLamp.position.set(5.7, 2.2, -1.1);
-      scene.add(warmLamp);
-
-      const mat = {
-        floor: new THREE.MeshStandardMaterial({ color: 0xb7aa9d, roughness: .62, metalness: .05 }),
-        wall: new THREE.MeshStandardMaterial({ color: 0xe9e2da, roughness: .84, metalness: .02 }),
-        ceiling: new THREE.MeshStandardMaterial({ color: 0xf2eee8, roughness: .9 }),
-        wood: new THREE.MeshStandardMaterial({ color: 0x8f6a45, roughness: .48, metalness: .08 }),
-        stone: new THREE.MeshStandardMaterial({ color: 0xcac3bb, roughness: .68, metalness: .04 }),
-        glass: new THREE.MeshPhysicalMaterial({ color: 0xdff4ff, roughness: .04, metalness: 0, transmission: .45, transparent: true, opacity: .36 }),
-        ocean: new THREE.MeshStandardMaterial({ color: 0x5d9fc2, roughness: .34, metalness: .02 }),
-        dark: new THREE.MeshStandardMaterial({ color: 0x151413, roughness: .5, metalness: .18 }),
-        paper: new THREE.MeshStandardMaterial({ color: 0xf4eadc, roughness: .75 }),
-        cork: new THREE.MeshStandardMaterial({ color: 0xb8a188, roughness: .88 }),
-        brass: new THREE.MeshStandardMaterial({ color: 0xb58a52, roughness: .34, metalness: .72 }),
-        glow: new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .82 })
-      };
-
-      function mesh(geometry, material, position, rotation = [0, 0, 0], scale = [1, 1, 1]) {
-        const object = new THREE.Mesh(geometry, material);
-        object.position.set(...position);
-        object.rotation.set(...rotation);
-        object.scale.set(...scale);
-        object.castShadow = true;
-        object.receiveShadow = true;
-        scene.add(object);
-        return object;
-      }
-
-      function box(w, h, d, material, position, rotation, scale) {
-        return mesh(new THREE.BoxGeometry(w, h, d), material, position, rotation, scale);
-      }
-
-      function addGlow(position, size = .13) {
-        const core = mesh(new THREE.SphereGeometry(size, 32, 16), mat.glow, position);
-        core.castShadow = false;
-        core.receiveShadow = false;
-        const halo = mesh(new THREE.SphereGeometry(size * 2.6, 32, 16), new THREE.MeshBasicMaterial({
-          color: 0xffffff,
-          transparent: true,
-          opacity: .16,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false
-        }), position);
-        halo.castShadow = false;
-        halo.receiveShadow = false;
-      }
-
-      function addRoomShell() {
-        box(15, .12, 12, mat.floor, [0, -.05, 0]);
-        box(15, .18, 12, mat.ceiling, [0, 5.05, 0]);
-        box(.16, 5.2, 12, mat.wall, [-7.45, 2.5, 0]);
-        box(.16, 5.2, 12, mat.wall, [7.45, 2.5, 0]);
-        box(15, 5.2, .16, mat.wall, [0, 2.5, -5.95]);
-        box(2.2, 4.2, .12, mat.wall, [-6.35, 2.3, -5.86]);
-        box(2.2, 4.2, .12, mat.wall, [6.35, 2.3, -5.86]);
-
-        const windowGlass = box(8.6, 3.25, .06, mat.glass, [0, 2.55, -5.76]);
-        windowGlass.castShadow = false;
-        box(.08, 3.42, .12, mat.stone, [-4.3, 2.55, -5.7]);
-        box(.08, 3.42, .12, mat.stone, [0, 2.55, -5.7]);
-        box(.08, 3.42, .12, mat.stone, [4.3, 2.55, -5.7]);
-        box(8.85, .08, .12, mat.stone, [0, 4.28, -5.7]);
-        box(8.85, .08, .12, mat.stone, [0, .86, -5.7]);
-
-        const ocean = mesh(new THREE.PlaneGeometry(28, 8, 48, 8), mat.ocean, [0, 1.25, -8.7], [-Math.PI / 2.8, 0, 0]);
-        ocean.castShadow = false;
-        ocean.receiveShadow = false;
-        for (let i = 0; i < 8; i++) {
-          const wave = box(2.2 + i * .25, .018, .015, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .23 }), [-5 + i * 1.4, 1.4 + Math.sin(i) * .18, -7.45 - i * .08]);
-          wave.castShadow = false;
-          wave.receiveShadow = false;
-        }
-
-        box(4.1, .12, 2.4, mat.wood, [0, .34, 1.75]);
-        box(3.1, .11, 1.2, mat.wood, [0, .5, 1.05]);
-      }
-
-      function addEntryObjects() {
-        const photoGroup = new THREE.Group();
-        photoGroup.position.set(-6.9, 2.9, -2.4);
-        photoGroup.rotation.y = Math.PI / 2;
-        for (let i = 0; i < 7; i++) {
-          const frame = new THREE.Mesh(new THREE.BoxGeometry(.44, .58, .045), mat.wood);
-          frame.position.set((i % 2) * .54, Math.floor(i / 2) * -.66, 0);
-          const face = new THREE.Mesh(new THREE.BoxGeometry(.34, .46, .052), mat.paper);
-          face.position.copy(frame.position);
-          face.position.z += .035;
-          photoGroup.add(frame, face);
-        }
-        scene.add(photoGroup);
-        addGlow([-6.82, 3.35, -2.05]);
-
-        box(1.18, 1.45, .08, mat.cork, [-7.18, 1.75, .5], [0, Math.PI / 2, 0]);
-        for (let i = 0; i < 5; i++) {
-          box(.28, .2, .05, mat.paper, [-7.1, 2.18 - Math.floor(i / 2) * .38, .17 + (i % 2) * .42], [0, Math.PI / 2, 0]);
-        }
-        addGlow([-6.96, 1.55, .72]);
-
-        box(.78, 1.18, .08, mat.paper, [-3.85, 2.25, -3.85], [0, -.25, 0]);
-        box(.88, .08, .12, mat.wood, [-3.85, 2.9, -3.85], [0, -.25, 0]);
-        box(.08, 1.2, .08, mat.wood, [-4.24, 1.68, -3.84], [0, -.25, 0]);
-        box(.08, 1.2, .08, mat.wood, [-3.46, 1.68, -3.84], [0, -.25, 0]);
-        addGlow([-3.85, 1.55, -3.55]);
-
-        box(.72, .06, .42, mat.dark, [-1.12, .78, 1.25], [0, .15, 0]);
-        mesh(new THREE.SphereGeometry(.09, 16, 10), mat.glow, [-1.38, .84, 1.02]);
-        mesh(new THREE.SphereGeometry(.07, 16, 10), mat.glow, [-.84, .84, 1.1]);
-        addGlow([-1.0, .88, 1.24], .09);
-
-        box(1.9, 1.05, .1, mat.dark, [5.3, 2.75, -3.82], [0, -.28, 0]);
-        addGlow([5.3, 2.75, -3.5]);
-
-        box(.85, .05, .55, mat.brass, [6.5, 1.0, 1.25], [0, -.35, 0]);
-        box(.85, .05, .55, mat.brass, [6.5, 1.55, 1.25], [0, -.35, 0]);
-        addGlow([6.48, 1.2, 1.0]);
-
-        const petBed = mesh(new THREE.TorusGeometry(.48, .14, 18, 48), mat.paper, [3.1, .66, 1.6], [Math.PI / 2, 0, .08]);
-        petBed.scale.set(1.15, .82, 1);
-        addGlow([3.1, .82, 1.58]);
-      }
-
-      const loader = new GLTFLoader();
-      function loadModel(url, position, scale, rotation = [0, 0, 0]) {
-        loader.load(url, (gltf) => {
-          const root = gltf.scene;
-          root.position.set(...position);
-          root.rotation.set(...rotation);
-          root.scale.setScalar(scale);
-          root.traverse((node) => {
-            if (node.isMesh) {
-              node.castShadow = true;
-              node.receiveShadow = true;
-              if (node.material) {
-                node.material.roughness = Math.min(1, (node.material.roughness ?? .6) + .08);
-              }
-            }
-          });
-          scene.add(root);
-        }, undefined, (error) => console.warn('模型加载失败', url, error));
-      }
-
-      addRoomShell();
-      addEntryObjects();
-      loadModel('./assets/models/polyhaven/Sofa_01/Sofa_01_1k.gltf', [-.25, .12, 3.75], .022, [0, Math.PI, 0]);
-      loadModel('./assets/models/polyhaven/coffee_table_round_01/coffee_table_round_01_1k.gltf', [.1, .42, 1.45], .017, [0, .15, 0]);
-      loadModel('./assets/models/polyhaven/CoffeeCart_01/CoffeeCart_01_1k.gltf', [6.35, .08, 1.35], .013, [0, -1.35, 0]);
-
-      let target = { x: 0, y: 0 };
-      let current = { x: 0, y: 0 };
-
-      function resize() {
-        const rect = stage3d.getBoundingClientRect();
-        const isSmall = rect.width < 720;
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isSmall ? 1.15 : 1.7));
-        renderer.setSize(rect.width, rect.height, false);
-        camera.aspect = rect.width / rect.height;
-        camera.position.set(0, isSmall ? 2.1 : 2.35, isSmall ? 9.7 : 8.8);
-        camera.updateProjectionMatrix();
-      }
-
-      function animate() {
-        current.x += (target.x - current.x) * .075;
-        current.y += (target.y - current.y) * .075;
-        camera.position.x = current.x * .7;
-        camera.position.y = 2.35 - current.y * .28;
-        camera.lookAt(current.x * .22, 1.25 - current.y * .16, -.8);
-        renderer.render(scene, camera);
-        requestAnimationFrame(animate);
-      }
-
-      const viewport = document.getElementById('roomViewport');
-      const motionOK = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-      if (motionOK && viewport) {
-        viewport.addEventListener('pointermove', (event) => {
-          const rect = viewport.getBoundingClientRect();
-          target.x = Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width - .5) * 2));
-          target.y = Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height - .5) * 2));
-        });
-        viewport.addEventListener('pointerleave', () => {
-          target.x = 0;
-          target.y = 0;
-        });
-      }
-
-      window.addEventListener('resize', resize);
-      resize();
-      animate();
+      updatePortals(0);
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
     }
   </script>
 </body>
