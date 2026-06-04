@@ -10,7 +10,7 @@
   <link rel="preload" href="./assets/work/heart-game.webp" as="image" />
   <link rel="preload" href="./assets/work/coco-diary.webp" as="image" />
   <link rel="preload" href="./assets/work/drink-game.webp" as="image" />
-  <link rel="preload" href="./assets/work/video-fast.webp" as="image" />
+  <link rel="preload" href="./assets/work/nuonuo-academy.webp" as="image" />
   <style>
     :root {
       color-scheme: light;
@@ -312,12 +312,37 @@
       pointer-events: none;
     }
 
-    .scroll-track {
-      height: calc(var(--story-steps, 8) * 100dvh);
+    .text-track {
+      position: relative;
+      z-index: 4;
       pointer-events: none;
     }
 
-    .stage-hero,
+    .text-scene {
+      min-height: 100dvh;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: clamp(94px, 13vh, 136px) clamp(18px, 5vw, 70px) clamp(36px, 8vh, 78px);
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(360px, 1.08fr);
+      gap: clamp(30px, 6vw, 86px);
+      align-items: center;
+    }
+
+    .hero-text {
+      width: 100%;
+      margin: 0;
+      padding-top: clamp(92px, 12vh, 120px);
+      grid-template-columns: minmax(0, 860px);
+      justify-content: start;
+      align-items: start;
+    }
+
+    .text-copy {
+      grid-column: 1;
+      color: var(--ink);
+    }
+
     .entry-layer {
       position: absolute;
       inset: 0;
@@ -325,14 +350,6 @@
       opacity: var(--layer-opacity, 0);
       transition: opacity .18s linear;
       pointer-events: none;
-    }
-
-    .stage-hero {
-      display: grid;
-      align-items: start;
-      justify-content: start;
-      padding: clamp(92px, 12vh, 120px) clamp(18px, 5vw, 70px) clamp(36px, 8vh, 78px);
-      --layer-opacity: 1;
     }
 
     .entry-layer {
@@ -354,24 +371,6 @@
 
     .entry-layer.is-active .visual {
       pointer-events: auto;
-    }
-
-    .kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-      color: rgba(23,32,51,.58);
-      font-size: 13px;
-      font-weight: 680;
-      line-height: 1;
-    }
-
-    .kicker::before {
-      content: "";
-      width: 42px;
-      height: 1px;
-      background: rgba(23,32,51,.2);
     }
 
     h1,
@@ -407,6 +406,7 @@
 
     .visual {
       position: relative;
+      grid-column: 2;
       min-height: clamp(420px, 60vh, 650px);
       padding: 0;
       border: 1px solid rgba(255,255,255,.84);
@@ -520,12 +520,7 @@
     }
 
     .section-copy {
-      opacity: var(--copy-opacity, 0);
-      transition: opacity .35s ease, transform .5s cubic-bezier(.19, 1, .22, 1);
-    }
-
-    .stage-hero .section-copy {
-      --copy-opacity: 1;
+      opacity: 1;
     }
 
     .section-image-1 { --section-image: url("./assets/work/photo-wall.webp"); }
@@ -534,7 +529,7 @@
     .section-image-4 { --section-image: url("./assets/work/heart-game.webp"); }
     .section-image-5 { --section-image: url("./assets/work/coco-diary.webp"); }
     .section-image-6 { --section-image: url("./assets/work/drink-game.webp"); }
-    .section-image-7 { --section-image: url("./assets/work/video-fast.webp"); }
+    .section-image-7 { --section-image: url("./assets/work/nuonuo-academy.webp"); }
 
     .auth-modal {
       position: fixed;
@@ -651,25 +646,32 @@
         display: none;
       }
 
-      .entry-layer {
+      .text-scene {
         grid-template-columns: 1fr;
         gap: 28px;
-        align-content: center;
+      }
+
+      .entry-layer {
+        grid-template-columns: 1fr;
+        display: block;
+        width: 100%;
+        left: 0;
+        transform: none;
+        padding: 0 16px 28px;
       }
 
       .visual {
+        position: absolute;
+        grid-column: auto;
+        left: 16px;
+        right: 16px;
+        bottom: max(28px, env(safe-area-inset-bottom));
         min-height: clamp(330px, 44vh, 520px);
       }
 
     }
 
     @media (max-width: 640px) {
-      body {
-        background:
-          radial-gradient(circle at 28% 6%, rgba(255,255,255,.96), transparent 26%),
-          linear-gradient(140deg, #f8fbff, #edf4fb 55%, #ffffff);
-      }
-
       .topbar {
         align-items: flex-start;
         gap: 8px;
@@ -720,13 +722,15 @@
         min-width: 58px;
       }
 
-      .stage-hero,
-      .entry-layer {
-        padding: 82px 16px 34px;
+      .text-scene {
+        min-height: 100svh;
+        align-items: start;
+        padding: 142px 16px 52svh;
       }
 
-      .stage-hero {
+      .hero-text {
         padding-top: 104px;
+        padding-bottom: 34px;
       }
 
       h1 {
@@ -744,7 +748,7 @@
       }
 
       .visual {
-        min-height: 330px;
+        min-height: min(330px, 39svh);
       }
 
       .visual-card {
@@ -797,14 +801,14 @@
       </div>
     </header>
 
-    <main class="scroll-stage" id="scrollStage">
-      <section class="stage-hero is-active" id="top" aria-label="nuonuo小窝首页">
-        <div class="section-copy">
+    <div class="scroll-stage" id="scrollStage" aria-label="入口图片舞台"></div>
+    <main class="text-track" id="textTrack">
+      <section class="text-scene hero-text" id="top">
+        <div class="text-copy">
           <h1><span>nuonuo</span><span>小窝</span></h1>
         </div>
       </section>
     </main>
-    <div class="scroll-track" id="scrollTrack" aria-hidden="true"></div>
   </div>
 
   <div id="authModal" class="auth-modal" aria-hidden="true">
@@ -852,7 +856,7 @@
       './assets/work/heart-game.webp',
       './assets/work/coco-diary.webp',
       './assets/work/drink-game.webp',
-      './assets/work/video-fast.webp'
+      './assets/work/nuonuo-academy.webp'
     ];
 
     const sections = [
@@ -862,7 +866,7 @@
       { key: 'game', title: '爱心小游戏', lead: '进入轻松一点的互动，把心情变成游戏里的分数。', href: './game.html', detail: '互动游戏', image: 4, requiresAuth: true },
       { key: 'pet', title: 'CoCo日记', lead: '给 CoCo 留一页柔软的日记，放下那些小小的日常。', href: './pet.html', detail: '日常记录', image: 5, requiresAuth: true },
       { key: 'drink', title: '酒桌游戏', lead: '聚会时打开，规则、节奏和气氛都放在同一屏里。', href: './drinkgame.html', detail: '聚会玩法', image: 6 },
-      { key: 'video', title: '视频快放', lead: '把动态记忆收进一块轻薄的玻璃屏幕。', href: './video.html', detail: '视频记忆', image: 7 }
+      { key: 'video', title: 'nuonuo学堂', lead: '把学习、资料和视频课程收进一块轻薄的玻璃屏幕。', href: './video.html', detail: '学习空间', image: 7 }
     ];
 
     const authBox = document.getElementById('authBox');
@@ -877,7 +881,7 @@
     const authCancelBtn = document.getElementById('authCancelBtn');
     const authSwitchBtn = document.getElementById('authSwitchBtn');
     const scrollStage = document.getElementById('scrollStage');
-    const scrollTrack = document.getElementById('scrollTrack');
+    const textTrack = document.getElementById('textTrack');
     const sectionNav = document.getElementById('sectionNav');
     const loader = document.getElementById('loader');
     const loaderBar = document.getElementById('loaderBar');
@@ -1116,23 +1120,17 @@
     }
 
     function buildSections() {
-      scrollTrack.style.setProperty('--story-steps', sections.length + 1);
       sections.forEach((section, index) => {
-        const number = String(index + 1).padStart(2, '0');
         const layer = document.createElement('section');
         layer.className = 'entry-layer';
         layer.id = section.key;
         layer.dataset.key = section.key;
         layer.setAttribute('aria-label', section.title);
         layer.innerHTML = `
-          <div class="section-copy">
-            <div class="kicker">${number} / 07</div>
-            <h2>${section.title}</h2>
-          </div>
           <div class="visual section-image-${section.image}" role="button" tabindex="-1" aria-label="进入${section.title}">
             <div class="visual-card">
               <div><strong>${section.title}</strong></div>
-              <div class="index-number">${number}</div>
+              <div class="index-number">${String(index + 1).padStart(2, '0')}</div>
             </div>
           </div>
         `;
@@ -1145,17 +1143,28 @@
         });
         scrollStage.appendChild(layer);
 
+        const textScene = document.createElement('section');
+        textScene.className = 'text-scene';
+        textScene.dataset.key = section.key;
+        textScene.innerHTML = `
+          <div class="text-copy section-copy">
+            <h2>${section.title}</h2>
+          </div>
+        `;
+        textTrack.appendChild(textScene);
+
         const dot = document.createElement('button');
         dot.className = 'nav-dot';
         dot.type = 'button';
         dot.textContent = String(index + 1);
         dot.setAttribute('aria-label', section.title);
         dot.addEventListener('click', () => {
-          window.scrollTo({ top: window.innerHeight * (index + 1), behavior: 'smooth' });
+          textScene.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
         sectionNav.appendChild(dot);
         section.layer = layer;
         section.visual = visual;
+        section.textScene = textScene;
         section.dot = dot;
       });
     }
@@ -1170,52 +1179,37 @@
     }
 
     function setupScrollStory() {
-      const hero = document.querySelector('.stage-hero');
-      const totalScenes = sections.length + 1;
       let ticking = false;
 
       const update = () => {
         const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-        const rawProgress = clamp(window.scrollY / Math.max(1, viewportHeight), 0, totalScenes - 1);
-        const sceneIndex = Math.floor(rawProgress);
-        const sceneProgress = rawProgress - sceneIndex;
-        const activeIndex = Math.round(rawProgress);
-
-        const heroOut = sceneIndex === 0 ? smoothstep(.35, .92, sceneProgress) : 1;
-        hero.style.setProperty('--layer-opacity', (1 - heroOut).toFixed(3));
-        hero.classList.toggle('is-active', activeIndex === 0);
+        const viewportCenter = viewportHeight * .5;
+        let activeIndex = 0;
+        let nearestDistance = Infinity;
 
         sections.forEach((section, index) => {
-          const layerIndex = index + 1;
-          const distance = rawProgress - layerIndex;
-          const isBefore = distance < 0;
-          const segmentProgress = isBefore ? 1 + distance : distance;
-          let visualOpacity = 0;
-          let copyOpacity = 0;
-
-          if (Math.abs(distance) < 1) {
-            if (isBefore) {
-              visualOpacity = smoothstep(.56, .82, segmentProgress);
-              copyOpacity = smoothstep(.72, .96, segmentProgress);
-            } else {
-              visualOpacity = 1 - smoothstep(.46, .82, segmentProgress);
-              copyOpacity = 1 - smoothstep(.38, .74, segmentProgress);
-            }
-          } else if (Math.abs(distance) < .001) {
-            visualOpacity = 1;
-            copyOpacity = 1;
+          const rect = section.textScene.getBoundingClientRect();
+          const sceneCenter = rect.top + rect.height * .5;
+          const distance = Math.abs(sceneCenter - viewportCenter);
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            activeIndex = index + 1;
           }
+        });
 
-          const layerOpacity = Math.max(visualOpacity, copyOpacity);
-          const isActive = activeIndex === layerIndex && layerOpacity > .55;
-          section.layer.style.setProperty('--layer-opacity', layerOpacity.toFixed(3));
+        sections.forEach((section, index) => {
+          const rect = section.textScene.getBoundingClientRect();
+          const sceneCenter = rect.top + rect.height * .5;
+          const normalizedDistance = Math.abs(sceneCenter - viewportCenter) / Math.max(1, viewportHeight);
+          const visualOpacity = 1 - smoothstep(.28, .68, normalizedDistance);
+          const isActive = activeIndex === index + 1 && visualOpacity > .42;
+          section.layer.style.setProperty('--layer-opacity', visualOpacity.toFixed(3));
           section.layer.style.setProperty('--visual-opacity', visualOpacity.toFixed(3));
-          section.layer.style.setProperty('--copy-opacity', copyOpacity.toFixed(3));
           section.layer.style.setProperty('--visual-scale', (0.992 + visualOpacity * .008).toFixed(3));
-          section.layer.style.setProperty('--layer-z', String(Math.round(layerOpacity * 100) + 1));
+          section.layer.style.setProperty('--layer-z', String(Math.round(visualOpacity * 100) + 1));
           section.layer.classList.toggle('is-active', isActive);
           section.visual.tabIndex = isActive ? 0 : -1;
-          section.dot.classList.toggle('is-active', activeIndex === layerIndex);
+          section.dot.classList.toggle('is-active', isActive);
         });
         ticking = false;
       };
