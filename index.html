@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -296,11 +296,8 @@
     }
 
     .panel {
-      min-height: 100dvh;
-      display: grid;
-      align-items: center;
-      padding: clamp(94px, 13vh, 136px) clamp(18px, 5vw, 70px) clamp(36px, 8vh, 78px);
-      scroll-snap-align: start;
+      min-height: 178dvh;
+      padding: 0;
       position: relative;
       overflow: hidden;
     }
@@ -320,21 +317,26 @@
     }
 
     .panel-inner {
+      position: sticky;
+      top: 0;
       width: min(1180px, 100%);
       margin: 0 auto;
+      min-height: 100dvh;
+      padding: clamp(94px, 13vh, 136px) clamp(18px, 5vw, 70px) clamp(36px, 8vh, 78px);
       display: grid;
       grid-template-columns: minmax(0, .92fr) minmax(360px, 1.08fr);
       gap: clamp(30px, 6vw, 86px);
       align-items: center;
-      position: relative;
       z-index: 1;
     }
 
     .hero .panel-inner {
       grid-template-columns: minmax(0, 860px);
       justify-content: start;
-      align-items: end;
-      min-height: min(64vh, 640px);
+      align-items: start;
+      width: 100%;
+      margin: 0;
+      padding-top: clamp(92px, 12vh, 120px);
     }
 
     .kicker {
@@ -366,7 +368,7 @@
 
     h1 {
       max-width: 790px;
-      font-size: clamp(58px, 10.6vw, 152px);
+      font-size: clamp(54px, 8.8vw, 128px);
       text-shadow: 0 22px 70px rgba(73, 92, 118, .18);
     }
 
@@ -386,52 +388,10 @@
       line-height: 1.75;
     }
 
-    .meta-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-top: 32px;
-      color: rgba(23,32,51,.58);
-      font-size: 13px;
-    }
-
-    .glass-button {
-      min-height: 46px;
-      border: 1px solid rgba(255,255,255,.8);
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 0 18px 0 22px;
-      color: #fff;
-      background: rgba(23,32,51,.88);
-      box-shadow: 0 18px 42px rgba(46, 61, 82, .18);
-      text-decoration: none;
-      cursor: pointer;
-      transition: transform .22s ease, box-shadow .22s ease, background .22s ease;
-      font-weight: 680;
-    }
-
-    .glass-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 24px 54px rgba(46, 61, 82, .22);
-      background: rgba(23,32,51,.96);
-    }
-
-    .glass-button::after {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-top: 2px solid currentColor;
-      border-right: 2px solid currentColor;
-      transform: rotate(45deg);
-    }
-
     .visual {
       position: relative;
       min-height: clamp(420px, 60vh, 650px);
+      padding: 0;
       border: 1px solid rgba(255,255,255,.84);
       border-radius: var(--radius);
       background: rgba(255,255,255,.45);
@@ -439,15 +399,15 @@
       overflow: hidden;
       backdrop-filter: blur(28px) saturate(145%);
       -webkit-backdrop-filter: blur(28px) saturate(145%);
-      transform: translateY(28px) scale(.965);
-      opacity: .72;
-      transition: transform .75s cubic-bezier(.19, 1, .22, 1), opacity .75s ease, box-shadow .75s ease;
-    }
-
-    .panel.is-active .visual,
-    .hero .visual {
-      transform: translateY(0) scale(1);
-      opacity: 1;
+      cursor: pointer;
+      transform:
+        translate3d(calc(var(--mx, 0) * -10px), var(--visual-y, 26px), 0)
+        rotateX(calc(var(--my, 0) * -2deg))
+        rotateY(calc(var(--mx, 0) * 2.5deg))
+        scale(var(--visual-scale, .965));
+      transform-style: preserve-3d;
+      opacity: var(--visual-opacity, .72);
+      transition: transform .75s cubic-bezier(.19, 1, .22, 1), opacity .55s ease, box-shadow .35s ease, filter .35s ease;
     }
 
     .visual::before {
@@ -462,8 +422,7 @@
       filter: saturate(.94) contrast(.98);
     }
 
-    .panel.is-active .visual::before,
-    .hero .visual::before {
+    .panel.is-active .visual::before {
       transform: scale(1);
     }
 
@@ -475,6 +434,29 @@
         linear-gradient(180deg, rgba(255,255,255,.15), transparent 44%, rgba(255,255,255,.26)),
         radial-gradient(circle at 22% 20%, rgba(255,255,255,.74), transparent 24%);
       pointer-events: none;
+    }
+
+    .visual:hover,
+    .visual:focus-visible {
+      box-shadow:
+        0 42px 130px rgba(73, 92, 118, .3),
+        inset 0 0 0 1px rgba(255,255,255,.88);
+      filter: saturate(1.04) contrast(1.02);
+      outline: none;
+    }
+
+    .visual:hover::before,
+    .visual:focus-visible::before {
+      transform: scale(1.035);
+      filter: saturate(1.03) contrast(1.02);
+    }
+
+    .visual:active {
+      transform:
+        translate3d(calc(var(--mx, 0) * -6px), calc(var(--visual-y, 26px) + 2px), 0)
+        rotateX(calc(var(--my, 0) * -1.2deg))
+        rotateY(calc(var(--mx, 0) * 1.6deg))
+        scale(.985);
     }
 
     .visual-card {
@@ -520,15 +502,14 @@
     }
 
     .section-copy {
-      transform: translateY(34px);
-      opacity: .48;
-      transition: opacity .65s ease, transform .65s cubic-bezier(.19, 1, .22, 1);
+      transform: translateY(var(--copy-y, 34px));
+      opacity: var(--copy-opacity, .48);
+      transition: opacity .35s ease, transform .5s cubic-bezier(.19, 1, .22, 1);
     }
 
-    .panel.is-active .section-copy,
     .hero .section-copy {
-      transform: translateY(0);
-      opacity: 1;
+      --copy-y: 0px;
+      --copy-opacity: 1;
     }
 
     .section-image-1 { --section-image: url("./assets/work/photo-wall.webp"); }
@@ -680,6 +661,13 @@
         gap: 8px;
       }
 
+      .topbar-right {
+        display: contents;
+        position: static;
+        max-width: none;
+        gap: 6px;
+      }
+
       .brand {
         min-height: 38px;
         padding: 0 11px;
@@ -687,12 +675,24 @@
       }
 
       .auth-box {
+        position: fixed;
+        top: 14px;
+        right: auto;
+        left: 118px;
+        width: 78px;
         min-height: 38px;
         gap: 6px;
         padding: 5px;
+        max-width: 78px;
+        overflow: visible;
+        justify-content: center;
       }
 
       .auth-status {
+        display: none;
+      }
+
+      .auth-box .ghost-btn {
         display: none;
       }
 
@@ -702,9 +702,20 @@
         font-size: 12px;
       }
 
+      .auth-box .btn {
+        min-width: 58px;
+      }
+
       .panel {
-        min-height: 100svh;
+        min-height: 166svh;
+      }
+
+      .panel-inner {
         padding: 82px 16px 34px;
+      }
+
+      .hero .panel-inner {
+        padding-top: 104px;
       }
 
       h1 {
@@ -734,8 +745,9 @@
         font-size: 34px;
       }
 
-      .glass-button {
-        width: 100%;
+      .visual:hover::before,
+      .visual:focus-visible::before {
+        transform: scale(1.015);
       }
     }
 
@@ -1105,11 +1117,8 @@
             <div class="section-copy">
               <div class="kicker">${number} / 07</div>
               <h2>${section.title}</h2>
-              <div class="meta-row">
-                <button class="glass-button app-link" type="button">${section.title}</button>
-              </div>
             </div>
-            <div class="visual section-image-${section.image}" aria-hidden="true">
+            <div class="visual section-image-${section.image}" role="button" tabindex="0" aria-label="进入${section.title}">
               <div class="visual-card">
                 <div><strong>${section.title}</strong></div>
                 <div class="index-number">${number}</div>
@@ -1117,7 +1126,13 @@
             </div>
           </div>
         `;
-        node.querySelector('.app-link').addEventListener('click', () => enterSection(section));
+        const visual = node.querySelector('.visual');
+        visual.addEventListener('click', () => enterSection(section));
+        visual.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          enterSection(section);
+        });
         scrollStage.appendChild(node);
 
         const dot = document.createElement('button');
@@ -1132,18 +1147,76 @@
       });
     }
 
-    function setupObservers() {
+    function clamp(value, min = 0, max = 1) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function smoothstep(edge0, edge1, value) {
+      const x = clamp((value - edge0) / (edge1 - edge0));
+      return x * x * (3 - 2 * x);
+    }
+
+    function setPanelReveal(panel, progress) {
+      const isHero = panel.classList.contains('hero');
+      if (isHero) {
+        const exit = smoothstep(.34, .86, progress);
+        panel.style.setProperty('--copy-opacity', (1 - exit).toFixed(3));
+        panel.style.setProperty('--copy-y', `${(-10 * exit).toFixed(1)}px`);
+        return;
+      }
+
+      const visualIn = smoothstep(.04, .24, progress);
+      const copyIn = smoothstep(.18, .38, progress);
+      const visualOut = smoothstep(.68, .94, progress);
+      const copyOut = smoothstep(.62, .9, progress);
+      const visualOpacity = visualIn * (1 - visualOut);
+      const copyOpacity = copyIn * (1 - copyOut);
+
+      panel.style.setProperty('--visual-opacity', visualOpacity.toFixed(3));
+      panel.style.setProperty('--visual-y', `${((1 - visualIn) * 30 - visualOut * 18).toFixed(1)}px`);
+      panel.style.setProperty('--visual-scale', (0.965 + visualIn * 0.035 - visualOut * 0.018).toFixed(3));
+      panel.style.setProperty('--copy-opacity', copyOpacity.toFixed(3));
+      panel.style.setProperty('--copy-y', `${((1 - copyIn) * 34 - copyOut * 16).toFixed(1)}px`);
+    }
+
+    function setupScrollStory() {
       const panels = [document.querySelector('.hero'), ...sections.map((item) => item.node)];
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          panels.forEach((panel) => panel.classList.remove('is-active'));
-          entry.target.classList.add('is-active');
-          const key = entry.target.dataset.key;
-          sections.forEach((section) => section.dot.classList.toggle('is-active', section.key === key));
+      let ticking = false;
+
+      const update = () => {
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        let activePanel = panels[0];
+        let nearest = Infinity;
+
+        panels.forEach((panel) => {
+          const rect = panel.getBoundingClientRect();
+          const travel = Math.max(1, rect.height - viewportHeight);
+          const progress = clamp(-rect.top / travel);
+          setPanelReveal(panel, progress);
+
+          const distance = Math.abs(rect.top);
+          if (rect.top <= viewportHeight * .55 && rect.bottom >= viewportHeight * .45 && distance < nearest) {
+            nearest = distance;
+            activePanel = panel;
+          }
         });
-      }, { threshold: .56 });
-      panels.forEach((panel) => observer.observe(panel));
+
+        panels.forEach((panel) => panel.classList.toggle('is-active', panel === activePanel));
+        const key = activePanel.dataset.key;
+        sections.forEach((section) => section.dot.classList.toggle('is-active', section.key === key));
+        ticking = false;
+      };
+
+      const requestUpdate = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      };
+
+      update();
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate, { passive: true });
+      window.addEventListener('load', requestUpdate, { once: true });
     }
 
     function setupMotion() {
@@ -1259,7 +1332,7 @@
     buildSections();
     setProgress(42);
     renderAuthState();
-    setupObservers();
+    setupScrollStory();
     setupMotion();
     setProgress(68);
 
