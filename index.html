@@ -4,12 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>nuonuo小窝</title>
-  <link rel="preload" href="./assets/work/glass-sections-sheet.png" as="image" />
+  <link rel="preload" href="./assets/work/photo-wall.webp" as="image" />
+  <link rel="preload" href="./assets/work/anniversary.webp" as="image" />
+  <link rel="preload" href="./assets/work/message-wall.webp" as="image" />
+  <link rel="preload" href="./assets/work/heart-game.webp" as="image" />
+  <link rel="preload" href="./assets/work/coco-diary.webp" as="image" />
+  <link rel="preload" href="./assets/work/drink-game.webp" as="image" />
+  <link rel="preload" href="./assets/work/video-fast.webp" as="image" />
   <style>
     :root {
       color-scheme: light;
-      --ink: #111827;
-      --text: #172033;
+      --ink: #0c1422;
+      --text: #142036;
       --muted: rgba(36, 48, 70, .66);
       --soft: rgba(255, 255, 255, .66);
       --strong: rgba(255, 255, 255, .86);
@@ -175,7 +181,7 @@
       min-height: 42px;
       padding: 0 13px;
       border-radius: 999px;
-      color: var(--ink);
+      color: rgba(12, 20, 34, .9);
       font-weight: 760;
       line-height: 1;
     }
@@ -325,7 +331,10 @@
     }
 
     .hero .panel-inner {
-      grid-template-columns: minmax(0, 1fr) minmax(340px, .82fr);
+      grid-template-columns: minmax(0, 860px);
+      justify-content: start;
+      align-items: end;
+      min-height: min(64vh, 640px);
     }
 
     .kicker {
@@ -358,6 +367,11 @@
     h1 {
       max-width: 790px;
       font-size: clamp(58px, 10.6vw, 152px);
+      text-shadow: 0 22px 70px rgba(73, 92, 118, .18);
+    }
+
+    h1 span {
+      display: block;
     }
 
     h2 {
@@ -505,43 +519,6 @@
       white-space: nowrap;
     }
 
-    .hero-orb {
-      min-height: clamp(430px, 58vh, 620px);
-    }
-
-    .hero-orb::before {
-      background:
-        radial-gradient(circle at 40% 42%, rgba(255,255,255,.94), rgba(224,237,250,.56) 28%, transparent 48%),
-        radial-gradient(circle at 72% 30%, rgba(196,166,111,.22), transparent 22%),
-        radial-gradient(circle at 30% 76%, rgba(113,153,201,.24), transparent 30%),
-        conic-gradient(from 110deg at 50% 50%, rgba(255,255,255,.72), rgba(166,196,229,.24), rgba(255,255,255,.84), rgba(196,166,111,.16), rgba(255,255,255,.72));
-    }
-
-    .hero-orb .orbit {
-      position: absolute;
-      inset: 16%;
-      border: 1px solid rgba(23,32,51,.08);
-      border-radius: 50%;
-      transform: rotate(var(--r));
-      animation: orbit 14s linear infinite;
-      z-index: 1;
-    }
-
-    .hero-orb .orbit:nth-child(2) {
-      inset: 25% 9%;
-      animation-duration: 18s;
-      animation-direction: reverse;
-    }
-
-    .hero-orb .orbit:nth-child(3) {
-      inset: 9% 27%;
-      animation-duration: 22s;
-    }
-
-    @keyframes orbit {
-      to { transform: rotate(calc(var(--r) + 360deg)); }
-    }
-
     .section-copy {
       transform: translateY(34px);
       opacity: .48;
@@ -554,26 +531,13 @@
       opacity: 1;
     }
 
-    .section-image-1 { --section-image: url("./assets/work/glass-sections-sheet.png"); }
-    .section-image-2 { --section-image: url("./assets/work/glass-sections-sheet.png"); }
-    .section-image-3 { --section-image: url("./assets/work/glass-sections-sheet.png"); }
-    .section-image-4 { --section-image: url("./assets/work/glass-sections-sheet.png"); }
-    .section-image-5 { --section-image: url("./assets/work/glass-sections-sheet.png"); }
-    .section-image-6 { --section-image: url("./assets/work/glass-sections-sheet.png"); }
-    .section-image-7 { --section-image: url("./assets/work/glass-sections-sheet.png"); }
-
-    .work-panel .visual::before {
-      background-size: 300% 300%;
-      background-repeat: no-repeat;
-    }
-
-    .section-image-1::before { background-position: 0% 0%; }
-    .section-image-2::before { background-position: 50% 0%; }
-    .section-image-3::before { background-position: 100% 0%; }
-    .section-image-4::before { background-position: 0% 50%; }
-    .section-image-5::before { background-position: 50% 50%; }
-    .section-image-6::before { background-position: 100% 50%; }
-    .section-image-7::before { background-position: 50% 100%; }
+    .section-image-1 { --section-image: url("./assets/work/photo-wall.webp"); }
+    .section-image-2 { --section-image: url("./assets/work/anniversary.webp"); }
+    .section-image-3 { --section-image: url("./assets/work/message-wall.webp"); }
+    .section-image-4 { --section-image: url("./assets/work/heart-game.webp"); }
+    .section-image-5 { --section-image: url("./assets/work/coco-diary.webp"); }
+    .section-image-6 { --section-image: url("./assets/work/drink-game.webp"); }
+    .section-image-7 { --section-image: url("./assets/work/video-fast.webp"); }
 
     .auth-modal {
       position: fixed;
@@ -694,6 +658,7 @@
       .hero .panel-inner {
         grid-template-columns: 1fr;
         gap: 28px;
+        min-height: auto;
       }
 
       .visual {
@@ -701,9 +666,6 @@
         order: -1;
       }
 
-      .hero .visual {
-        order: 0;
-      }
     }
 
     @media (max-width: 640px) {
@@ -746,7 +708,7 @@
       }
 
       h1 {
-        font-size: clamp(52px, 18vw, 82px);
+        font-size: clamp(48px, 15vw, 66px);
       }
 
       h2 {
@@ -817,22 +779,7 @@
         <div class="panel-inner">
           <div class="section-copy">
             <div class="kicker">私人收藏</div>
-            <h1>nuonuo 小窝</h1>
-            <p class="copy">像浏览一组作品一样进入我们的照片、留言、纪念日和小游戏。向下滑动，每一屏都会展开一个入口。</p>
-            <div class="meta-row">
-              <span>8 段入口</span>
-              <span>毛玻璃动效</span>
-              <span>手机适配</span>
-            </div>
-          </div>
-          <div class="visual hero-orb" aria-hidden="true">
-            <span class="orbit" style="--r: 22deg"></span>
-            <span class="orbit" style="--r: -18deg"></span>
-            <span class="orbit" style="--r: 68deg"></span>
-            <div class="visual-card">
-              <div><strong>向下展开</strong><span>每一段都是一个入口</span></div>
-              <div class="index-number">00</div>
-            </div>
+            <h1><span>nuonuo</span><span>小窝</span></h1>
           </div>
         </div>
       </section>
@@ -876,6 +823,16 @@
     const AUTH_USER_PREFIX = 'users/';
     const LS_CURRENT_USER = 'site_current_user_v1';
     const cos = window.COS ? new COS({ SecretId: SECRET_ID, SecretKey: SECRET_KEY }) : null;
+
+    const sectionImageSources = [
+      './assets/work/photo-wall.webp',
+      './assets/work/anniversary.webp',
+      './assets/work/message-wall.webp',
+      './assets/work/heart-game.webp',
+      './assets/work/coco-diary.webp',
+      './assets/work/drink-game.webp',
+      './assets/work/video-fast.webp'
+    ];
 
     const sections = [
       { key: 'photo', title: '照片墙', lead: '把喜欢的瞬间铺成一面会发光的墙。', href: './photo.html', detail: '影像收藏', image: 1 },
@@ -1148,15 +1105,13 @@
             <div class="section-copy">
               <div class="kicker">${number} / 07</div>
               <h2>${section.title}</h2>
-              <p class="copy">${section.lead}</p>
               <div class="meta-row">
                 <button class="glass-button app-link" type="button">${section.title}</button>
-                <span>${section.requiresAuth ? '需要登录' : '直接进入'}</span>
               </div>
             </div>
             <div class="visual section-image-${section.image}" aria-hidden="true">
               <div class="visual-card">
-                <div><strong>${section.title}</strong><span>${section.detail}</span></div>
+                <div><strong>${section.title}</strong></div>
                 <div class="index-number">${number}</div>
               </div>
             </div>
@@ -1308,16 +1263,18 @@
     setupMotion();
     setProgress(68);
 
-    const art = new Image();
-    art.onload = () => {
-      if (art.decode) {
-        art.decode().catch(() => undefined).finally(finishLoading);
-      } else {
-        finishLoading();
-      }
-    };
-    art.onerror = finishLoading;
-    art.src = './assets/work/glass-sections-sheet.png';
+    let loadedImages = 0;
+    const imagePreloads = sectionImageSources.map((src) => new Promise((resolve) => {
+      const image = new Image();
+      image.onload = image.onerror = () => {
+        loadedImages += 1;
+        setProgress(68 + Math.round((loadedImages / sectionImageSources.length) * 22));
+        resolve();
+      };
+      image.src = src;
+    }));
+
+    Promise.all(imagePreloads).then(finishLoading);
     window.addEventListener('load', () => setProgress(86), { once: true });
     setTimeout(finishLoading, 4200);
   </script>
