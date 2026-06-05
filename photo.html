@@ -629,6 +629,50 @@
       backdrop-filter: blur(24px) saturate(150%);
       -webkit-backdrop-filter: blur(24px) saturate(150%);
     }
+
+    @media (max-width: 720px) {
+      body::before {
+        opacity: .38;
+        mask-image: none;
+      }
+
+      .toolbar {
+        background: rgba(255,255,255,.86) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        transform: translateZ(0);
+        contain: paint;
+      }
+
+      .toolbar,
+      .toolbar.is-compact,
+      .toolbar .brand h1,
+      .toolbar .brand p,
+      .toolbar .toolbar-left,
+      .toolbar .toolbar-right,
+      .toolbar .back-btn {
+        transition: none !important;
+      }
+
+      .photo-item,
+      .photo-meta,
+      .photo-owner,
+      .upload-panel,
+      .empty-state {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      .photo-item {
+        background: rgba(255,255,255,.72) !important;
+        box-shadow: 0 12px 34px rgba(92,111,138,.12) !important;
+      }
+
+      .photo-meta,
+      .photo-owner {
+        background: rgba(255,255,255,.78) !important;
+      }
+    }
   </style>
 </head>
 

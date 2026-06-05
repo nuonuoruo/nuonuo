@@ -1,791 +1,53 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="format-detection" content="telephone=no" />
-  <title>宠物养成 - 小狗</title>
+  <title>CoCo 日记</title>
+  <link rel="stylesheet" href="./assets/site-motion.css" />
+  <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="18" fill="%23eaf4ff"/%3E%3Cpath fill="%237199c9" d="M32 49 15 32c-6-6-2-17 7-17 5 0 8 3 10 7 2-4 5-7 10-7 9 0 13 11 7 17L32 49z"/%3E%3C/svg%3E' />
   <style>
     :root {
-      --text: #1d1d1f;
-      --subtext: #6e6e73;
-      --shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
-      --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.06);
-      --danger: #ff3b30;
-      --primary: #0a84ff;
-      --primary2: #0071e3;
-      --card: rgba(255,255,255,.72);
+      color-scheme: light;
+      --ink: #162033;
+      --muted: rgba(46, 58, 80, .68);
+      --line: rgba(105, 128, 158, .18);
+      --glass: rgba(255,255,255,.68);
+      --glass-strong: rgba(255,255,255,.84);
+      --blue: #6da8e8;
+      --pink: #ff8fb0;
+      --gold: #d7a85d;
+      --green: #66c47c;
+      --shadow: 0 28px 90px rgba(84, 103, 128, .17);
+      --radius: 8px;
     }
 
     * { box-sizing: border-box; }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       min-height: 100%;
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
       background:
-        radial-gradient(circle at 12% 12%, rgba(0, 113, 227, 0.12), transparent 18%),
-        radial-gradient(circle at 85% 15%, rgba(255, 80, 120, 0.12), transparent 16%),
-        radial-gradient(circle at 70% 88%, rgba(80, 200, 120, 0.10), transparent 18%),
-        linear-gradient(180deg, #fbfbfd 0%, #f5f5f7 100%);
-      touch-action: manipulation;
+        radial-gradient(circle at 14% 10%, rgba(255, 209, 222, .42), transparent 28%),
+        radial-gradient(circle at 84% 16%, rgba(255, 229, 190, .62), transparent 30%),
+        radial-gradient(circle at 56% 92%, rgba(177, 216, 248, .7), transparent 42%),
+        linear-gradient(145deg, #fffafd 0%, #eef7ff 48%, #fffdf7 100%);
     }
 
     body {
-      padding: 20px;
+      min-height: 100svh;
       overflow-x: hidden;
-      -webkit-user-select: none;
-      user-select: none;
-      touch-action: manipulation;
-    }
-
-    .page {
-      max-width: 980px;
-      margin: 0 auto;
-      min-height: calc(100vh - 40px);
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .topbar {
-      background: rgba(255, 255, 255, 0.72);
-      backdrop-filter: saturate(180%) blur(22px);
-      -webkit-backdrop-filter: saturate(180%) blur(22px);
-      border: 1px solid rgba(255, 255, 255, 0.72);
-      border-radius: 24px;
-      box-shadow: var(--shadow-soft);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-      flex-wrap: wrap;
-    }
-
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.06);
-      color: var(--text);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
-      touch-action: manipulation;
-      -webkit-touch-callout: none;
-    }
-
-    .back-btn:hover {
-      transform: translateY(-1px);
-      background: rgba(0, 0, 0, 0.08);
-    }
-
-    .brand-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .brand-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #2c8cff 0%, #0066d6 100%);
-      box-shadow: 0 0 0 6px rgba(44, 140, 255, 0.10);
-      flex: 0 0 auto;
-    }
-
-    .brand-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      white-space: nowrap;
-    }
-
-    .auth-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .auth-status {
-      font-size: 13px;
-      color: var(--subtext);
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.42);
-      border: 1px solid rgba(0, 0, 0, 0.05);
-      white-space: nowrap;
-    }
-
-    .stat-chip {
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.7);
-      border: 1px solid rgba(0,0,0,.06);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .stat-chip strong {
-      font-size: 16px;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 999px;
-      font-weight: 700;
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 18px;
-      font-size: 14px;
-      touch-action: manipulation;
-    }
-
-    .btn:hover { transform: translateY(-1px); }
-
-    .danger-btn {
-      background: rgba(255,59,48,.92);
-      color: #fff;
-      box-shadow: 0 8px 18px rgba(255,59,48,.18);
-    }
-
-    .primary-btn {
-      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
-      color: #fff;
-      box-shadow: 0 8px 18px rgba(0,113,227,.18);
-    }
-
-    .ghost-btn {
-      background: rgba(0,0,0,.06);
-      color: var(--text);
-    }
-
-    .hero-wrap {
-      flex: 1;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      padding-top: 2px;
-    }
-
-    .hero {
-      width: min(100%, 920px);
-      background: rgba(255, 255, 255, 0.72);
-      backdrop-filter: saturate(180%) blur(24px);
-      -webkit-backdrop-filter: saturate(180%) blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.82);
-      border-radius: 30px;
-      box-shadow: var(--shadow);
-      padding: 28px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: auto -120px -120px auto;
-      width: 280px;
-      height: 280px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 45, 85, 0.10) 0%, rgba(255,45,85,0) 70%);
-      pointer-events: none;
-    }
-
-    .game-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .game-header h1 {
-      margin: 0;
-      font-size: clamp(30px, 4.5vw, 48px);
-      line-height: 1.08;
-      letter-spacing: -0.06em;
-      font-weight: 900;
-    }
-
-    .game-header p {
-      margin: 10px 0 0;
-      color: var(--subtext);
-      font-size: 16px;
-      line-height: 1.8;
-      max-width: 660px;
-    }
-
-    .game-board {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: minmax(300px, 420px) minmax(260px, 1fr);
-      gap: 20px;
-      align-items: start;
-    }
-
-    .scene-panel {
-      display: grid;
-      gap: 12px;
-    }
-
-    .main-view {
-      border-radius: 28px;
-      background:
-        radial-gradient(circle at 25% 20%, rgba(255,255,255,.75), transparent 20%),
-        radial-gradient(circle at 70% 18%, rgba(255,255,255,.45), transparent 15%),
-        linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.68));
-      position: relative;
-      overflow: hidden;
-      min-height: 520px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 12px 30px rgba(0,0,0,.04);
-      border: 1px solid rgba(255,255,255,.65);
-    }
-
-    .room-light {
-      position: absolute;
-      inset: auto -30px -120px auto;
-      width: 340px;
-      height: 340px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 194, 214, .22) 0%, rgba(255, 194, 214, 0) 70%);
-      pointer-events: none;
-    }
-
-    .floor {
-      position: absolute;
-      left: 0; right: 0; bottom: 0;
-      height: 150px;
-      background:
-        linear-gradient(180deg, rgba(94, 195, 121, .06), rgba(47,179,107,.10)),
-        linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.12));
-      border-top: 1px solid rgba(80,180,110,.15);
-    }
-
-    .dog-wrap {
-      position: absolute;
-      left: 50%;
-      bottom: 44px;
-      transform: translateX(-50%);
-      width: min(100%, 900px);
-      height: 370px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      pointer-events: none;
-    }
-
-    .dog-stage {
-      position: relative;
-      width: min(100%, 860px);
-      height: 340px;
-    }
-
-    .dog-card {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      pointer-events: auto;
-      z-index: 10;
-    }
-
-    .dog-button {
-      appearance: none;
-      border: none;
-      background: transparent;
-      padding: 0;
-      cursor: pointer;
-      position: relative;
-      width: min(860px, 100%);
-      height: 100%;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      outline: none;
-    }
-
-    .dog-button:focus-visible {
-      outline: 3px solid rgba(52,152,255,.35);
-      outline-offset: 6px;
-      border-radius: 24px;
-    }
-
-    .dog-svg {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      filter: drop-shadow(0 18px 28px rgba(0,0,0,.08));
-      transition: transform .18s ease;
-      transform-origin: center bottom;
-    }
-
-    .dog-button:hover .dog-svg {
-      transform: translateY(-2px) scale(1.01);
-    }
-
-    .dog-button:active .dog-svg,
-    .dog-button.bounce .dog-svg {
-      animation: bounce .28s ease;
-    }
-
-    .dog-caption {
-      position: absolute;
-      left: 50%;
-      top: 8px;
-      transform: translateX(-50%);
-      background: rgba(255,255,255,.86);
-      backdrop-filter: blur(8px);
-      border-radius: 999px;
-      padding: 8px 14px;
-      font-weight: 800;
-      color: #5f4b32;
-      box-shadow: 0 10px 20px rgba(0,0,0,.06);
-      border: 1px solid rgba(255,255,255,.55);
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .bowl, .cup {
-      position: absolute;
-      bottom: 10px;
-      z-index: 20;
-      border: none;
-      cursor: pointer;
-      background: transparent;
-      width: 132px;
-      height: 110px;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      transition: transform .15s ease, filter .15s ease;
-      pointer-events: auto;
-    }
-    .bowl:hover,.cup:hover{transform:translateY(-2px)}
-    .bowl:active,.cup:active{transform:translateY(1px) scale(.98)}
-
-    .bowl { left: 42px; }
-    .cup { right: 46px; }
-
-    .bowl .label, .cup .label {
-      position: absolute;
-      left: 50%;
-      bottom: -20px;
-      transform: translateX(-50%);
-      font-size: 13px;
-      font-weight: 800;
-      color: #6a5a47;
-      white-space: nowrap;
-      background: rgba(255,255,255,.72);
-      padding: 4px 10px;
-      border-radius: 999px;
-      box-shadow: 0 8px 14px rgba(0,0,0,.05);
-    }
-
-    .bowl-shape {
-      position: absolute;
-      inset: 20px 10px 28px 10px;
-      border-radius: 18px 18px 42px 42px;
-      background:
-        radial-gradient(circle at 35% 28%, rgba(255,255,255,.85), transparent 25%),
-        linear-gradient(180deg, #ffd48f 0%, #ffb84d 100%);
-      box-shadow: inset 0 -10px 16px rgba(145, 83, 0, .12), 0 10px 18px rgba(0,0,0,.08);
-      border: 1px solid rgba(255,255,255,.35);
-    }
-    .bowl-shape::before {
-      content:"";
-      position:absolute;
-      left:50%; top:-12px;
-      transform:translateX(-50%);
-      width:104px; height:22px;
-      border-radius:999px;
-      background:linear-gradient(180deg,#ffe4b0,#ffd07a);
-      border:1px solid rgba(255,255,255,.35);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.6);
-    }
-    .bowl-rice {
-      position:absolute;
-      left:22px; right:22px;
-      top:39px;
-      height:24px;
-      border-radius:999px;
-      background:
-        radial-gradient(circle at 20% 40%, #fff 0 16%, transparent 17%),
-        radial-gradient(circle at 50% 35%, #fff 0 15%, transparent 16%),
-        radial-gradient(circle at 78% 42%, #fff 0 15%, transparent 16%),
-        linear-gradient(180deg, #fff8e8, #fff0c9);
-      opacity:.96;
-      filter: blur(.1px);
-    }
-
-    .cup-shape {
-      position:absolute;
-      inset:18px 20px 28px 20px;
-      border-radius:16px 16px 12px 12px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.55)),
-        linear-gradient(180deg, #cfefff, #68bfff);
-      box-shadow: inset 0 -10px 16px rgba(0,0,0,.08), 0 10px 18px rgba(0,0,0,.08);
-      border:1px solid rgba(255,255,255,.42);
-    }
-    .cup-shape::before {
-      content:"";
-      position:absolute;
-      right:-15px;
-      top:24px;
-      width:32px;
-      height:42px;
-      border:6px solid #7ec6ff;
-      border-left:none;
-      border-radius:0 20px 20px 0;
-      box-sizing:border-box;
-      filter: drop-shadow(0 2px 2px rgba(0,0,0,.04));
-    }
-    .cup-water {
-      position:absolute;
-      left:25px; right:25px;
-      bottom:22px;
-      height:52px;
-      border-radius:10px 10px 12px 12px;
-      background:
-        radial-gradient(circle at 45% 20%, rgba(255,255,255,.7), transparent 18%),
-        linear-gradient(180deg, #bfe9ff, #54b3ff);
-      box-shadow: inset 0 10px 16px rgba(255,255,255,.15);
-    }
-
-    .pet-hint {
-      text-align:center;
-      color:#7a7a7a;
-      font-size:13px;
-      margin-top:2px;
-    }
-
-    .game-side {
-      display: grid;
-      gap: 14px;
-    }
-
-    .info-card {
-      border-radius: 22px;
-      background: rgba(255,255,255,.68);
-      border: 1px solid rgba(0,0,0,.06);
-      box-shadow: var(--shadow-soft);
-      padding: 16px 16px 15px;
-    }
-
-    .info-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-
-    .user-box {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-      color: #555;
-      font-size: 14px;
-    }
-
-    .stats {
-      display: grid;
-      gap: 12px;
-    }
-
-    .stat {
-      background: rgba(255,255,255,.82);
-      border-radius: 18px;
-      padding: 14px;
-      border: 1px solid rgba(0,0,0,.03);
-    }
-
-    .stat-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 15px;
-      font-weight: 800;
-    }
-
-    .bar {
-      width: 100%;
-      height: 14px;
-      background: #ebebeb;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .fill {
-      height: 100%;
-      width: 0%;
-      border-radius: inherit;
-      transition: width .25s ease;
-    }
-
-    .fill.affection { background: linear-gradient(90deg,#ff7aa2,#ff4d8d); }
-    .fill.hunger { background: linear-gradient(90deg,#76df78,#2fb457); }
-    .fill.thirst { background: linear-gradient(90deg,#79d0ff,#3498ff); }
-
-    .mood-box {
-      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.76));
-      border-radius: 18px;
-      padding: 14px;
-      line-height: 1.7;
-      color: #555;
-      border: 1px solid rgba(0,0,0,.03);
-    }
-
-    .mood-box strong {
-      display: block;
-      color: #333;
-      margin-bottom: 4px;
-      font-size: 15px;
-    }
-
-    .name-input-wrap {
-      display: grid;
-      gap: 10px;
-    }
-
-    .name-input-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .name-input {
-      flex: 1 1 180px;
-      height: 44px;
-      border-radius: 14px;
-      border: 1px solid rgba(0,0,0,.08);
-      background: rgba(255,255,255,.92);
-      padding: 0 14px;
-      font-size: 14px;
-      color: var(--text);
-      outline: none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
-    }
-
-    .name-input:focus {
-      border-color: rgba(10,132,255,.35);
-      box-shadow: 0 0 0 4px rgba(10,132,255,.10);
-    }
-
-    .name-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .name-actions .btn {
-      flex: 1 1 0;
-      min-width: 120px;
-    }
-
-    .sync-tip {
-      font-size: 12px;
-      color: #7a7a7a;
-      line-height: 1.6;
-      margin-top: 8px;
-    }
-
-    .login-gate {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.62);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 999;
-      display: none;
-      align-items: center;
-      justify-content: center;
       padding: 18px;
-    }
-
-    .login-gate.show { display: flex; }
-
-    .login-card {
-      width: min(92vw, 460px);
-      border-radius: 24px;
-      background: rgba(255,255,255,.95);
-      border: 1px solid rgba(255,255,255,.35);
-      box-shadow: 0 30px 80px rgba(0,0,0,.25);
-      overflow: hidden;
-    }
-
-    .login-card .head {
-      padding: 18px 20px 12px;
-      border-bottom: 1px solid rgba(0,0,0,.06);
-    }
-    .login-card .head h3 {
-      margin: 0;
-      font-size: 18px;
-    }
-    .login-card .head p {
-      margin: 8px 0 0;
-      color: var(--subtext);
-      font-size: 13px;
-      line-height: 1.7;
-    }
-    .login-card .body {
-      padding: 18px 20px 20px;
-      display: grid;
-      gap: 12px;
-    }
-    .login-card .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .login-card .actions button {
-      flex: 1 1 0;
-      min-width: 120px;
-      height: 44px;
-      border: none;
-      border-radius: 14px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .ok {
-      background: linear-gradient(180deg, #0a84ff 0%, #0071e3 100%);
-      color: #fff;
-    }
-    .cancel {
-      background: rgba(0,0,0,.06);
-      color: var(--text);
-    }
-
-    .pet-float {
-      position: absolute;
-      pointer-events: none;
-      z-index: 20;
-      animation: floatUp .95s ease forwards;
-      font-size: 22px;
-      filter: drop-shadow(0 8px 10px rgba(0,0,0,.08));
-    }
-
-    @keyframes bounce {
-      0%{transform:scale(1)}
-      45%{transform:scale(1.045)}
-      100%{transform:scale(1)}
-    }
-
-    @keyframes floatUp {
-      0%{opacity:0; transform:translateY(0) scale(.82)}
-      15%{opacity:1}
-      100%{opacity:0; transform:translateY(-110px) scale(1.35)}
-    }
-
-    @media (max-width: 820px) {
-      .game-board {
-        grid-template-columns: 1fr;
-      }
-      .main-view {
-        min-height: 460px;
-      }
-    }
-
-    @media (max-width: 720px) {
-      body { padding: 12px; }
-      .page {
-        min-height: calc(100vh - 24px);
-      }
-      .topbar {
-        border-radius: 22px;
-        padding: 12px 14px;
-      }
-      .topbar-left {
-        width: 100%;
-      }
-      .auth-box {
-        width: 100%;
-        justify-content: flex-start;
-      }
-      .back-btn {
-        padding: 9px 12px;
-        font-size: 12px;
-      }
-      .hero {
-        border-radius: 24px;
-        padding: 20px 16px 18px;
-      }
-      .game-header p {
-        font-size: 14px;
-      }
-      .game-header {
-        gap: 12px;
-      }
-      .btn {
-        width: 100%;
-      }
-      .main-view {
-        min-height: 430px;
-        border-radius: 24px;
-      }
-      .bowl{left:10px}
-      .cup{right:10px}
-      .bowl,.cup{
-        width:110px;
-        height:96px;
-      }
-      .name-actions .btn{
-        min-width:100%;
-      }
-      .login-card .actions button{
-        min-width:100%;
-      }
-    }
-  </style>
-  <link rel="stylesheet" href="./assets/site-motion.css" />
-  <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="18" fill="%23eaf4ff"/%3E%3Cpath fill="%237199c9" d="M32 49 15 32c-6-6-2-17 7-17 5 0 8 3 10 7 2-4 5-7 10-7 9 0 13 11 7 17L32 49z"/%3E%3C/svg%3E' />
-  <style>
-    body {
-      background:
-        radial-gradient(circle at 18% 10%, rgba(180, 210, 244, .72), transparent 30%),
-        radial-gradient(circle at 88% 18%, rgba(255, 250, 235, .9), transparent 28%),
-        radial-gradient(circle at 42% 92%, rgba(212, 227, 246, .9), transparent 36%),
-        linear-gradient(140deg, #f9fbff 0%, #eef5fb 48%, #ffffff 100%) !important;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
     }
 
     body::before {
@@ -795,25 +57,710 @@
       z-index: 0;
       pointer-events: none;
       background:
-        linear-gradient(90deg, rgba(126, 149, 178, .07) 1px, transparent 1px),
-        linear-gradient(rgba(126, 149, 178, .06) 1px, transparent 1px);
-      background-size: 64px 64px;
-      mask-image: radial-gradient(circle at 50% 36%, rgba(0,0,0,.68), transparent 70%);
+        linear-gradient(90deg, rgba(126,149,178,.06) 1px, transparent 1px),
+        linear-gradient(rgba(126,149,178,.055) 1px, transparent 1px);
+      background-size: 68px 68px;
+      mask-image: radial-gradient(circle at 50% 34%, rgba(0,0,0,.55), transparent 72%);
     }
 
-    .page { position: relative; z-index: 1; }
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
 
     .topbar,
-    .pet-shell,
+    .hero,
     .panel,
-    .login-card,
-    .auth-box {
-      border-radius: 8px !important;
-      border: 1px solid rgba(255,255,255,.78) !important;
-      background: rgba(255,255,255,.58) !important;
-      box-shadow: 0 28px 90px rgba(92, 111, 138, .18) !important;
-      backdrop-filter: blur(24px) saturate(150%);
-      -webkit-backdrop-filter: blur(24px) saturate(150%);
+    .login-card {
+      border: 1px solid rgba(255,255,255,.78);
+      border-radius: var(--radius);
+      background: var(--glass);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px) saturate(150%);
+      -webkit-backdrop-filter: blur(22px) saturate(150%);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 14px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .topbar-left,
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+
+    .back-btn,
+    .brand-row,
+    .chip,
+    .btn {
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 999px;
+      background: rgba(255,255,255,.58);
+      color: var(--ink);
+      text-decoration: none;
+      box-shadow: 0 12px 32px rgba(84, 103, 128, .1);
+    }
+
+    .back-btn,
+    .brand-row,
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 13px;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 0 1px rgba(109,168,232,.2), 0 0 18px rgba(109,168,232,.55);
+    }
+
+    .chip strong {
+      font-size: 16px;
+    }
+
+    .btn {
+      min-height: 42px;
+      border: 0;
+      padding: 0 16px;
+      cursor: pointer;
+      font-weight: 780;
+      transition: transform .16s ease, opacity .2s ease, box-shadow .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(1px) scale(.985); }
+    .btn:disabled { opacity: .48; cursor: not-allowed; }
+
+    .primary-btn {
+      color: #fff;
+      background: linear-gradient(180deg, #2794ff, #0874dc);
+      box-shadow: 0 14px 34px rgba(49, 137, 226, .22);
+    }
+
+    .danger-btn {
+      color: #fff;
+      background: linear-gradient(180deg, #ff6a74, #f04452);
+      box-shadow: 0 14px 34px rgba(240, 68, 82, .2);
+    }
+
+    .ghost-btn {
+      background: rgba(255,255,255,.62);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(18px, 3vw, 34px);
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      border-radius: 999px;
+    }
+
+    .hero::before {
+      right: -110px;
+      top: -120px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(255, 226, 190, .52), transparent 68%);
+    }
+
+    .hero::after {
+      left: -90px;
+      bottom: -130px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(189, 222, 250, .56), transparent 70%);
+    }
+
+    .hero-head {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .hero-title h1 {
+      margin: 0;
+      font-size: clamp(38px, 8vw, 92px);
+      line-height: .92;
+      letter-spacing: 0;
+      font-weight: 880;
+    }
+
+    .hero-title p {
+      max-width: 560px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .mood-card {
+      min-width: min(100%, 280px);
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,.76);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.54);
+      box-shadow: 0 18px 54px rgba(84, 103, 128, .12);
+    }
+
+    .mood-card strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .mood-card div {
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .pet-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(320px, 1.08fr) minmax(300px, .92fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .room {
+      position: relative;
+      min-height: 560px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.72);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.84), rgba(255,255,255,.42)),
+        radial-gradient(circle at 25% 22%, rgba(255,255,255,.78), transparent 24%),
+        radial-gradient(circle at 70% 18%, rgba(255, 231, 190, .38), transparent 28%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 20px 70px rgba(84, 103, 128, .13);
+    }
+
+    .window {
+      position: absolute;
+      left: 24px;
+      top: 24px;
+      width: 150px;
+      height: 112px;
+      border: 1px solid rgba(255,255,255,.76);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(90deg, transparent calc(50% - 1px), rgba(255,255,255,.7) 50%, transparent calc(50% + 1px)),
+        linear-gradient(180deg, transparent calc(50% - 1px), rgba(255,255,255,.7) 50%, transparent calc(50% + 1px)),
+        linear-gradient(180deg, #e9f7ff, #fff3e7);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 20px 54px rgba(84, 103, 128, .1);
+    }
+
+    .sun {
+      position: absolute;
+      right: 36px;
+      top: 38px;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff7ca, #ffd77d 58%, transparent 70%);
+      opacity: .72;
+    }
+
+    .floor {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 168px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.28)),
+        repeating-linear-gradient(90deg, rgba(207,174,128,.18) 0 1px, transparent 1px 56px),
+        linear-gradient(180deg, rgba(232, 211, 181, .28), rgba(211, 182, 142, .18));
+      border-top: 1px solid rgba(185, 151, 102, .14);
+    }
+
+    .dog-area {
+      position: absolute;
+      left: 50%;
+      bottom: 52px;
+      width: min(92%, 520px);
+      height: 390px;
+      transform: translateX(-50%);
+    }
+
+    .dog-caption {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      z-index: 5;
+      transform: translateX(-50%);
+      padding: 8px 14px;
+      border: 1px solid rgba(255,255,255,.76);
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      box-shadow: 0 14px 36px rgba(84, 103, 128, .12);
+      color: rgba(69, 52, 32, .86);
+      font-weight: 820;
+    }
+
+    .dog-button {
+      position: absolute;
+      left: 50%;
+      bottom: 24px;
+      width: min(88vw, 330px);
+      height: 300px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      transform: translateX(-50%);
+      -webkit-tap-highlight-color: transparent;
+      transform-origin: 50% 90%;
+    }
+
+    .dog-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      filter: drop-shadow(0 26px 28px rgba(91, 65, 38, .14));
+      transition: transform .18s ease;
+    }
+
+    .dog-button:hover .dog-svg { transform: translateY(-2px); }
+    .dog-button.bounce .dog-svg { animation: dogBounce .38s ease; }
+    .dog-button.sleepy .dog-svg { animation: sleepy 2.8s ease-in-out infinite; }
+    .dog-button.hungry .dog-svg { animation: hungry 1.8s ease-in-out infinite; }
+    .dog-button.happy .dog-svg { animation: happyWiggle 1.8s ease-in-out infinite; }
+
+    .tail {
+      transform-origin: 47px 118px;
+      animation: wag 1.2s ease-in-out infinite;
+    }
+
+    .ear-left { transform-origin: 89px 94px; }
+    .ear-right { transform-origin: 231px 94px; }
+    .dog-button.happy .ear-left { animation: earFlop 1.8s ease-in-out infinite; }
+    .dog-button.happy .ear-right { animation: earFlop 1.8s ease-in-out infinite reverse; }
+
+    .eye-sleep { opacity: 0; }
+    .dog-button.sleepy .eye-open { opacity: 0; }
+    .dog-button.sleepy .eye-sleep { opacity: 1; }
+
+    .bowl,
+    .cup,
+    .toy {
+      position: absolute;
+      z-index: 6;
+      bottom: 14px;
+      width: 112px;
+      height: 98px;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .16s ease;
+    }
+
+    .bowl { left: 20px; }
+    .cup { right: 20px; }
+    .toy { left: 50%; bottom: 0; width: 88px; height: 72px; transform: translateX(-50%); }
+    .bowl:hover,
+    .cup:hover { transform: translateY(-2px); }
+    .toy:hover { transform: translateX(-50%) translateY(-2px); }
+
+    .object-label {
+      position: absolute;
+      left: 50%;
+      bottom: -16px;
+      transform: translateX(-50%);
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.7);
+      color: rgba(69, 52, 32, .74);
+      font-size: 12px;
+      font-weight: 820;
+      white-space: nowrap;
+    }
+
+    .bowl-shape,
+    .cup-shape,
+    .toy-shape {
+      position: absolute;
+      inset: 14px 8px 22px;
+      border: 1px solid rgba(255,255,255,.48);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.64), 0 14px 28px rgba(91, 65, 38, .12);
+    }
+
+    .bowl-shape {
+      border-radius: 18px 18px 42px 42px;
+      background: linear-gradient(180deg, #ffd995, #ffb85d);
+    }
+
+    .bowl-shape::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -12px;
+      width: 92px;
+      height: 22px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ffe9bd, #ffd68c);
+      transform: translateX(-50%);
+    }
+
+    .bowl-food {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      top: 36px;
+      height: 22px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 22% 42%, #fff 0 16%, transparent 17%),
+        radial-gradient(circle at 52% 35%, #fff 0 15%, transparent 16%),
+        radial-gradient(circle at 78% 44%, #fff 0 15%, transparent 16%),
+        linear-gradient(180deg, #fff7dc, #ffe7a5);
+    }
+
+    .cup-shape {
+      inset: 12px 18px 22px;
+      border-radius: 16px 16px 12px 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.58)), linear-gradient(180deg, #ccefff, #69bfff);
+    }
+
+    .cup-shape::before {
+      content: "";
+      position: absolute;
+      right: -14px;
+      top: 20px;
+      width: 28px;
+      height: 40px;
+      border: 5px solid #78c7ff;
+      border-left: 0;
+      border-radius: 0 20px 20px 0;
+    }
+
+    .cup-water {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 16px;
+      height: 42px;
+      border-radius: 9px;
+      background: linear-gradient(180deg, #c7edff, #56b3ff);
+    }
+
+    .toy-shape {
+      inset: 18px 9px 16px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 32% 34%, rgba(255,255,255,.8), transparent 18%),
+        linear-gradient(135deg, #ff8fb0, #ffb46d);
+    }
+
+    .panels {
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      padding: 16px;
+    }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+      font-weight: 840;
+    }
+
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .meter {
+      padding: 12px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.66);
+      background: rgba(255,255,255,.52);
+    }
+
+    .meter-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      color: rgba(22,32,51,.78);
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .bar {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(112, 132, 158, .14);
+    }
+
+    .fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      transition: width .32s ease;
+    }
+
+    .fill.affection { background: linear-gradient(90deg, #ff87aa, #ff4d8d); }
+    .fill.hunger { background: linear-gradient(90deg, #8fe08f, #39b864); }
+    .fill.thirst { background: linear-gradient(90deg, #8cdbff, #3aa0ff); }
+    .fill.energy { background: linear-gradient(90deg, #ffe08f, #ffb84d); }
+    .fill.clean { background: linear-gradient(90deg, #b9e8ff, #8fb3ff); }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .action {
+      min-height: 64px;
+      border: 1px solid rgba(255,255,255,.72);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.54);
+      color: var(--ink);
+      cursor: pointer;
+      display: grid;
+      align-content: center;
+      gap: 4px;
+      padding: 10px;
+      text-align: left;
+      box-shadow: 0 14px 34px rgba(84,103,128,.1);
+      transition: transform .16s ease, background .2s ease;
+    }
+
+    .action:hover { transform: translateY(-1px); background: rgba(255,255,255,.72); }
+    .action strong { font-size: 14px; }
+    .action span { color: var(--muted); font-size: 12px; }
+
+    .name-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+    }
+
+    .name-input {
+      min-width: 0;
+      height: 42px;
+      border: 1px solid rgba(105,128,158,.2);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.72);
+      color: var(--ink);
+      outline: none;
+      padding: 0 12px;
+    }
+
+    .log-list {
+      display: grid;
+      gap: 8px;
+      max-height: 162px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .log-item {
+      padding: 10px 11px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.52);
+      color: rgba(22,32,51,.72);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .care-line {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .pet-float {
+      position: absolute;
+      z-index: 30;
+      pointer-events: none;
+      font-size: 22px;
+      animation: floatUp .95s ease forwards;
+      filter: drop-shadow(0 8px 10px rgba(84,103,128,.12));
+    }
+
+    .login-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(28, 36, 52, .48);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .login-gate.show { display: flex; }
+
+    .login-card {
+      width: min(94vw, 460px);
+      overflow: hidden;
+      background: rgba(255,255,255,.88);
+    }
+
+    .login-card .head {
+      padding: 18px 20px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .login-card h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .login-card p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .login-card .body {
+      display: grid;
+      gap: 14px;
+      padding: 18px 20px 20px;
+    }
+
+    .login-card .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @keyframes dogBounce {
+      0% { transform: scale(1); }
+      38% { transform: scale(1.045) translateY(-4px); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes wag {
+      0%, 100% { transform: rotate(-9deg); }
+      50% { transform: rotate(13deg); }
+    }
+
+    @keyframes happyWiggle {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(2px); }
+    }
+
+    @keyframes hungry {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(3px); }
+    }
+
+    @keyframes sleepy {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(3px) scale(.99); }
+    }
+
+    @keyframes earFlop {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(0) scale(.82); }
+      16% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-96px) scale(1.28); }
+    }
+
+    @media (max-width: 900px) {
+      .pet-grid { grid-template-columns: 1fr; }
+      .room { min-height: 520px; }
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 12px; }
+      body::before { opacity: .45; mask-image: none; }
+
+      .topbar,
+      .hero,
+      .panel,
+      .login-card {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+
+      .topbar { position: relative; top: auto; }
+      .topbar-right,
+      .topbar-left { width: 100%; }
+      .hero { padding: 16px; }
+      .hero-title h1 { font-size: clamp(42px, 15vw, 64px); }
+      .room { min-height: 470px; }
+      .dog-area { width: 100%; height: 340px; bottom: 42px; }
+      .dog-button { width: min(86vw, 280px); height: 250px; bottom: 34px; }
+      .bowl, .cup { width: 92px; height: 82px; bottom: 18px; }
+      .bowl { left: 8px; }
+      .cup { right: 8px; }
+      .toy { bottom: -2px; }
+      .state-grid { grid-template-columns: 1fr; }
+      .action-grid { grid-template-columns: 1fr; }
+      .name-row { grid-template-columns: 1fr; }
+      .name-row .btn { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
@@ -823,132 +770,125 @@
       <div class="topbar-left">
         <a class="back-btn" href="./index.html" aria-label="返回主页">← 返回主页</a>
         <a class="brand-row" href="./index.html" aria-label="返回主页">
-          <div class="brand-dot" aria-hidden="true"></div>
-          <div class="brand-title">宠物养成</div>
+          <span class="brand-dot" aria-hidden="true"></span>
+          <span>CoCo 日记</span>
         </a>
       </div>
-
-      <div class="auth-box">
-        <div class="auth-status">当前登录：<span id="userText">未登录</span></div>
-        <div class="stat-chip">❤️ <strong id="affectionTopText">0</strong></div>
+      <div class="topbar-right">
+        <span class="chip">用户：<strong id="userText">未登录</strong></span>
+        <span class="chip">好感：<strong id="affectionTopText">0</strong></span>
         <button class="btn danger-btn" id="logoutBtn" type="button">退出登录</button>
       </div>
     </header>
 
-    <main class="hero-wrap">
-      <section class="hero">
-        <div class="game-header">
-          <div>
-            <h1>小狗养成</h1>
-                    </div>
+    <main class="hero">
+      <div class="hero-head">
+        <div class="hero-title">
+          <h1>像真的养了一只小狗</h1>
+          <p>每天喂食、喂水、陪玩、散步、洗澡。CoCo 会根据你的照顾状态变开心、撒娇、犯困，也会把每次互动记在日记里。</p>
         </div>
+        <div class="mood-card">
+          <strong id="moodTitle">今天的心情</strong>
+          <div id="moodText">正在看看 CoCo 的状态...</div>
+        </div>
+      </div>
 
-        <div class="game-board">
-          <div class="scene-panel">
-            <div class="main-view">
-              <div class="room-light"></div>
-              <div class="floor"></div>
+      <section class="pet-grid" aria-label="CoCo 互动区">
+        <div class="room">
+          <div class="window" aria-hidden="true"></div>
+          <div class="sun" aria-hidden="true"></div>
+          <div class="floor" aria-hidden="true"></div>
+          <div class="dog-area">
+            <div class="dog-caption" id="dogCaption">CoCo</div>
+            <button id="dogBtn" class="dog-button" type="button" aria-label="摸摸 CoCo">
+              <svg class="dog-svg" viewBox="0 0 320 300" aria-hidden="true">
+                <path class="tail" d="M62 172 C26 150 32 106 72 110 C102 113 102 149 76 154" fill="none" stroke="#c88447" stroke-width="24" stroke-linecap="round"/>
+                <ellipse cx="160" cy="190" rx="96" ry="82" fill="#efbd75"/>
+                <ellipse cx="160" cy="220" rx="76" ry="46" fill="#fff4e8"/>
+                <path class="ear-left" d="M94 104 C65 58 82 26 121 36 C138 41 142 62 132 84 C120 96 108 104 94 104Z" fill="#c88447"/>
+                <path class="ear-right" d="M226 104 C255 58 238 26 199 36 C182 41 178 62 188 84 C200 96 212 104 226 104Z" fill="#c88447"/>
+                <circle cx="160" cy="136" r="84" fill="#f3c77d"/>
+                <ellipse cx="160" cy="159" rx="56" ry="39" fill="#fff7ed"/>
+                <circle class="eye-open" cx="126" cy="126" r="8" fill="#241b16"/>
+                <circle class="eye-open" cx="194" cy="126" r="8" fill="#241b16"/>
+                <path class="eye-sleep" d="M116 126 C122 132 132 132 138 126" fill="none" stroke="#241b16" stroke-width="5" stroke-linecap="round"/>
+                <path class="eye-sleep" d="M184 126 C190 132 200 132 206 126" fill="none" stroke="#241b16" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="160" cy="154" r="8" fill="#241b16"/>
+                <path d="M160 162 C150 174 137 172 130 164" fill="none" stroke="#241b16" stroke-width="5" stroke-linecap="round"/>
+                <path d="M160 162 C170 174 183 172 190 164" fill="none" stroke="#241b16" stroke-width="5" stroke-linecap="round"/>
+                <path d="M118 188 C138 204 182 204 202 188" fill="none" stroke="#dd9965" stroke-width="7" stroke-linecap="round" opacity=".65"/>
+                <ellipse cx="102" cy="260" rx="28" ry="16" fill="#d99a5c"/>
+                <ellipse cx="218" cy="260" rx="28" ry="16" fill="#d99a5c"/>
+              </svg>
+            </button>
 
-              <div class="dog-wrap">
-                <div class="dog-stage">
-                  <div class="dog-caption" id="dogCaption">小狗</div>
-
-                  <button id="feedBtn" class="bowl" type="button" aria-label="喂食">
-                    <div class="bowl-shape">
-                      <div class="bowl-rice"></div>
-                    </div>
-                    <div class="label">点击喂食</div>
-                  </button>
-
-                  <button id="waterBtn" class="cup" type="button" aria-label="喂水">
-                    <div class="cup-shape">
-                      <div class="cup-water"></div>
-                    </div>
-                    <div class="label">点击喂水</div>
-                  </button>
-
-                  <div class="dog-card">
-                    <button id="dogBtn" class="dog-button" type="button" aria-label="点击小狗增加好感度">
-                      <svg class="dog-svg" viewBox="0 0 200 200" aria-label="温柔金毛头像">
-                        <path d="M40 74 C29 48 40 26 63 29 C73 30 79 39 80 49 C69 60 58 71 40 74 Z" fill="#D89B57"/>
-                        <path d="M160 74 C171 48 160 26 137 29 C127 30 121 39 120 49 C131 60 142 71 160 74 Z" fill="#D89B57"/>
-                        <circle cx="100" cy="108" r="72" fill="#F2C37A"/>
-                        <ellipse cx="100" cy="122" rx="45" ry="32" fill="#FFF8F0"/>
-                        <circle cx="80" cy="95" r="7.5" fill="#222"/>
-                        <circle cx="120" cy="95" r="7.5" fill="#222"/>
-                        <circle cx="100" cy="116" r="6.8" fill="#222"/>
-                        <path d="M100 123 C91 132 82 131 77 126" stroke="#222" stroke-width="4" stroke-linecap="round" fill="none"/>
-                        <path d="M100 123 C109 132 118 131 123 126" stroke="#222" stroke-width="4" stroke-linecap="round" fill="none"/>
-                        <path d="M70 145 C85 155 115 155 130 145" stroke="#E09B68" stroke-width="5" stroke-linecap="round" fill="none" opacity=".7"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-                     </div>
-
-          <div class="game-side">
-            <div class="info-card">
-              <div class="info-title">📦 当前状态</div>
-              <div class="user-box">
-                <div>登录用户：<strong id="userBox">未登录</strong></div>
-                <div>小狗名字：<strong id="petNameText">未命名</strong></div>
-              </div>
-
-              <div class="stats">
-                <div class="stat">
-                  <div class="stat-top">
-                    <span>❤️ 好感度</span>
-                    <span id="affectionText">0 / 100</span>
-                  </div>
-                  <div class="bar"><div id="affectionBar" class="fill affection"></div></div>
-                </div>
-
-                <div class="stat">
-                  <div class="stat-top">
-                    <span>🍗 饱食度</span>
-                    <span id="hungerText">0 / 100</span>
-                  </div>
-                  <div class="bar"><div id="hungerBar" class="fill hunger"></div></div>
-                </div>
-
-                <div class="stat">
-                  <div class="stat-top">
-                    <span>💧 饮水度</span>
-                    <span id="thirstText">0 / 100</span>
-                  </div>
-                  <div class="bar"><div id="thirstBar" class="fill thirst"></div></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="info-card">
-              <div class="info-title">✏️ 起名字</div>
-              <div class="mood-box">
-                <strong>给小狗起个名字</strong>
-                <div class="name-input-wrap">
-                  <div class="name-input-row">
-                    <input id="nameInput" class="name-input" type="text" maxlength="20" placeholder="请输入小狗名字" />
-                  </div>
-                  <div class="name-actions">
-                    <button class="btn primary-btn" id="saveNameBtn" type="button">保存名字</button>
-                    <button class="btn ghost-btn" id="resetNameBtn" type="button">恢复默认</button>
-                  </div>
-                </div>
-                          </div>
-            </div>
-
-            <div class="info-card">
-              <div class="info-title">💬 小狗心情</div>
-              <div class="mood-box" id="moodBox">
-                <strong>小狗心情</strong>
-                <div id="moodText">还没有和我互动呢～</div>
-              </div>
-            </div>
+            <button id="feedBtn" class="bowl" type="button" aria-label="喂食">
+              <span class="bowl-shape"><span class="bowl-food"></span></span>
+              <span class="object-label">喂食</span>
+            </button>
+            <button id="waterBtn" class="cup" type="button" aria-label="喂水">
+              <span class="cup-shape"><span class="cup-water"></span></span>
+              <span class="object-label">喂水</span>
+            </button>
+            <button id="playBtn" class="toy" type="button" aria-label="陪玩">
+              <span class="toy-shape"></span>
+              <span class="object-label">陪玩</span>
+            </button>
           </div>
         </div>
+
+        <aside class="panels" aria-label="CoCo 状态">
+          <section class="panel">
+            <div class="panel-title">
+              <span>状态仪表</span>
+              <span class="care-line" id="petNameText">CoCo</span>
+            </div>
+            <div class="state-grid">
+              <div class="meter">
+                <div class="meter-top"><span>好感度</span><span id="affectionText">0 / 100</span></div>
+                <div class="bar"><div id="affectionBar" class="fill affection"></div></div>
+              </div>
+              <div class="meter">
+                <div class="meter-top"><span>饱食度</span><span id="hungerText">0 / 100</span></div>
+                <div class="bar"><div id="hungerBar" class="fill hunger"></div></div>
+              </div>
+              <div class="meter">
+                <div class="meter-top"><span>饮水度</span><span id="thirstText">0 / 100</span></div>
+                <div class="bar"><div id="thirstBar" class="fill thirst"></div></div>
+              </div>
+              <div class="meter">
+                <div class="meter-top"><span>精力</span><span id="energyText">0 / 100</span></div>
+                <div class="bar"><div id="energyBar" class="fill energy"></div></div>
+              </div>
+              <div class="meter">
+                <div class="meter-top"><span>干净度</span><span id="cleanText">0 / 100</span></div>
+                <div class="bar"><div id="cleanBar" class="fill clean"></div></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-title">照顾 CoCo</div>
+            <div class="action-grid">
+              <button class="action" id="walkBtn" type="button"><strong>出门散步</strong><span>提升精力和好感</span></button>
+              <button class="action" id="cleanBtn" type="button"><strong>洗澡梳毛</strong><span>让 CoCo 香香的</span></button>
+              <button class="action" id="napBtn" type="button"><strong>陪它午睡</strong><span>恢复一点状态</span></button>
+              <button class="action" id="treatBtn" type="button"><strong>奖励零食</strong><span>小小惊喜</span></button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-title">名字和日记</div>
+            <div class="name-row">
+              <input id="nameInput" class="name-input" type="text" maxlength="20" placeholder="给小狗取个名字" />
+              <button class="btn primary-btn" id="saveNameBtn" type="button">保存</button>
+            </div>
+            <div style="height:8px"></div>
+            <button class="btn ghost-btn" id="resetNameBtn" type="button">恢复 CoCo</button>
+            <div style="height:12px"></div>
+            <div class="log-list" id="logList"></div>
+          </section>
+        </aside>
       </section>
     </main>
   </div>
@@ -957,16 +897,13 @@
     <div class="login-card">
       <div class="head">
         <h3>需要先登录</h3>
-        <p>必须先在主页注册/登录后，才能开始养这只小狗。登录态会沿用主页的账号。</p>
+        <p>先在主页注册或登录，CoCo 的状态会保存在云端，之后回来还能继续照顾它。</p>
       </div>
       <div class="body">
-        <div style="color:#555;line-height:1.7;font-size:14px;">
-          你现在还没有登录，或者登录态失效了。<br/>
-          请先返回主页完成注册/登录，然后再进入宠物页面。
-        </div>
+        <div class="care-line">当前还没有登录，或者登录状态已经失效。</div>
         <div class="actions">
-          <button class="ok" id="goHomeBtn" type="button">返回主页</button>
-          <button class="cancel" id="refreshBtn" type="button">重新检测</button>
+          <button class="btn primary-btn" id="goHomeBtn" type="button">返回主页登录</button>
+          <button class="btn ghost-btn" id="refreshBtn" type="button">重新检测</button>
         </div>
       </div>
     </div>
@@ -983,37 +920,52 @@
     const putJson = shared.putJsonToCos;
     const isNotFound = shared.isNotFound;
 
-    // 全站共享同一只小狗
     const PET_KEY = 'petdata/shared_pet.json';
-
     const DECAY_MS = 24 * 60 * 60 * 1000;
-    const DEFAULT_PET_NAME = '小狗';
+    const SLOW_DECAY_MS = 36 * 60 * 60 * 1000;
+    const DEFAULT_PET_NAME = 'CoCo';
     const SYNC_INTERVAL_MS = 8000;
 
     const els = {
       userText: document.getElementById('userText'),
-      userBox: document.getElementById('userBox'),
       petNameText: document.getElementById('petNameText'),
       nameInput: document.getElementById('nameInput'),
       affectionTopText: document.getElementById('affectionTopText'),
       affectionText: document.getElementById('affectionText'),
       hungerText: document.getElementById('hungerText'),
       thirstText: document.getElementById('thirstText'),
+      energyText: document.getElementById('energyText'),
+      cleanText: document.getElementById('cleanText'),
       affectionBar: document.getElementById('affectionBar'),
       hungerBar: document.getElementById('hungerBar'),
       thirstBar: document.getElementById('thirstBar'),
+      energyBar: document.getElementById('energyBar'),
+      cleanBar: document.getElementById('cleanBar'),
       dogBtn: document.getElementById('dogBtn'),
       feedBtn: document.getElementById('feedBtn'),
       waterBtn: document.getElementById('waterBtn'),
+      playBtn: document.getElementById('playBtn'),
+      walkBtn: document.getElementById('walkBtn'),
+      cleanBtn: document.getElementById('cleanBtn'),
+      napBtn: document.getElementById('napBtn'),
+      treatBtn: document.getElementById('treatBtn'),
       logoutBtn: document.getElementById('logoutBtn'),
+      moodTitle: document.getElementById('moodTitle'),
       moodText: document.getElementById('moodText'),
       dogCaption: document.getElementById('dogCaption'),
       loginGate: document.getElementById('loginGate'),
       goHomeBtn: document.getElementById('goHomeBtn'),
       refreshBtn: document.getElementById('refreshBtn'),
       saveNameBtn: document.getElementById('saveNameBtn'),
-      resetNameBtn: document.getElementById('resetNameBtn')
+      resetNameBtn: document.getElementById('resetNameBtn'),
+      logList: document.getElementById('logList')
     };
+
+    let state = null;
+    let saving = false;
+    let loading = false;
+    let currentUser = null;
+    let syncTimer = null;
 
     function clamp(n, min, max) {
       return Math.max(min, Math.min(max, n));
@@ -1033,20 +985,36 @@
       return {
         petName: DEFAULT_PET_NAME,
         affection: 0,
+        energy: 72,
+        clean: 78,
         lastFedAt: null,
         lastWaterAt: null,
+        lastPlayedAt: null,
+        lastWalkAt: null,
+        lastCleanAt: null,
+        careLog: [],
         createdAt: nowISO(),
         updatedAt: nowISO()
       };
     }
 
-    function decayPercent(updatedAt) {
+    function normalizeState(data) {
+      const base = defaultState();
+      const merged = { ...base, ...(data || {}) };
+      merged.petName = merged.petName || DEFAULT_PET_NAME;
+      merged.affection = clamp(Number(merged.affection || 0), 0, 100);
+      merged.energy = clamp(Number(merged.energy ?? 72), 0, 100);
+      merged.clean = clamp(Number(merged.clean ?? 78), 0, 100);
+      merged.careLog = Array.isArray(merged.careLog) ? merged.careLog.slice(0, 8) : [];
+      return merged;
+    }
+
+    function decayPercent(updatedAt, ms = DECAY_MS) {
       const t = toMs(updatedAt);
       if (!t) return 0;
       const elapsed = Date.now() - t;
       if (elapsed <= 0) return 100;
-      const remain = 1 - (elapsed / DECAY_MS);
-      return clamp(Math.round(remain * 100), 0, 100);
+      return clamp(Math.round((1 - elapsed / ms) * 100), 0, 100);
     }
 
     function currentHunger() {
@@ -1057,68 +1025,125 @@
       return state ? decayPercent(state.lastWaterAt) : 0;
     }
 
-    function moodByState() {
-      if (!state) return '还没有和我互动呢～';
+    function currentEnergy() {
+      if (!state) return 0;
+      const playedDrain = state.lastPlayedAt ? Math.max(0, 12 - Math.floor((Date.now() - toMs(state.lastPlayedAt)) / (60 * 60 * 1000))) : 0;
+      return clamp((state.energy || 0) - playedDrain, 0, 100);
+    }
+
+    function currentClean() {
+      if (!state) return 0;
+      const cleanDecay = decayPercent(state.lastCleanAt, SLOW_DECAY_MS);
+      return state.lastCleanAt ? Math.min(clamp(state.clean || 0, 0, 100), cleanDecay) : clamp(state.clean || 0, 0, 100);
+    }
+
+    function addLog(text) {
+      state.careLog = [
+        { text, at: nowISO() },
+        ...(state.careLog || [])
+      ].slice(0, 8);
+    }
+
+    function moodInfo() {
+      if (!state) return ['今天的心情', '正在看看 CoCo 的状态...'];
       const h = currentHunger();
       const w = currentThirst();
+      const e = currentEnergy();
+      const c = currentClean();
       const a = clamp(state.affection || 0, 0, 100);
+      const name = state.petName || DEFAULT_PET_NAME;
 
-      if (a >= 80 && h >= 60 && w >= 60) return '今天状态超棒！我最喜欢你了～';
-      if (h <= 15 || w <= 15) return '我有点饿/渴了，快来照顾我吧～';
-      if (a >= 50) return '和你在一起真开心，继续陪我玩吧！';
-      if (a >= 20) return '我已经开始记得你啦～';
-      return '摸摸我，我会慢慢喜欢上你的～';
+      if (h < 18) return ['肚子咕咕叫', `${name} 正盯着饭碗看，想吃一点东西。`];
+      if (w < 18) return ['有点口渴', `${name} 舔了舔嘴巴，水杯该续上啦。`];
+      if (c < 22) return ['想洗香香', `${name} 玩了一圈，毛毛需要梳一梳。`];
+      if (e < 18) return ['困困的', `${name} 想趴在你旁边睡一会儿。`];
+      if (a >= 82 && h >= 55 && w >= 55) return ['超级黏人', `${name} 今天状态很好，看到你就摇尾巴。`];
+      if (a >= 48) return ['越来越熟悉你', `${name} 已经会主动靠过来了。`];
+      return ['慢慢亲近中', `摸摸 ${name}，它会一点点记住你的味道。`];
+    }
+
+    function dogMode() {
+      const h = currentHunger();
+      const w = currentThirst();
+      const e = currentEnergy();
+      const a = clamp(state?.affection || 0, 0, 100);
+      if (e < 18) return 'sleepy';
+      if (h < 18 || w < 18) return 'hungry';
+      if (a >= 70) return 'happy';
+      return '';
+    }
+
+    function renderLog() {
+      const logs = state?.careLog || [];
+      els.logList.innerHTML = logs.length
+        ? logs.map(item => `<div class="log-item">${escapeHtml(item.text)}<br><span>${formatTime(item.at)}</span></div>`).join('')
+        : '<div class="log-item">还没有日记。先摸摸 CoCo，第一条记录就会出现。</div>';
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatTime(ts) {
+      const t = toMs(ts);
+      if (!t) return '';
+      const d = new Date(t);
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     }
 
     function render() {
       if (!state) return;
-
       const h = currentHunger();
       const w = currentThirst();
+      const e = currentEnergy();
+      const c = currentClean();
       const a = clamp(state.affection || 0, 0, 100);
       const petName = state.petName || DEFAULT_PET_NAME;
+      const [title, mood] = moodInfo();
 
       els.userText.textContent = currentUser?.username || '未登录';
-      els.userBox.textContent = currentUser?.username || '未登录';
       els.petNameText.textContent = petName;
+      els.dogCaption.textContent = petName;
       els.affectionTopText.textContent = a;
+      els.moodTitle.textContent = title;
+      els.moodText.textContent = mood;
 
       els.affectionText.textContent = `${a} / 100`;
       els.hungerText.textContent = `${h} / 100`;
       els.thirstText.textContent = `${w} / 100`;
+      els.energyText.textContent = `${e} / 100`;
+      els.cleanText.textContent = `${c} / 100`;
 
       els.affectionBar.style.width = `${a}%`;
       els.hungerBar.style.width = `${h}%`;
       els.thirstBar.style.width = `${w}%`;
+      els.energyBar.style.width = `${e}%`;
+      els.cleanBar.style.width = `${c}%`;
 
-      const mood = moodByState();
-      els.moodText.textContent = mood;
-      els.dogCaption.textContent = `${petName}`;
+      els.feedBtn.disabled = h >= 100;
+      els.waterBtn.disabled = w >= 100;
+
+      els.dogBtn.classList.remove('sleepy', 'hungry', 'happy');
+      const mode = dogMode();
+      if (mode) els.dogBtn.classList.add(mode);
 
       if (document.activeElement !== els.nameInput) {
         els.nameInput.value = petName === DEFAULT_PET_NAME ? '' : petName;
       }
-
-      els.feedBtn.disabled = h === 100;
-      els.waterBtn.disabled = w === 100;
+      renderLog();
     }
 
-    let state = null;
-    let saving = false;
-    let loading = false;
-    let syncTimer = null;
-    let currentUser = null;
-    let lastRemoteUpdatedAt = null;
-
     async function saveState() {
-      if (!state) return;
-      if (saving) return;
+      if (!state || saving) return;
       saving = true;
-
       try {
         state.updatedAt = nowISO();
         await putJson(PET_KEY, state);
-        lastRemoteUpdatedAt = state.updatedAt;
       } catch (err) {
         console.error(err);
       } finally {
@@ -1129,7 +1154,6 @@
     async function loadState() {
       if (loading) return;
       loading = true;
-
       currentUser = getCurrentUser();
       if (!currentUser) {
         els.loginGate.classList.add('show');
@@ -1139,16 +1163,11 @@
 
       try {
         const text = await getObjectText(PET_KEY);
-        const data = JSON.parse(text);
-        state = {
-          ...defaultState(),
-          ...data
-        };
-        if (!state.petName) state.petName = DEFAULT_PET_NAME;
-        lastRemoteUpdatedAt = state.updatedAt || null;
+        state = normalizeState(JSON.parse(text));
       } catch (err) {
         if (isNotFound(err)) {
           state = defaultState();
+          addLog('CoCo 来到小窝，正在等你照顾它。');
           await saveState();
         } else {
           console.error(err);
@@ -1163,24 +1182,11 @@
 
     async function syncFromCloud() {
       if (!state || saving || loading) return;
-
       try {
         const text = await getObjectText(PET_KEY);
-        const data = JSON.parse(text);
-        const remoteUpdatedAt = data?.updatedAt || null;
-
-        if (!remoteUpdatedAt) return;
-
-        const localTs = toMs(state.updatedAt) || 0;
-        const remoteTs = toMs(remoteUpdatedAt) || 0;
-
-        if (remoteTs > localTs) {
-          state = {
-            ...defaultState(),
-            ...data,
-            petName: data.petName || DEFAULT_PET_NAME
-          };
-          lastRemoteUpdatedAt = remoteUpdatedAt;
+        const remote = normalizeState(JSON.parse(text));
+        if ((toMs(remote.updatedAt) || 0) > (toMs(state.updatedAt) || 0)) {
+          state = remote;
           render();
         }
       } catch (err) {
@@ -1198,55 +1204,74 @@
       const el = document.createElement('div');
       el.className = 'pet-float';
       el.textContent = icon;
-
-      const rect = els.dogBtn.getBoundingClientRect();
-      const px = x ?? rect.left + rect.width * 0.5;
-      const py = y ?? rect.top + rect.height * 0.5;
-
+      const host = document.querySelector('.dog-area');
+      const rect = host.getBoundingClientRect();
+      const px = x ?? rect.left + rect.width * .5;
+      const py = y ?? rect.top + rect.height * .42;
       el.style.left = `${px - rect.left}px`;
       el.style.top = `${py - rect.top}px`;
-
-      els.dogBtn.appendChild(el);
+      host.appendChild(el);
       setTimeout(() => el.remove(), 950);
     }
 
-    async function petDog(event) {
+    async function interact(icon, logText, changes = {}, event = null) {
       if (!state) return;
-      state.affection = clamp((state.affection || 0) + 1, 0, 100);
+      state.affection = clamp((state.affection || 0) + (changes.affection || 0), 0, 100);
+      state.energy = clamp((state.energy || 0) + (changes.energy || 0), 0, 100);
+      state.clean = clamp((state.clean || 0) + (changes.clean || 0), 0, 100);
+      if (changes.feed) state.lastFedAt = nowISO();
+      if (changes.water) state.lastWaterAt = nowISO();
+      if (changes.play) state.lastPlayedAt = nowISO();
+      if (changes.walk) state.lastWalkAt = nowISO();
+      if (changes.cleanNow) state.lastCleanAt = nowISO();
+      addLog(logText);
       bounce();
-      spawnFloat(Math.random() > 0.5 ? '💖' : '✨', event?.clientX, event?.clientY);
+      spawnFloat(icon, event?.clientX, event?.clientY);
       render();
       await saveState();
     }
 
-    async function feedDog(event) {
-      if (!state) return;
-      state.lastFedAt = nowISO();
-      state.affection = clamp((state.affection || 0) + 5, 0, 100);
-      bounce();
-      spawnFloat('🍖', event?.clientX, event?.clientY);
-      render();
-      await saveState();
+    function petDog(event) {
+      return interact('💗', `摸摸了 ${state.petName || DEFAULT_PET_NAME}，它把头靠了过来。`, { affection: 1 }, event);
     }
 
-    async function waterDog(event) {
-      if (!state) return;
-      state.lastWaterAt = nowISO();
-      state.affection = clamp((state.affection || 0) + 4, 0, 100);
-      bounce();
-      spawnFloat('💧', event?.clientX, event?.clientY);
-      render();
-      await saveState();
+    function feedDog(event) {
+      return interact('🍚', `${state.petName || DEFAULT_PET_NAME} 吃了一碗饭，尾巴摇得很快。`, { affection: 5, energy: 3, feed: true }, event);
+    }
+
+    function waterDog(event) {
+      return interact('💧', `${state.petName || DEFAULT_PET_NAME} 喝了水，精神了一点。`, { affection: 4, water: true }, event);
+    }
+
+    function playDog(event) {
+      return interact('🎾', `陪 ${state.petName || DEFAULT_PET_NAME} 玩了小球，它开心地转圈。`, { affection: 6, energy: -8, clean: -4, play: true }, event);
+    }
+
+    function walkDog(event) {
+      return interact('🌿', `带 ${state.petName || DEFAULT_PET_NAME} 出门散步，闻了好多新味道。`, { affection: 7, energy: 8, clean: -7, walk: true }, event);
+    }
+
+    function cleanDog(event) {
+      return interact('🫧', `给 ${state.petName || DEFAULT_PET_NAME} 洗澡梳毛，现在香香软软。`, { affection: 3, clean: 100, cleanNow: true }, event);
+    }
+
+    function napDog(event) {
+      return interact('💤', `陪 ${state.petName || DEFAULT_PET_NAME} 睡了一会儿，它醒来很安心。`, { affection: 3, energy: 18 }, event);
+    }
+
+    function treatDog(event) {
+      return interact('🦴', `奖励了 ${state.petName || DEFAULT_PET_NAME} 一块小零食。`, { affection: 4, energy: 2, feed: true }, event);
     }
 
     async function savePetName() {
       if (!state) return;
       const value = els.nameInput.value.trim();
       if (!value) {
-        alert('请输入小狗名字。');
+        alert('请输入小狗名字');
         return;
       }
       state.petName = value.slice(0, 20);
+      addLog(`给小狗起名叫 ${state.petName}。`);
       render();
       await saveState();
     }
@@ -1254,18 +1279,14 @@
     async function resetName() {
       if (!state) return;
       state.petName = DEFAULT_PET_NAME;
-      els.nameInput.value = '';
+      addLog('把名字恢复成 CoCo。');
       render();
       await saveState();
     }
 
     function logout() {
       shared.setCurrentUser(null, { notify: false });
-      if (window.NuonuoMotion?.returnHome) {
-        window.NuonuoMotion.returnHome('pet');
-        return;
-      }
-      location.href = './index.html';
+      goHome();
     }
 
     function goHome() {
@@ -1286,13 +1307,17 @@
     els.dogBtn.addEventListener('click', petDog);
     els.feedBtn.addEventListener('click', feedDog);
     els.waterBtn.addEventListener('click', waterDog);
+    els.playBtn.addEventListener('click', playDog);
+    els.walkBtn.addEventListener('click', walkDog);
+    els.cleanBtn.addEventListener('click', cleanDog);
+    els.napBtn.addEventListener('click', napDog);
+    els.treatBtn.addEventListener('click', treatDog);
     els.saveNameBtn.addEventListener('click', savePetName);
     els.resetNameBtn.addEventListener('click', resetName);
-
-    els.nameInput.addEventListener('keydown', async (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        await savePetName();
+    els.nameInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        savePetName();
       }
     });
 
@@ -1301,7 +1326,6 @@
     }, 60 * 1000);
 
     syncTimer = setInterval(syncFromCloud, SYNC_INTERVAL_MS);
-
     loadState();
   </script>
 </body>
