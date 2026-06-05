@@ -59,10 +59,13 @@
   }
 
   function makeOverlay() {
+    const columnCount = window.matchMedia('(max-width: 720px)').matches ? 8 : 16;
+    const columns = Array.from({ length: columnCount }, () => '<span class="nuonuo-transition-column"></span>').join('');
     const overlay = document.createElement('div');
     overlay.className = 'nuonuo-transition';
     overlay.setAttribute('aria-hidden', 'true');
     overlay.innerHTML = `
+      <div class="nuonuo-transition-columns">${columns}</div>
       <div class="nuonuo-transition-card">
         <span class="nuonuo-transition-shard"></span>
         <span class="nuonuo-transition-shard"></span>
@@ -83,6 +86,7 @@
     const overlay = makeOverlay();
     const card = overlay.querySelector('.nuonuo-transition-card');
     const shards = overlay.querySelectorAll('.nuonuo-transition-shard');
+    const columns = overlay.querySelectorAll('.nuonuo-transition-column');
     const page = document.querySelector('.site-shell, .page') || document.body;
     const tl = gsap.timeline({
       defaults: { ease: 'power3.inOut' },
@@ -90,6 +94,19 @@
     });
 
     tl.fromTo(overlay, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, 0)
+      .fromTo(columns,
+        { scaleY: 0, autoAlpha: 0.2 },
+        {
+          scaleY: 1,
+          autoAlpha: 1,
+          duration: 0.58,
+          stagger: {
+            each: window.matchMedia('(max-width: 720px)').matches ? 0.018 : 0.012,
+            from: 'edges'
+          }
+        },
+        0.02
+      )
       .fromTo(card, { autoAlpha: 0, y: 34, scale: 0.76 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.46 }, 0.02)
       .to(card, { scale: 1.22, duration: 0.32 }, 0.48)
       .to(shards, {
@@ -147,8 +164,10 @@
     if (overlay) {
       const card = overlay.querySelector('.nuonuo-transition-card');
       const shards = overlay.querySelectorAll('.nuonuo-transition-shard');
+      const columns = overlay.querySelectorAll('.nuonuo-transition-column');
       gsap.set(overlay, { autoAlpha: 1 });
       gsap.set(card, { scale: 1.18 });
+      gsap.set(columns, { scaleY: 1, autoAlpha: 1 });
       tl.to(shards, {
         x: (index) => [-70, 70, 0][index] || 0,
         y: (index) => [42, 36, -42][index] || 0,
@@ -157,7 +176,17 @@
         stagger: 0.02
       }, 0)
         .to(card, { scale: 0.84, y: -20, autoAlpha: 0, duration: 0.44 }, 0.08)
-        .to(overlay, { autoAlpha: 0, duration: 0.36 }, 0.18);
+        .to(columns, {
+          scaleY: 0,
+          autoAlpha: 0.18,
+          transformOrigin: 'top center',
+          duration: 0.48,
+          stagger: {
+            each: window.matchMedia('(max-width: 720px)').matches ? 0.016 : 0.01,
+            from: 'center'
+          }
+        }, 0.12)
+        .to(overlay, { autoAlpha: 0, duration: 0.24 }, 0.5);
     }
 
     tl.fromTo(page, { autoAlpha: 0, y: 34, scale: 0.985 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.62 }, overlay ? 0.18 : 0)

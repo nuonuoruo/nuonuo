@@ -95,11 +95,18 @@
       display: grid;
       place-items: center;
       padding: 24px;
+      --loader-mask-y: 0%;
       background:
         radial-gradient(circle at 34% 30%, rgba(255,255,255,1), transparent 28%),
         radial-gradient(circle at 76% 24%, rgba(255, 220, 190, .5), transparent 32%),
         radial-gradient(circle at 24% 78%, rgba(255, 207, 222, .28), transparent 30%),
         linear-gradient(135deg, #fffafd, #eaf5ff);
+      -webkit-mask-image: linear-gradient(180deg, #fff 50%, rgba(255,255,255,.98) 58%, rgba(255,255,255,.84) 68%, rgba(255,255,255,.38) 84%, transparent 100%);
+      mask-image: linear-gradient(180deg, #fff 50%, rgba(255,255,255,.98) 58%, rgba(255,255,255,.84) 68%, rgba(255,255,255,.38) 84%, transparent 100%);
+      -webkit-mask-size: 100% 210%;
+      mask-size: 100% 210%;
+      -webkit-mask-position: 0 var(--loader-mask-y);
+      mask-position: 0 var(--loader-mask-y);
       transition: opacity .55s ease, visibility .55s ease;
     }
 
@@ -112,6 +119,7 @@
     .loader-card {
       position: relative;
       width: min(380px, 88vw);
+      min-height: 220px;
       padding: 26px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,.86);
@@ -120,6 +128,64 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(28px) saturate(150%);
       -webkit-backdrop-filter: blur(28px) saturate(150%);
+    }
+
+    .loader-cover-title {
+      position: relative;
+      z-index: 1;
+      margin-top: 30px;
+      color: rgba(12, 20, 34, .9);
+      font-size: clamp(36px, 11vw, 58px);
+      font-weight: 820;
+      line-height: .94;
+    }
+
+    .loader-cover-copy {
+      position: relative;
+      z-index: 1;
+      max-width: 260px;
+      margin: 16px 0 24px;
+      color: rgba(48, 62, 84, .62);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .loader-mini-scene {
+      position: absolute;
+      right: 20px;
+      bottom: 54px;
+      width: 118px;
+      height: 76px;
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.52), rgba(255,255,255,.12)),
+        radial-gradient(circle at 28% 42%, rgba(255, 220, 190, .42), transparent 32%),
+        radial-gradient(circle at 72% 36%, rgba(180, 214, 246, .58), transparent 38%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 24px 54px rgba(92, 111, 138, .12);
+    }
+
+    .loader-mini-scene::before,
+    .loader-mini-scene::after {
+      content: "";
+      position: absolute;
+      border: 1px solid rgba(255,255,255,.62);
+      border-radius: 6px;
+      background: rgba(255,255,255,.22);
+    }
+
+    .loader-mini-scene::before {
+      left: 18px;
+      top: 20px;
+      width: 34px;
+      height: 24px;
+    }
+
+    .loader-mini-scene::after {
+      right: 16px;
+      bottom: 16px;
+      width: 42px;
+      height: 28px;
     }
 
     .loader-card::before {
@@ -728,8 +794,7 @@
     }
 
     .story-title-text,
-    .reveal-text,
-    .reveal-char {
+    .reveal-text {
       display: block;
       will-change: transform, opacity;
     }
@@ -742,6 +807,10 @@
     .reveal-char {
       display: inline-block;
       transform-origin: 50% 80%;
+    }
+
+    .story-copy.is-active .reveal-char {
+      will-change: transform, opacity;
     }
 
     .line-sheen {
@@ -1302,6 +1371,9 @@
         <span class="loader-title">正在加载 nuonuo</span>
         <span id="loaderPercent">0%</span>
       </div>
+      <div class="loader-cover-title">nuonuo</div>
+      <p class="loader-cover-copy">把照片、留言和小小的日常，先轻轻收进一块玻璃里。</p>
+      <span class="loader-mini-scene" aria-hidden="true"></span>
       <div class="loader-track"><div class="loader-bar" id="loaderBar"></div></div>
     </div>
   </div>
@@ -1500,6 +1572,27 @@
     let storyScrollTrigger = null;
     let storyNavProgress = null;
     let returnSectionKey = window.NuonuoMotion?.getReturnSection?.() || null;
+    const SCENE_SPAN = 1.32;
+    const REVEAL_START = 0.16;
+    const REVEAL_END = 0.72;
+    const HOLD_END = 1.02;
+    const EXIT_START = 1.06;
+
+    function getStoryDuration() {
+      return sections.length * SCENE_SPAN;
+    }
+
+    function getStoryTime(index, offset = 0) {
+      return Math.max(0, Math.min(getStoryDuration(), index * SCENE_SPAN + offset));
+    }
+
+    function storyTimeToProgress(time) {
+      return clamp(time / getStoryDuration(), 0, 1);
+    }
+
+    function progressToStoryIndex(progressValue) {
+      return Math.max(0, Math.min(sections.length - 1, Math.floor((progressValue * getStoryDuration()) / SCENE_SPAN + 0.0001)));
+    }
 
     function setProgress(value) {
       progress = Math.max(progress, Math.min(100, value));
@@ -1516,6 +1609,7 @@
 
       const loaderCard = loader.querySelector('.loader-card');
       const loaderShards = loader.querySelectorAll('.loader-shard');
+      const loaderCover = loader.querySelectorAll('.loader-cover-title, .loader-cover-copy, .loader-mini-scene');
       const heroShards = document.querySelectorAll('.hero-glass-shard');
       const tl = gsap.timeline({
         defaults: { ease: 'power3.inOut' },
@@ -1527,12 +1621,18 @@
       });
 
       tl.to(loaderBar, { boxShadow: '0 0 30px rgba(255, 216, 186, .72)', duration: 0.18 }, 0)
-        .to(loaderCard, {
-          y: -18,
-          scale: 0.92,
+        .to(loaderCover, {
+          y: -22,
           autoAlpha: 0,
+          duration: 0.36,
+          stagger: 0.025
+        }, 0.08)
+        .to(loaderCard, {
+          y: -16,
+          scale: 0.94,
+          autoAlpha: 0.24,
           duration: 0.5
-        }, 0.18)
+        }, 0.22)
         .to(loaderShards, {
           x: (index) => [-140, 94, 42][index] || 0,
           y: (index) => [96, 138, 68][index] || 0,
@@ -1542,6 +1642,7 @@
           duration: 0.54,
           stagger: 0.035
         }, 0.08)
+        .to(loader, { '--loader-mask-y': '100%', duration: 0.72, ease: 'power3.inOut' }, 0.18)
         .fromTo(heroShards,
           { autoAlpha: 0, scale: 0.62 },
           { autoAlpha: 0.72, scale: 1, duration: 0.46, stagger: 0.035 },
@@ -1795,6 +1896,7 @@
         section.visual.tabIndex = isActive ? 0 : -1;
         section.visual.setAttribute('aria-hidden', String(!isActive));
         section.textScene.setAttribute('aria-hidden', String(!isActive));
+        section.textScene.classList.toggle('is-active', isActive);
         section.dot.classList.toggle('is-active', isActive);
       });
     }
@@ -1802,17 +1904,16 @@
     function getStorySnapProgress(index) {
       const clamped = Math.max(0, Math.min(sections.length - 1, index));
       if (sections.length <= 1 || clamped === 0) return 0;
-      return (clamped + 0.14) / sections.length;
+      return storyTimeToProgress(getStoryTime(clamped, 0.08));
     }
 
-    function getProgressiveSnapPoints(sceneCount) {
+    function getProgressiveSnapPoints() {
       const points = [0, 1];
       sections.forEach((section, index) => {
-        const base = getStorySnapProgress(index);
-        points.push(base);
-        points.push((index + 0.34) / sceneCount);
-        points.push((index + 0.56) / sceneCount);
-        points.push((index + 0.72) / sceneCount);
+        points.push(getStorySnapProgress(index));
+        points.push(storyTimeToProgress(getStoryTime(index, REVEAL_END)));
+        points.push(storyTimeToProgress(getStoryTime(index, HOLD_END)));
+        points.push(storyTimeToProgress(getStoryTime(index, EXIT_START)));
       });
       return Array.from(new Set(points.map(point => clamp(point, 0, 1).toFixed(5))))
         .map(Number)
@@ -1855,9 +1956,10 @@
         scrollToStoryIndex(index);
         if (window.gsap) {
           const section = sections[index];
+          const isMobile = window.matchMedia('(max-width: 920px)').matches;
           gsap.fromTo([section.visual, section.textScene],
-            { filter: 'brightness(1.16)', scale: 1.018 },
-            { filter: 'brightness(1)', scale: 1, duration: 0.62, ease: 'power3.out', clearProps: 'filter' }
+            { scale: isMobile ? 1.012 : 1.018, ...(isMobile ? {} : { filter: 'brightness(1.16)' }) },
+            { scale: 1, ...(isMobile ? {} : { filter: 'brightness(1)' }), duration: 0.62, ease: 'power3.out', clearProps: isMobile ? 'scale' : 'filter,scale' }
           );
         }
       };
@@ -1888,10 +1990,10 @@
         reduceMotion: '(prefers-reduced-motion: reduce)'
       }, (context) => {
         const { isDesktop, isMobile, reduceMotion } = context.conditions;
-        const sceneCount = sections.length;
-        const lastIndex = sceneCount - 1;
-        const snapPoints = getProgressiveSnapPoints(sceneCount);
-        const travel = () => Math.max(window.innerHeight * sceneCount, 1);
+        const lastIndex = sections.length - 1;
+        const sceneDuration = getStoryDuration();
+        const snapPoints = getProgressiveSnapPoints();
+        const travel = () => Math.max(window.innerHeight * sceneDuration, 1);
 
         gsap.set(layerItems, { autoAlpha: 0, zIndex: 1 });
         gsap.set(visualItems, {
@@ -1916,7 +2018,7 @@
           autoAlpha: 0,
           yPercent: 115,
           scale: 0.96,
-          filter: 'blur(5px)'
+          filter: isMobile ? 'none' : 'blur(5px)'
         });
         gsap.set(sheenItems, {
           autoAlpha: 0,
@@ -1945,7 +2047,7 @@
           gsap.set(visualItems, { autoAlpha: 0, clearProps: 'transform' });
           gsap.set(copyItems, { autoAlpha: 0, clearProps: 'transform' });
           gsap.set(titleItems, { autoAlpha: 1, yPercent: 0 });
-          gsap.set(charItems, { autoAlpha: 1, yPercent: 0, scale: 1, filter: 'blur(0px)' });
+          gsap.set(charItems, { autoAlpha: 1, yPercent: 0, scale: 1, filter: 'none' });
           gsap.set(sheenItems, { autoAlpha: 0 });
           gsap.set(layerItems[0], { autoAlpha: 1 });
           gsap.set(visualItems[0], { autoAlpha: 1 });
@@ -1971,7 +2073,7 @@
             start: 'top top',
             end: () => `+=${travel()}`,
             pin: true,
-            scrub: 0.8,
+            scrub: isMobile ? 0.45 : 0.8,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             snap: {
@@ -1992,30 +2094,31 @@
               ease: 'power2.inOut'
             },
             onUpdate: (self) => {
-              setActiveStory(Math.floor(self.progress * sceneCount + 0.0001));
+              setActiveStory(progressToStoryIndex(self.progress));
             },
             onRefresh: (self) => {
               storyScrollTrigger = self;
-              setActiveStory(Math.floor(self.progress * sceneCount + 0.0001));
+              setActiveStory(progressToStoryIndex(self.progress));
             }
           }
         });
 
         sections.forEach((section, index) => {
-          const lineStart = index + 0.16;
-          const lineGap = isMobile ? 0.22 : 0.24;
-          const lineDuration = isMobile ? 0.34 : 0.38;
+          const lineStart = getStoryTime(index, REVEAL_START);
+          const lineGap = isMobile ? 0.2 : 0.24;
+          const lineDuration = isMobile ? 0.32 : 0.38;
 
           section.storyLines.forEach((line, lineIndex) => {
             const chars = Array.from(line.querySelectorAll('.reveal-char'));
             const sheen = line.querySelector('.line-sheen');
             const at = lineStart + lineIndex * lineGap;
+            const charBatch = isMobile ? Math.max(0.004, 0.12 / Math.max(chars.length, 1)) : 0.01;
             tl.fromTo(sheen,
               { autoAlpha: 0, xPercent: -135 },
               {
-                autoAlpha: 0.95,
+                autoAlpha: isMobile ? 0.58 : 0.95,
                 xPercent: 285,
-                duration: lineDuration + 0.12,
+                duration: isMobile ? lineDuration : lineDuration + 0.12,
                 ease: 'power2.inOut'
               },
               at - 0.04
@@ -2030,10 +2133,10 @@
               autoAlpha: 1,
               yPercent: 0,
               scale: 1,
-              filter: 'blur(0px)',
+              filter: isMobile ? 'none' : 'blur(0px)',
               duration: lineDuration,
               stagger: {
-                each: isMobile ? 0.008 : 0.01,
+                each: charBatch,
                 from: 'start'
               },
               ease: 'power3.out'
@@ -2044,7 +2147,8 @@
         for (let i = 0; i < lastIndex; i += 1) {
           const current = sections[i];
           const next = sections[i + 1];
-          const at = i + 0.78;
+          const at = getStoryTime(i, EXIT_START);
+          const nextIn = getStoryTime(i, EXIT_START + 0.1);
           const nextTilt = isDesktop ? (i % 2 === 0 ? -4 : 4) : 0;
 
           tl.set(next.layer, { zIndex: 100 + i + 1 }, at - 0.02)
@@ -2052,9 +2156,9 @@
               autoAlpha: 0,
               yPercent: -112,
               scale: 0.98,
-              filter: 'blur(4px)',
-              duration: 0.28,
-              stagger: isMobile ? 0.002 : 0.003,
+              filter: isMobile ? 'none' : 'blur(4px)',
+              duration: isMobile ? 0.24 : 0.28,
+              stagger: isMobile ? 0.0015 : 0.003,
               ease: 'power3.inOut'
             }, at)
             .to(current.titleText, {
@@ -2081,7 +2185,7 @@
             .fromTo(next.layer,
               { autoAlpha: 0 },
               { autoAlpha: 1, duration: 0.26 },
-              at + 0.04
+              nextIn
             )
             .fromTo(next.visual,
               {
@@ -2099,7 +2203,7 @@
                 rotationY: 0,
                 duration: 0.34
               },
-              at + 0.06
+              nextIn + 0.02
             )
             .fromTo(next.textScene,
               {
@@ -2113,7 +2217,7 @@
                 scale: 1,
                 duration: 0.22
               },
-              at + 0.08
+              nextIn + 0.04
             )
             .fromTo(next.titleText,
               {
@@ -2126,7 +2230,7 @@
                 duration: 0.2,
                 ease: 'power3.out'
               },
-              at + 0.08
+              nextIn + 0.04
             )
             .fromTo(next.visual.querySelector('.visual-card'),
               {
@@ -2140,11 +2244,11 @@
                 scale: 1,
                 duration: 0.26
               },
-              at + 0.12
+              nextIn + 0.08
             );
         }
 
-        tl.to({}, { duration: 0.01 }, sceneCount);
+        tl.to({}, { duration: 0.01 }, sceneDuration);
         storyScrollTrigger = tl.scrollTrigger;
 
         return () => {
@@ -2193,7 +2297,7 @@
             trigger: hero,
             start: 'top top',
             end: 'bottom top',
-            scrub: 0.9,
+            scrub: isMobile ? 0.5 : 0.9,
             invalidateOnRefresh: true
           }
         });
