@@ -562,6 +562,42 @@
         0 1px 0 rgba(255,255,255,.5);
     }
 
+    .story-title-mask,
+    .reveal-line {
+      display: block;
+      overflow: hidden;
+      clip-path: inset(-12% 0 -16% 0);
+    }
+
+    .story-title-text,
+    .reveal-text {
+      display: block;
+      will-change: transform, opacity;
+    }
+
+    .story-narrative {
+      display: grid;
+      gap: clamp(10px, 1.3vw, 16px);
+      max-width: 520px;
+      margin-top: clamp(18px, 3.6vh, 34px);
+      color: rgba(23,32,51,.72);
+      font-size: clamp(16px, 1.35vw, 20px);
+      line-height: 1.72;
+      letter-spacing: 0;
+    }
+
+    .story-narrative::before {
+      content: "";
+      width: min(104px, 24vw);
+      height: 1px;
+      margin-bottom: clamp(2px, .8vh, 8px);
+      background: linear-gradient(90deg, rgba(23,32,51,.42), rgba(113,153,201,.18), transparent);
+    }
+
+    .reveal-line {
+      padding-bottom: .04em;
+    }
+
     .copy {
       max-width: 540px;
       margin: 24px 0 0;
@@ -709,6 +745,11 @@
     }
 
     body.gsap-story .story-copy {
+      will-change: transform, opacity;
+    }
+
+    body.gsap-story .story-title-text,
+    body.gsap-story .reveal-text {
       will-change: transform, opacity;
     }
 
@@ -954,6 +995,19 @@
         line-height: .98;
       }
 
+      .story-narrative {
+        gap: 8px;
+        max-width: min(360px, 88vw);
+        margin-top: 16px;
+        font-size: clamp(14px, 3.65vw, 16px);
+        line-height: 1.58;
+      }
+
+      .story-narrative::before {
+        width: 72px;
+        margin-bottom: 2px;
+      }
+
       .copy {
         margin-top: 18px;
         font-size: 15px;
@@ -961,9 +1015,9 @@
       }
 
       .visual {
-        top: 36svh;
+        top: 40svh;
         bottom: auto;
-        min-height: min(320px, 38svh);
+        min-height: min(300px, 35svh);
       }
 
       .exhibit-space::before {
@@ -1110,13 +1164,78 @@
     ];
 
     const sections = [
-      { key: 'photo', title: '照片墙', href: './photo.html', image: 1 },
-      { key: 'days', title: '纪念日', href: './days.html', image: 2 },
-      { key: 'message', title: '留言墙', href: './message.html', image: 3 },
-      { key: 'game', title: '爱心小游戏', href: './game.html', image: 4, requiresAuth: true },
-      { key: 'pet', title: 'CoCo日记', href: './pet.html', image: 5, requiresAuth: true },
-      { key: 'drink', title: '酒桌游戏', href: './drinkgame.html', image: 6 },
-      { key: 'video', title: 'nuonuo学堂', href: './video.html', image: 7 }
+      {
+        key: 'photo',
+        title: '照片墙',
+        href: './photo.html',
+        image: 1,
+        story: [
+          '把喜欢的瞬间收进同一面玻璃墙。',
+          '每一张照片，都是重新回到那天的入口。'
+        ]
+      },
+      {
+        key: 'days',
+        title: '纪念日',
+        href: './days.html',
+        image: 2,
+        story: [
+          '重要的日子不只被记住，也被认真陈列。',
+          '时间向前走，纪念会在这里慢慢发光。'
+        ]
+      },
+      {
+        key: 'message',
+        title: '留言墙',
+        href: './message.html',
+        image: 3,
+        story: [
+          '把想说的话放下来，让它们安静地留在墙上。',
+          '短短几行字，也可以成为很久以后的证据。'
+        ]
+      },
+      {
+        key: 'game',
+        title: '爱心小游戏',
+        href: './game.html',
+        image: 4,
+        requiresAuth: true,
+        story: [
+          '用一点点互动，把心情变成可以点击的小游戏。',
+          '登录后进入，进度和惊喜都会继续留着。'
+        ]
+      },
+      {
+        key: 'pet',
+        title: 'CoCo日记',
+        href: './pet.html',
+        image: 5,
+        requiresAuth: true,
+        story: [
+          '记录 CoCo 的小动作、小情绪和每天的可爱。',
+          '像一本轻轻翻开的日记，只给熟悉的人看。'
+        ]
+      },
+      {
+        key: 'drink',
+        title: '酒桌游戏',
+        href: './drinkgame.html',
+        image: 6,
+        story: [
+          '把聚会里的热闹变成随手可开的游戏局。',
+          '规则简单一点，气氛就可以更快到位。'
+        ]
+      },
+      {
+        key: 'video',
+        title: 'nuonuo学堂',
+        href: './video.html',
+        image: 7,
+        story: [
+          '把学习、资料和视频课程收进一块轻盈的屏幕。',
+          '需要的时候打开，就能继续上一段进度。'
+        ]
+      }
     ];
 
     const authBox = document.getElementById('authBox');
@@ -1236,8 +1355,19 @@
       location.href = section.href;
     }
 
+    function renderStoryLines(lines) {
+      return (lines || [])
+        .map(line => `
+          <span class="reveal-line">
+            <span class="reveal-text">${escapeHtml(line)}</span>
+          </span>
+        `)
+        .join('');
+    }
+
     function buildSections() {
       sections.forEach((section, index) => {
+        const number = section.number || String(index + 1).padStart(2, '0');
         const layer = document.createElement('section');
         layer.className = 'entry-layer';
         layer.id = section.key;
@@ -1247,7 +1377,7 @@
           <div class="visual section-image-${section.image}" role="button" tabindex="-1" aria-label="进入${section.title}">
             <div class="visual-card">
               <div><strong>${section.title}</strong></div>
-              <div class="index-number">${String(index + 1).padStart(2, '0')}</div>
+              <div class="index-number">${number}</div>
             </div>
           </div>
         `;
@@ -1265,10 +1395,15 @@
         textScene.dataset.key = section.key;
         textScene.innerHTML = `
           <div class="story-copy-inner section-copy">
-            <h2>${section.title}</h2>
+            <h2 class="story-title-mask"><span class="story-title-text">${escapeHtml(section.title)}</span></h2>
+            <div class="story-narrative" aria-label="${escapeHtml(section.title)}介绍">
+              ${renderStoryLines(section.story)}
+            </div>
           </div>
         `;
         storyCopyStage.appendChild(textScene);
+        section.titleText = textScene.querySelector('.story-title-text');
+        section.storyLines = Array.from(textScene.querySelectorAll('.reveal-text'));
 
         const dot = document.createElement('button');
         dot.className = 'nav-dot';
@@ -1324,6 +1459,8 @@
           section.layer.style.setProperty('--visual-opacity', visualOpacity.toFixed(3));
           section.layer.style.setProperty('--visual-scale', (0.992 + visualOpacity * .008).toFixed(3));
           section.layer.style.setProperty('--layer-z', String(Math.round(visualOpacity * 100) + 1));
+          section.textScene.style.opacity = visualOpacity.toFixed(3);
+          section.textScene.style.visibility = visualOpacity > .04 ? 'visible' : 'hidden';
           section.layer.classList.toggle('is-active', isActive);
           section.visual.tabIndex = isActive ? 0 : -1;
           section.dot.classList.toggle('is-active', isActive);
@@ -1388,6 +1525,8 @@
       const visualItems = sections.map(section => section.visual);
       const copyItems = sections.map(section => section.textScene);
       const cardItems = sections.map(section => section.visual.querySelector('.visual-card'));
+      const titleItems = sections.map(section => section.titleText);
+      const lineItems = sections.flatMap(section => section.storyLines);
       const exhibitItems = gsap.utils.toArray('.exhibit-column, .exhibit-line');
       mm.add({
         isDesktop: '(min-width: 921px)',
@@ -1414,6 +1553,14 @@
           scale: isMobile ? 0.985 : 0.94,
           transformOrigin: '0% 50%'
         });
+        gsap.set(titleItems, {
+          autoAlpha: 0,
+          yPercent: 118
+        });
+        gsap.set(lineItems, {
+          autoAlpha: 0,
+          yPercent: 112
+        });
         gsap.set(cardItems, {
           autoAlpha: 0,
           y: isMobile ? 16 : 28,
@@ -1428,10 +1575,20 @@
         gsap.set(layerItems[0], { autoAlpha: 1, zIndex: 100 });
         gsap.set(visualItems[0], { autoAlpha: 1, y: 0, scale: 1, rotationX: 0, rotationY: 0 });
         gsap.set(copyItems[0], { autoAlpha: 1, y: 0, scale: 1 });
+        gsap.set(titleItems[0], { autoAlpha: 1, yPercent: 0 });
+        gsap.set(sections[0].storyLines, { autoAlpha: 1, yPercent: 0 });
         gsap.set(cardItems[0], { autoAlpha: 1, y: 0, scale: 1 });
         setActiveStory(0);
 
         if (reduceMotion) {
+          gsap.set(layerItems, { clearProps: 'transform' });
+          gsap.set(visualItems, { autoAlpha: 0, clearProps: 'transform' });
+          gsap.set(copyItems, { autoAlpha: 0, clearProps: 'transform' });
+          gsap.set(titleItems, { autoAlpha: 1, yPercent: 0 });
+          gsap.set(lineItems, { autoAlpha: 1, yPercent: 0 });
+          gsap.set(layerItems[0], { autoAlpha: 1 });
+          gsap.set(visualItems[0], { autoAlpha: 1 });
+          gsap.set(copyItems[0], { autoAlpha: 1 });
           return () => {};
         }
 
@@ -1488,12 +1645,25 @@
           const nextTilt = isDesktop ? (i % 2 === 0 ? -4 : 4) : 0;
 
           tl.set(next.layer, { zIndex: 100 + i + 1 }, at - 0.02)
+            .to(current.storyLines.slice().reverse(), {
+              autoAlpha: 0,
+              yPercent: -112,
+              duration: 0.42,
+              stagger: isMobile ? 0.035 : 0.055,
+              ease: 'power3.inOut'
+            }, at - 0.04)
+            .to(current.titleText, {
+              autoAlpha: 0,
+              yPercent: -116,
+              duration: 0.5,
+              ease: 'power3.inOut'
+            }, at + 0.04)
             .to(current.textScene, {
               autoAlpha: 0,
               y: isMobile ? -28 : -70,
               scale: isMobile ? 0.985 : 0.94,
               duration: 0.42
-            }, at)
+            }, at + 0.08)
             .to(current.visual, {
               autoAlpha: 0,
               y: isMobile ? -16 : -54,
@@ -1539,6 +1709,33 @@
               },
               at + 0.18
             )
+            .fromTo(next.titleText,
+              {
+                autoAlpha: 0,
+                yPercent: 118
+              },
+              {
+                autoAlpha: 1,
+                yPercent: 0,
+                duration: 0.72,
+                ease: 'power3.out'
+              },
+              at + 0.26
+            )
+            .fromTo(next.storyLines,
+              {
+                autoAlpha: 0,
+                yPercent: 112
+              },
+              {
+                autoAlpha: 1,
+                yPercent: 0,
+                duration: 0.82,
+                stagger: isMobile ? 0.055 : 0.075,
+                ease: 'power3.out'
+              },
+              at + 0.42
+            )
             .fromTo(next.visual.querySelector('.visual-card'),
               {
                 autoAlpha: 0,
@@ -1560,7 +1757,7 @@
 
         return () => {
           storyScrollTrigger = null;
-          gsap.killTweensOf(exhibitItems);
+          gsap.killTweensOf([exhibitItems, titleItems, lineItems]);
           tl.kill();
         };
       });
