@@ -1493,14 +1493,27 @@
       });
     }
 
+    function getStorySnapProgress(index) {
+      const clamped = Math.max(0, Math.min(sections.length - 1, index));
+      if (sections.length <= 1 || clamped === 0) return 0;
+      return (clamped + 0.14) / sections.length;
+    }
+
     function scrollToStoryIndex(index) {
       if (storyScrollTrigger) {
         const clamped = Math.max(0, Math.min(sections.length - 1, index));
-        const progressTarget = sections.length <= 1 ? 0 : clamped / (sections.length - 1);
+        const progressTarget = getStorySnapProgress(clamped);
         const y = storyScrollTrigger.start + (storyScrollTrigger.end - storyScrollTrigger.start) * progressTarget;
         storyNavProgress = progressTarget;
         window.scrollTo({ top: y, left: 0, behavior: 'auto' });
+        if (storyScrollTrigger.animation) {
+          storyScrollTrigger.animation.progress(progressTarget);
+        }
+        storyScrollTrigger.update();
         requestAnimationFrame(() => {
+          if (storyScrollTrigger.animation) {
+            storyScrollTrigger.animation.progress(progressTarget);
+          }
           storyScrollTrigger.update();
           setActiveStory(clamped);
         });
@@ -1536,7 +1549,8 @@
         const { isDesktop, isMobile, reduceMotion } = context.conditions;
         const sceneCount = sections.length;
         const lastIndex = sceneCount - 1;
-        const travel = () => Math.max(window.innerHeight * lastIndex, 1);
+        const snapPoints = sections.map((section, index) => getStorySnapProgress(index)).concat(1);
+        const travel = () => Math.max(window.innerHeight * sceneCount, 1);
 
         gsap.set(layerItems, { autoAlpha: 0, zIndex: 1 });
         gsap.set(visualItems, {
@@ -1576,7 +1590,6 @@
         gsap.set(visualItems[0], { autoAlpha: 1, y: 0, scale: 1, rotationX: 0, rotationY: 0 });
         gsap.set(copyItems[0], { autoAlpha: 1, y: 0, scale: 1 });
         gsap.set(titleItems[0], { autoAlpha: 1, yPercent: 0 });
-        gsap.set(sections[0].storyLines, { autoAlpha: 1, yPercent: 0 });
         gsap.set(cardItems[0], { autoAlpha: 1, y: 0, scale: 1 });
         setActiveStory(0);
 
@@ -1620,7 +1633,9 @@
                   storyNavProgress = null;
                   return target;
                 }
-                return lastIndex > 0 ? Math.round(value * lastIndex) / lastIndex : 0;
+                return snapPoints.reduce((closest, point) => (
+                  Math.abs(point - value) < Math.abs(closest - value) ? point : closest
+                ), snapPoints[0]);
               },
               duration: { min: 0.18, max: 0.42 },
               delay: 0.04,
@@ -1629,19 +1644,34 @@
               ease: 'power2.inOut'
             },
             onUpdate: (self) => {
-              setActiveStory(Math.round(self.progress * lastIndex));
+              setActiveStory(Math.floor(self.progress * sceneCount + 0.0001));
             },
             onRefresh: (self) => {
               storyScrollTrigger = self;
-              setActiveStory(Math.round(self.progress * lastIndex));
+              setActiveStory(Math.floor(self.progress * sceneCount + 0.0001));
             }
           }
+        });
+
+        sections.forEach((section, index) => {
+          const lineStart = index + 0.16;
+          const lineGap = isMobile ? 0.2 : 0.22;
+          const lineDuration = isMobile ? 0.34 : 0.38;
+
+          section.storyLines.forEach((line, lineIndex) => {
+            tl.to(line, {
+              autoAlpha: 1,
+              yPercent: 0,
+              duration: lineDuration,
+              ease: 'power3.out'
+            }, lineStart + lineIndex * lineGap);
+          });
         });
 
         for (let i = 0; i < lastIndex; i += 1) {
           const current = sections[i];
           const next = sections[i + 1];
-          const at = i + 0.16;
+          const at = i + 0.78;
           const nextTilt = isDesktop ? (i % 2 === 0 ? -4 : 4) : 0;
 
           tl.set(next.layer, { zIndex: 100 + i + 1 }, at - 0.02)
@@ -1651,13 +1681,13 @@
               duration: 0.42,
               stagger: isMobile ? 0.035 : 0.055,
               ease: 'power3.inOut'
-            }, at - 0.04)
+            }, at)
             .to(current.titleText, {
               autoAlpha: 0,
               yPercent: -116,
               duration: 0.5,
               ease: 'power3.inOut'
-            }, at + 0.04)
+            }, at + 0.06)
             .to(current.textScene, {
               autoAlpha: 0,
               y: isMobile ? -28 : -70,
@@ -1674,8 +1704,8 @@
             .to(current.layer, { autoAlpha: 0, duration: 0.38 }, at + 0.1)
             .fromTo(next.layer,
               { autoAlpha: 0 },
-              { autoAlpha: 1, duration: 0.5 },
-              at + 0.08
+              { autoAlpha: 1, duration: 0.26 },
+              at + 0.04
             )
             .fromTo(next.visual,
               {
@@ -1691,9 +1721,9 @@
                 scale: 1,
                 rotationX: 0,
                 rotationY: 0,
-                duration: 0.62
+                duration: 0.34
               },
-              at + 0.1
+              at + 0.06
             )
             .fromTo(next.textScene,
               {
@@ -1705,9 +1735,9 @@
                 autoAlpha: 1,
                 y: 0,
                 scale: 1,
-                duration: 0.56
+                duration: 0.22
               },
-              at + 0.18
+              at + 0.08
             )
             .fromTo(next.titleText,
               {
@@ -1717,24 +1747,10 @@
               {
                 autoAlpha: 1,
                 yPercent: 0,
-                duration: 0.72,
+                duration: 0.2,
                 ease: 'power3.out'
               },
-              at + 0.26
-            )
-            .fromTo(next.storyLines,
-              {
-                autoAlpha: 0,
-                yPercent: 112
-              },
-              {
-                autoAlpha: 1,
-                yPercent: 0,
-                duration: 0.82,
-                stagger: isMobile ? 0.055 : 0.075,
-                ease: 'power3.out'
-              },
-              at + 0.42
+              at + 0.08
             )
             .fromTo(next.visual.querySelector('.visual-card'),
               {
@@ -1746,13 +1762,13 @@
                 autoAlpha: 1,
                 y: 0,
                 scale: 1,
-                duration: 0.46
+                duration: 0.26
               },
-              at + 0.34
+              at + 0.12
             );
         }
 
-        tl.to({}, { duration: 0.01 }, lastIndex);
+        tl.to({}, { duration: 0.01 }, sceneCount);
         storyScrollTrigger = tl.scrollTrigger;
 
         return () => {
