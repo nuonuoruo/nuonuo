@@ -473,17 +473,141 @@
     }
 
     .hero-text {
+      position: relative;
       width: 100%;
       margin: 0;
       padding-top: clamp(92px, 12vh, 120px);
       grid-template-columns: minmax(0, 860px);
       justify-content: start;
       align-items: start;
+      overflow: hidden;
     }
 
     .text-copy {
+      position: relative;
+      z-index: 3;
       grid-column: 1;
       color: var(--ink);
+    }
+
+    .hero-bridge {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+      --bridge-light: 0;
+    }
+
+    .hero-flow-line,
+    .hero-sheen {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .hero-flow-line {
+      left: clamp(18px, 5vw, 70px);
+      right: clamp(18px, 5vw, 70px);
+      top: 50%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(23,32,51,.34), rgba(255,255,255,.86), rgba(113,153,201,.3), transparent);
+      opacity: calc(.18 + var(--bridge-light) * .62);
+      transform-origin: left center;
+      filter: drop-shadow(0 0 16px rgba(255,255,255,.6));
+    }
+
+    .hero-sheen {
+      left: -18vw;
+      top: 18vh;
+      width: 34vw;
+      height: 58vh;
+      border-radius: 999px;
+      background: linear-gradient(105deg, transparent, rgba(255,255,255,.74), rgba(184,214,246,.24), transparent);
+      opacity: calc(.08 + var(--bridge-light) * .52);
+      filter: blur(20px);
+      transform: skewX(-18deg);
+    }
+
+    .hero-glass-shard {
+      position: absolute;
+      width: clamp(82px, 12vw, 168px);
+      aspect-ratio: 1.34;
+      border: 1px solid rgba(255,255,255,.66);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.62), rgba(255,255,255,.16)),
+        linear-gradient(90deg, rgba(113,153,201,.18), rgba(255,255,255,.05));
+      box-shadow:
+        0 28px 80px rgba(73,92,118,.16),
+        inset 0 1px 0 rgba(255,255,255,.76),
+        inset 0 -20px 42px rgba(113,153,201,.08);
+      backdrop-filter: blur(18px) saturate(148%);
+      -webkit-backdrop-filter: blur(18px) saturate(148%);
+      opacity: .68;
+    }
+
+    .hero-glass-shard::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: inherit;
+      background:
+        linear-gradient(120deg, rgba(255,255,255,.7), transparent 42%),
+        radial-gradient(circle at 72% 28%, rgba(196,166,111,.24), transparent 24%);
+      opacity: .68;
+    }
+
+    .hero-glass-shard.shard-a {
+      right: 12vw;
+      top: 18vh;
+      transform: rotate(-8deg);
+    }
+
+    .hero-glass-shard.shard-b {
+      right: 30vw;
+      bottom: 20vh;
+      width: clamp(74px, 10vw, 136px);
+      transform: rotate(10deg);
+    }
+
+    .hero-glass-shard.shard-c {
+      left: 12vw;
+      bottom: 18vh;
+      width: clamp(68px, 9vw, 126px);
+      transform: rotate(-14deg);
+    }
+
+    .hero-glass-shard.shard-d {
+      right: 7vw;
+      bottom: 34vh;
+      width: clamp(56px, 8vw, 108px);
+      transform: rotate(16deg);
+    }
+
+    .hero-glass-shard.shard-e {
+      left: 44vw;
+      top: 30vh;
+      width: clamp(54px, 7vw, 98px);
+      transform: rotate(7deg);
+    }
+
+    .hero-stage-hint {
+      position: absolute;
+      right: clamp(18px, 8vw, 96px);
+      bottom: clamp(68px, 12vh, 120px);
+      display: grid;
+      place-items: center;
+      width: clamp(96px, 12vw, 150px);
+      aspect-ratio: 1;
+      border: 1px solid rgba(255,255,255,.58);
+      border-radius: 50%;
+      color: rgba(23,32,51,.48);
+      background: radial-gradient(circle, rgba(255,255,255,.48), rgba(255,255,255,.08) 64%, transparent);
+      box-shadow: inset 0 0 0 1px rgba(113,153,201,.1), 0 22px 70px rgba(73,92,118,.12);
+      font-size: clamp(34px, 5vw, 70px);
+      font-weight: 760;
+      line-height: 1;
+      opacity: .7;
     }
 
     .story-copy {
@@ -570,9 +694,35 @@
     }
 
     .story-title-text,
-    .reveal-text {
+    .reveal-text,
+    .reveal-char {
       display: block;
       will-change: transform, opacity;
+    }
+
+    .reveal-text {
+      position: relative;
+      display: inline-block;
+    }
+
+    .reveal-char {
+      display: inline-block;
+      transform-origin: 50% 80%;
+    }
+
+    .line-sheen {
+      position: absolute;
+      top: -18%;
+      bottom: -18%;
+      left: 0;
+      width: 36%;
+      border-radius: 999px;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.88), rgba(113,153,201,.34), transparent);
+      opacity: 0;
+      filter: blur(4px);
+      transform: translateX(-130%) skewX(-14deg);
+      pointer-events: none;
+      mix-blend-mode: screen;
     }
 
     .story-narrative {
@@ -985,6 +1135,53 @@
         padding-bottom: 34px;
       }
 
+      .hero-flow-line {
+        left: 16px;
+        right: 16px;
+        top: 48%;
+      }
+
+      .hero-sheen {
+        top: 20vh;
+        width: 54vw;
+        height: 40vh;
+      }
+
+      .hero-glass-shard {
+        width: 86px;
+        opacity: .46;
+      }
+
+      .hero-glass-shard.shard-a {
+        right: 20px;
+        top: 28vh;
+      }
+
+      .hero-glass-shard.shard-b {
+        right: 42vw;
+        bottom: 24vh;
+        width: 72px;
+      }
+
+      .hero-glass-shard.shard-c {
+        left: 18px;
+        bottom: 22vh;
+        width: 68px;
+      }
+
+      .hero-glass-shard.shard-d,
+      .hero-glass-shard.shard-e {
+        display: none;
+      }
+
+      .hero-stage-hint {
+        right: 24px;
+        bottom: 86px;
+        width: 82px;
+        font-size: 30px;
+        opacity: .45;
+      }
+
       h1 {
         font-size: clamp(48px, 15vw, 66px);
       }
@@ -1092,6 +1289,16 @@
       <section class="text-scene hero-text" id="top">
         <div class="text-copy">
           <h1><span>nuonuo</span><span>小窝</span></h1>
+        </div>
+        <div class="hero-bridge" id="heroBridge" aria-hidden="true">
+          <span class="hero-flow-line"></span>
+          <span class="hero-sheen"></span>
+          <span class="hero-glass-shard shard-a"></span>
+          <span class="hero-glass-shard shard-b"></span>
+          <span class="hero-glass-shard shard-c"></span>
+          <span class="hero-glass-shard shard-d"></span>
+          <span class="hero-glass-shard shard-e"></span>
+          <span class="hero-stage-hint">01</span>
         </div>
       </section>
       <section class="story-pin" id="storyPin" aria-label="入口故事舞台">
@@ -1355,11 +1562,24 @@
       location.href = section.href;
     }
 
+    function splitTextToChars(text) {
+      return Array.from(String(text || ''));
+    }
+
+    function renderStoryChars(line) {
+      return splitTextToChars(line)
+        .map(char => `<span class="reveal-char" aria-hidden="true">${char === ' ' ? '&nbsp;' : escapeHtml(char)}</span>`)
+        .join('');
+    }
+
     function renderStoryLines(lines) {
       return (lines || [])
         .map(line => `
-          <span class="reveal-line">
-            <span class="reveal-text">${escapeHtml(line)}</span>
+          <span class="reveal-line" aria-label="${escapeHtml(line)}">
+            <span class="reveal-text">
+              ${renderStoryChars(line)}
+              <span class="line-sheen" aria-hidden="true"></span>
+            </span>
           </span>
         `)
         .join('');
@@ -1404,6 +1624,8 @@
         storyCopyStage.appendChild(textScene);
         section.titleText = textScene.querySelector('.story-title-text');
         section.storyLines = Array.from(textScene.querySelectorAll('.reveal-text'));
+        section.storyChars = Array.from(textScene.querySelectorAll('.reveal-char'));
+        section.storySheens = Array.from(textScene.querySelectorAll('.line-sheen'));
 
         const dot = document.createElement('button');
         dot.className = 'nav-dot';
@@ -1499,6 +1721,20 @@
       return (clamped + 0.14) / sections.length;
     }
 
+    function getProgressiveSnapPoints(sceneCount) {
+      const points = [0, 1];
+      sections.forEach((section, index) => {
+        const base = getStorySnapProgress(index);
+        points.push(base);
+        points.push((index + 0.34) / sceneCount);
+        points.push((index + 0.56) / sceneCount);
+        points.push((index + 0.72) / sceneCount);
+      });
+      return Array.from(new Set(points.map(point => clamp(point, 0, 1).toFixed(5))))
+        .map(Number)
+        .sort((a, b) => a - b);
+    }
+
     function scrollToStoryIndex(index) {
       if (storyScrollTrigger) {
         const clamped = Math.max(0, Math.min(sections.length - 1, index));
@@ -1539,7 +1775,8 @@
       const copyItems = sections.map(section => section.textScene);
       const cardItems = sections.map(section => section.visual.querySelector('.visual-card'));
       const titleItems = sections.map(section => section.titleText);
-      const lineItems = sections.flatMap(section => section.storyLines);
+      const charItems = sections.flatMap(section => section.storyChars);
+      const sheenItems = sections.flatMap(section => section.storySheens);
       const exhibitItems = gsap.utils.toArray('.exhibit-column, .exhibit-line');
       mm.add({
         isDesktop: '(min-width: 921px)',
@@ -1549,7 +1786,7 @@
         const { isDesktop, isMobile, reduceMotion } = context.conditions;
         const sceneCount = sections.length;
         const lastIndex = sceneCount - 1;
-        const snapPoints = sections.map((section, index) => getStorySnapProgress(index)).concat(1);
+        const snapPoints = getProgressiveSnapPoints(sceneCount);
         const travel = () => Math.max(window.innerHeight * sceneCount, 1);
 
         gsap.set(layerItems, { autoAlpha: 0, zIndex: 1 });
@@ -1571,9 +1808,15 @@
           autoAlpha: 0,
           yPercent: 118
         });
-        gsap.set(lineItems, {
+        gsap.set(charItems, {
           autoAlpha: 0,
-          yPercent: 112
+          yPercent: 115,
+          scale: 0.96,
+          filter: 'blur(5px)'
+        });
+        gsap.set(sheenItems, {
+          autoAlpha: 0,
+          xPercent: -130
         });
         gsap.set(cardItems, {
           autoAlpha: 0,
@@ -1598,7 +1841,8 @@
           gsap.set(visualItems, { autoAlpha: 0, clearProps: 'transform' });
           gsap.set(copyItems, { autoAlpha: 0, clearProps: 'transform' });
           gsap.set(titleItems, { autoAlpha: 1, yPercent: 0 });
-          gsap.set(lineItems, { autoAlpha: 1, yPercent: 0 });
+          gsap.set(charItems, { autoAlpha: 1, yPercent: 0, scale: 1, filter: 'blur(0px)' });
+          gsap.set(sheenItems, { autoAlpha: 0 });
           gsap.set(layerItems[0], { autoAlpha: 1 });
           gsap.set(visualItems[0], { autoAlpha: 1 });
           gsap.set(copyItems[0], { autoAlpha: 1 });
@@ -1655,16 +1899,40 @@
 
         sections.forEach((section, index) => {
           const lineStart = index + 0.16;
-          const lineGap = isMobile ? 0.2 : 0.22;
+          const lineGap = isMobile ? 0.22 : 0.24;
           const lineDuration = isMobile ? 0.34 : 0.38;
 
           section.storyLines.forEach((line, lineIndex) => {
-            tl.to(line, {
+            const chars = Array.from(line.querySelectorAll('.reveal-char'));
+            const sheen = line.querySelector('.line-sheen');
+            const at = lineStart + lineIndex * lineGap;
+            tl.fromTo(sheen,
+              { autoAlpha: 0, xPercent: -135 },
+              {
+                autoAlpha: 0.95,
+                xPercent: 285,
+                duration: lineDuration + 0.12,
+                ease: 'power2.inOut'
+              },
+              at - 0.04
+            )
+            .to(sheen, {
+              autoAlpha: 0,
+              duration: 0.1,
+              ease: 'power1.out'
+            }, at + lineDuration + 0.08)
+            .to(chars, {
               autoAlpha: 1,
               yPercent: 0,
+              scale: 1,
+              filter: 'blur(0px)',
               duration: lineDuration,
+              stagger: {
+                each: isMobile ? 0.008 : 0.01,
+                from: 'start'
+              },
               ease: 'power3.out'
-            }, lineStart + lineIndex * lineGap);
+            }, at);
           });
         });
 
@@ -1675,11 +1943,13 @@
           const nextTilt = isDesktop ? (i % 2 === 0 ? -4 : 4) : 0;
 
           tl.set(next.layer, { zIndex: 100 + i + 1 }, at - 0.02)
-            .to(current.storyLines.slice().reverse(), {
+            .to(current.storyChars.slice().reverse(), {
               autoAlpha: 0,
               yPercent: -112,
-              duration: 0.42,
-              stagger: isMobile ? 0.035 : 0.055,
+              scale: 0.98,
+              filter: 'blur(4px)',
+              duration: 0.28,
+              stagger: isMobile ? 0.002 : 0.003,
               ease: 'power3.inOut'
             }, at)
             .to(current.titleText, {
@@ -1773,7 +2043,103 @@
 
         return () => {
           storyScrollTrigger = null;
-          gsap.killTweensOf([exhibitItems, titleItems, lineItems]);
+          gsap.killTweensOf([exhibitItems, titleItems, charItems, sheenItems]);
+          tl.kill();
+        };
+      });
+    }
+
+    function setupHeroBridge() {
+      if (!window.gsap || !window.ScrollTrigger) return;
+
+      const hero = document.getElementById('top');
+      const title = hero?.querySelector('h1');
+      const bridge = document.getElementById('heroBridge');
+      if (!hero || !title || !bridge) return;
+
+      const shards = gsap.utils.toArray('.hero-glass-shard');
+      const flowLine = bridge.querySelector('.hero-flow-line');
+      const sheen = bridge.querySelector('.hero-sheen');
+      const hint = bridge.querySelector('.hero-stage-hint');
+
+      const mm = gsap.matchMedia();
+      mm.add({
+        isDesktop: '(min-width: 921px)',
+        isMobile: '(max-width: 920px)',
+        reduceMotion: '(prefers-reduced-motion: reduce)'
+      }, (context) => {
+        const { isDesktop, isMobile, reduceMotion } = context.conditions;
+        if (reduceMotion) return () => {};
+
+        gsap.set(bridge, { '--bridge-light': 0 });
+        gsap.set(shards, {
+          autoAlpha: isMobile ? 0.42 : 0.66,
+          y: (index) => (index % 2 === 0 ? 18 : -18),
+          x: (index) => (index % 2 === 0 ? -10 : 12),
+          scale: isMobile ? 0.9 : 0.86,
+          transformOrigin: '50% 50%'
+        });
+        gsap.set(flowLine, { scaleX: 0.12, autoAlpha: 0.42 });
+        gsap.set(sheen, { xPercent: -35, autoAlpha: 0.18 });
+        gsap.set(hint, { autoAlpha: isMobile ? 0.35 : 0.62, scale: 0.92 });
+
+        const tl = gsap.timeline({
+          defaults: { ease: 'power2.inOut' },
+          scrollTrigger: {
+            trigger: hero,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 0.9,
+            invalidateOnRefresh: true
+          }
+        });
+
+        tl.to(bridge, { '--bridge-light': 1, duration: 0.72 }, 0)
+          .to(title, {
+            y: isMobile ? -34 : -64,
+            scale: isMobile ? 0.92 : 0.88,
+            autoAlpha: 0.38,
+            duration: 0.9
+          }, 0.08)
+          .to(flowLine, {
+            scaleX: 1,
+            autoAlpha: 0.95,
+            duration: 0.82
+          }, 0.02)
+          .to(sheen, {
+            xPercent: 235,
+            autoAlpha: 0.72,
+            duration: 0.9
+          }, 0.08)
+          .to(shards, {
+            x: (index) => {
+              const desktop = [-260, -120, 180, 260, 44];
+              const mobile = [-88, 48, 112, 0, 0];
+              return isDesktop ? desktop[index] || 0 : mobile[index] || 0;
+            },
+            y: (index) => {
+              const desktop = [260, 310, 250, 150, 290];
+              const mobile = [270, 248, 226, 0, 0];
+              return isDesktop ? desktop[index] || 220 : mobile[index] || 220;
+            },
+            rotation: (index) => {
+              const desktop = [10, -8, 8, -12, 16];
+              const mobile = [8, -7, 11, 0, 0];
+              return isDesktop ? desktop[index] || 0 : mobile[index] || 0;
+            },
+            scale: (index) => (isDesktop ? [1.08, 0.96, 0.9, 0.82, 0.76][index] || 0.8 : [0.72, 0.66, 0.62][index] || 0.6),
+            autoAlpha: (index) => (isMobile && index > 2 ? 0 : 0.88),
+            duration: 0.9,
+            stagger: 0.035
+          }, 0.04)
+          .to(hint, {
+            y: isMobile ? 230 : 260,
+            scale: isMobile ? 0.7 : 0.76,
+            autoAlpha: 0,
+            duration: 0.82
+          }, 0.12);
+
+        return () => {
           tl.kill();
         };
       });
@@ -1893,6 +2259,7 @@
     setProgress(42);
     renderAuthState();
     setupGsapStory();
+    setupHeroBridge();
     setupMotion();
     setProgress(68);
 
