@@ -619,6 +619,8 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="./assets/site-motion.css" />
+  <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="18" fill="%23eaf4ff"/%3E%3Cpath fill="%237199c9" d="M32 49 15 32c-6-6-2-17 7-17 5 0 8 3 10 7 2-4 5-7 10-7 9 0 13 11 7 17L32 49z"/%3E%3C/svg%3E' />
   <style>
     body {
       background:
@@ -657,7 +659,7 @@
     }
   </style>
 </head>
-<body>
+<body data-page-key="game" class="nuonuo-page-enter">
   <div class="page">
     <header class="topbar">
       <div class="topbar-left">
@@ -726,6 +728,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
   <script src="./assets/site-auth.js"></script>
+  <script src="./assets/vendor/gsap/gsap.min.js"></script>
+  <script src="./assets/site-motion.js"></script>
   <script>
     const shared = window.NuonuoShared;
     const GAME_STATE_PREFIX = 'games/';

@@ -12,6 +12,7 @@
   <link rel="preload" href="./assets/work/coco-diary.webp" as="image" />
   <link rel="preload" href="./assets/work/drink-game.webp" as="image" />
   <link rel="preload" href="./assets/work/nuonuo-academy.webp" as="image" />
+  <link rel="stylesheet" href="./assets/site-motion.css" />
   <style>
     :root {
       color-scheme: light;
@@ -49,10 +50,10 @@
       text-rendering: optimizeLegibility;
       overflow-x: hidden;
       background:
-        radial-gradient(circle at 18% 10%, rgba(180, 210, 244, .72), transparent 30%),
-        radial-gradient(circle at 88% 18%, rgba(255, 250, 235, .9), transparent 28%),
-        radial-gradient(circle at 42% 92%, rgba(212, 227, 246, .9), transparent 36%),
-        linear-gradient(140deg, #f9fbff 0%, #eef5fb 48%, #ffffff 100%);
+        radial-gradient(circle at 12% 12%, rgba(255, 206, 219, .34), transparent 30%),
+        radial-gradient(circle at 84% 16%, rgba(255, 224, 190, .48), transparent 30%),
+        radial-gradient(circle at 46% 88%, rgba(181, 216, 246, .68), transparent 38%),
+        linear-gradient(140deg, #fffafd 0%, #eef6ff 46%, #fffdf7 100%);
     }
 
     body::before,
@@ -75,7 +76,9 @@
     body::after {
       z-index: -1;
       background:
-        radial-gradient(circle at calc(50% + var(--mx, 0) * 10%) calc(36% + var(--my, 0) * 8%), rgba(255,255,255,.9), transparent 26%),
+        radial-gradient(circle at calc(50% + var(--mx, 0) * 10%) calc(36% + var(--my, 0) * 8%), rgba(255,255,255,.92), transparent 26%),
+        radial-gradient(circle at 22% 72%, rgba(255, 235, 207, .28), transparent 30%),
+        radial-gradient(circle at 76% 76%, rgba(255, 210, 224, .2), transparent 28%),
         linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,0));
       opacity: .72;
     }
@@ -94,7 +97,9 @@
       padding: 24px;
       background:
         radial-gradient(circle at 34% 30%, rgba(255,255,255,1), transparent 28%),
-        linear-gradient(135deg, #f8fbff, #e8f1fb);
+        radial-gradient(circle at 76% 24%, rgba(255, 220, 190, .5), transparent 32%),
+        radial-gradient(circle at 24% 78%, rgba(255, 207, 222, .28), transparent 30%),
+        linear-gradient(135deg, #fffafd, #eaf5ff);
       transition: opacity .55s ease, visibility .55s ease;
     }
 
@@ -105,14 +110,62 @@
     }
 
     .loader-card {
+      position: relative;
       width: min(380px, 88vw);
       padding: 26px;
+      overflow: hidden;
       border: 1px solid rgba(255,255,255,.86);
       border-radius: var(--radius);
       background: rgba(255,255,255,.5);
       box-shadow: var(--shadow);
       backdrop-filter: blur(28px) saturate(150%);
       -webkit-backdrop-filter: blur(28px) saturate(150%);
+    }
+
+    .loader-card::before {
+      content: "";
+      position: absolute;
+      inset: -28% -40%;
+      background: linear-gradient(110deg, transparent 32%, rgba(255,255,255,.86) 48%, transparent 64%);
+      transform: translateX(-58%) skewX(-14deg);
+      animation: loaderSheen 2.4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .loader-shard {
+      position: absolute;
+      border: 1px solid rgba(255,255,255,.72);
+      border-radius: 8px;
+      background: rgba(255,255,255,.24);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.76), 0 20px 42px rgba(95, 118, 146, .13);
+      pointer-events: none;
+    }
+
+    .loader-shard.shard-a {
+      right: 22px;
+      top: 14px;
+      width: 68px;
+      height: 42px;
+    }
+
+    .loader-shard.shard-b {
+      left: 28px;
+      bottom: 14px;
+      width: 58px;
+      height: 34px;
+    }
+
+    .loader-shard.shard-c {
+      right: 92px;
+      bottom: 18px;
+      width: 44px;
+      height: 30px;
+    }
+
+    @keyframes loaderSheen {
+      0%, 38% { transform: translateX(-58%) skewX(-14deg); opacity: .18; }
+      72% { transform: translateX(68%) skewX(-14deg); opacity: .7; }
+      100% { transform: translateX(68%) skewX(-14deg); opacity: 0; }
     }
 
     .loader-top {
@@ -591,25 +644,6 @@
       transform: rotate(7deg);
     }
 
-    .hero-stage-hint {
-      position: absolute;
-      right: clamp(18px, 8vw, 96px);
-      bottom: clamp(68px, 12vh, 120px);
-      display: grid;
-      place-items: center;
-      width: clamp(96px, 12vw, 150px);
-      aspect-ratio: 1;
-      border: 1px solid rgba(255,255,255,.58);
-      border-radius: 50%;
-      color: rgba(23,32,51,.48);
-      background: radial-gradient(circle, rgba(255,255,255,.48), rgba(255,255,255,.08) 64%, transparent);
-      box-shadow: inset 0 0 0 1px rgba(113,153,201,.1), 0 22px 70px rgba(73,92,118,.12);
-      font-size: clamp(34px, 5vw, 70px);
-      font-weight: 760;
-      line-height: 1;
-      opacity: .7;
-    }
-
     .story-copy {
       position: absolute;
       inset: 0;
@@ -717,8 +751,9 @@
       left: 0;
       width: 36%;
       border-radius: 999px;
-      background: linear-gradient(100deg, transparent, rgba(255,255,255,.88), rgba(113,153,201,.34), transparent);
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.9), rgba(255,215,188,.34), rgba(113,153,201,.22), transparent);
       opacity: 0;
+      visibility: hidden;
       filter: blur(4px);
       transform: translateX(-130%) skewX(-14deg);
       pointer-events: none;
@@ -1174,14 +1209,6 @@
         display: none;
       }
 
-      .hero-stage-hint {
-        right: 24px;
-        bottom: 86px;
-        width: 82px;
-        font-size: 30px;
-        opacity: .45;
-      }
-
       h1 {
         font-size: clamp(48px, 15vw, 66px);
       }
@@ -1265,9 +1292,12 @@
     }
   </style>
 </head>
-<body>
+<body data-page-key="home">
   <div class="loader" id="loader" aria-live="polite">
     <div class="loader-card">
+      <span class="loader-shard shard-a"></span>
+      <span class="loader-shard shard-b"></span>
+      <span class="loader-shard shard-c"></span>
       <div class="loader-top">
         <span class="loader-title">正在加载 nuonuo</span>
         <span id="loaderPercent">0%</span>
@@ -1298,7 +1328,6 @@
           <span class="hero-glass-shard shard-c"></span>
           <span class="hero-glass-shard shard-d"></span>
           <span class="hero-glass-shard shard-e"></span>
-          <span class="hero-stage-hint">01</span>
         </div>
       </section>
       <section class="story-pin" id="storyPin" aria-label="入口故事舞台">
@@ -1346,6 +1375,7 @@
   <script src="./assets/site-auth.js"></script>
   <script src="./assets/vendor/gsap/gsap.min.js"></script>
   <script src="./assets/vendor/gsap/ScrollTrigger.min.js"></script>
+  <script src="./assets/site-motion.js"></script>
   <script>
     const shared = window.NuonuoShared;
     const getCurrentUser = shared.getCurrentUser;
@@ -1465,9 +1495,11 @@
     const loaderBar = document.getElementById('loaderBar');
     const loaderPercent = document.getElementById('loaderPercent');
     let pendingRedirect = null;
+    let pendingRedirectSection = null;
     let progress = 0;
     let storyScrollTrigger = null;
     let storyNavProgress = null;
+    let returnSectionKey = window.NuonuoMotion?.getReturnSection?.() || null;
 
     function setProgress(value) {
       progress = Math.max(progress, Math.min(100, value));
@@ -1475,15 +1507,58 @@
       loaderPercent.textContent = `${Math.round(progress)}%`;
     }
 
+    function playLoaderBridge(done) {
+      if (!window.gsap || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        loader.classList.add('is-done');
+        done();
+        return;
+      }
+
+      const loaderCard = loader.querySelector('.loader-card');
+      const loaderShards = loader.querySelectorAll('.loader-shard');
+      const heroShards = document.querySelectorAll('.hero-glass-shard');
+      const tl = gsap.timeline({
+        defaults: { ease: 'power3.inOut' },
+        onComplete: () => {
+          loader.classList.add('is-done');
+          gsap.set(loader, { autoAlpha: 0, pointerEvents: 'none' });
+          done();
+        }
+      });
+
+      tl.to(loaderBar, { boxShadow: '0 0 30px rgba(255, 216, 186, .72)', duration: 0.18 }, 0)
+        .to(loaderCard, {
+          y: -18,
+          scale: 0.92,
+          autoAlpha: 0,
+          duration: 0.5
+        }, 0.18)
+        .to(loaderShards, {
+          x: (index) => [-140, 94, 42][index] || 0,
+          y: (index) => [96, 138, 68][index] || 0,
+          rotation: (index) => [-12, 10, 8][index] || 0,
+          scale: (index) => [1.06, 0.92, 0.82][index] || 1,
+          autoAlpha: 0.76,
+          duration: 0.54,
+          stagger: 0.035
+        }, 0.08)
+        .fromTo(heroShards,
+          { autoAlpha: 0, scale: 0.62 },
+          { autoAlpha: 0.72, scale: 1, duration: 0.46, stagger: 0.035 },
+          0.26
+        )
+        .to(loader, { autoAlpha: 0, duration: 0.42 }, 0.52);
+    }
+
     function finishLoading() {
       setProgress(100);
-      setTimeout(() => loader.classList.add('is-done'), 180);
-      setTimeout(() => {
-        document.body.classList.add('site-ready');
+      document.body.classList.add('site-ready');
+      playLoaderBridge(() => {
         if (window.ScrollTrigger) {
           setTimeout(() => ScrollTrigger.refresh(), 80);
         }
-      }, 760);
+        handleReturnToSection();
+      });
     }
 
     function escapeHtml(str) {
@@ -1556,7 +1631,16 @@
     function enterSection(section) {
       if (section.requiresAuth && !getCurrentUser()) {
         pendingRedirect = section.href;
+        pendingRedirectSection = section;
         openAuthModal('login');
+        return;
+      }
+      navigateToSection(section);
+    }
+
+    function navigateToSection(section) {
+      if (window.NuonuoMotion?.navigateToPage) {
+        window.NuonuoMotion.navigateToPage(section.href, { sectionKey: section.key });
         return;
       }
       location.href = section.href;
@@ -1760,6 +1844,26 @@
       storyPin.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function handleReturnToSection() {
+      const key = returnSectionKey || window.NuonuoMotion?.consumeReturnSection?.();
+      if (!key) return;
+      returnSectionKey = null;
+      window.NuonuoMotion?.consumeReturnSection?.();
+      const index = sections.findIndex(section => section.key === key);
+      if (index < 0) return;
+      const run = () => {
+        scrollToStoryIndex(index);
+        if (window.gsap) {
+          const section = sections[index];
+          gsap.fromTo([section.visual, section.textScene],
+            { filter: 'brightness(1.16)', scale: 1.018 },
+            { filter: 'brightness(1)', scale: 1, duration: 0.62, ease: 'power3.out', clearProps: 'filter' }
+          );
+        }
+      };
+      setTimeout(run, 140);
+    }
+
     function setupGsapStory() {
       if (!window.gsap || !window.ScrollTrigger) {
         setupScrollStory();
@@ -1816,7 +1920,7 @@
         });
         gsap.set(sheenItems, {
           autoAlpha: 0,
-          xPercent: -130
+          xPercent: -140
         });
         gsap.set(cardItems, {
           autoAlpha: 0,
@@ -1918,7 +2022,8 @@
             )
             .to(sheen, {
               autoAlpha: 0,
-              duration: 0.1,
+              xPercent: 335,
+              duration: 0.08,
               ease: 'power1.out'
             }, at + lineDuration + 0.08)
             .to(chars, {
@@ -1972,6 +2077,7 @@
               duration: 0.48
             }, at + 0.02)
             .to(current.layer, { autoAlpha: 0, duration: 0.38 }, at + 0.1)
+            .set(current.storySheens, { autoAlpha: 0, xPercent: -140 }, at + 0.44)
             .fromTo(next.layer,
               { autoAlpha: 0 },
               { autoAlpha: 1, duration: 0.26 },
@@ -2060,7 +2166,6 @@
       const shards = gsap.utils.toArray('.hero-glass-shard');
       const flowLine = bridge.querySelector('.hero-flow-line');
       const sheen = bridge.querySelector('.hero-sheen');
-      const hint = bridge.querySelector('.hero-stage-hint');
 
       const mm = gsap.matchMedia();
       mm.add({
@@ -2081,7 +2186,6 @@
         });
         gsap.set(flowLine, { scaleX: 0.12, autoAlpha: 0.42 });
         gsap.set(sheen, { xPercent: -35, autoAlpha: 0.18 });
-        gsap.set(hint, { autoAlpha: isMobile ? 0.35 : 0.62, scale: 0.92 });
 
         const tl = gsap.timeline({
           defaults: { ease: 'power2.inOut' },
@@ -2131,13 +2235,7 @@
             autoAlpha: (index) => (isMobile && index > 2 ? 0 : 0.88),
             duration: 0.9,
             stagger: 0.035
-          }, 0.04)
-          .to(hint, {
-            y: isMobile ? 230 : 260,
-            scale: isMobile ? 0.7 : 0.76,
-            autoAlpha: 0,
-            duration: 0.82
-          }, 0.12);
+          }, 0.04);
 
         return () => {
           tl.kill();
@@ -2156,6 +2254,7 @@
 
     authCancelBtn.addEventListener('click', () => {
       pendingRedirect = null;
+      pendingRedirectSection = null;
       closeAuthModal();
     });
 
@@ -2201,12 +2300,17 @@
           };
           await putJsonToCos(makeUserKey(username), userData);
           setCurrentUser({ username });
-          closeAuthModal();
-          alert('注册成功，已自动登录');
-          if (pendingRedirect) {
+        closeAuthModal();
+        alert('注册成功，已自动登录');
+        if (pendingRedirect) {
+            const targetSection = pendingRedirectSection || sections.find(section => section.href === pendingRedirect);
             const target = pendingRedirect;
             pendingRedirect = null;
-            setTimeout(() => { location.href = target; }, 120);
+            pendingRedirectSection = null;
+            setTimeout(() => {
+              if (targetSection) navigateToSection(targetSection);
+              else location.href = target;
+            }, 120);
           }
         } catch (err) {
           console.error(err);
@@ -2230,9 +2334,14 @@
         closeAuthModal();
         alert('登录成功');
         if (pendingRedirect) {
+          const targetSection = pendingRedirectSection || sections.find(section => section.href === pendingRedirect);
           const target = pendingRedirect;
           pendingRedirect = null;
-          setTimeout(() => { location.href = target; }, 120);
+          pendingRedirectSection = null;
+          setTimeout(() => {
+            if (targetSection) navigateToSection(targetSection);
+            else location.href = target;
+          }, 120);
         }
       } catch (err) {
         console.error(err);
@@ -2243,6 +2352,7 @@
     authModal.addEventListener('click', (e) => {
       if (e.target === authModal) {
         pendingRedirect = null;
+        pendingRedirectSection = null;
         closeAuthModal();
       }
     });
@@ -2250,6 +2360,7 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         pendingRedirect = null;
+        pendingRedirectSection = null;
         closeAuthModal();
       }
     });
