@@ -1,4 +1,6 @@
 (function () {
+  // Shared COS/auth layer used by the homepage, photo wall, message wall, game, and pet pages.
+  // Keep bucket credentials and user-record helpers centralized so each page only handles its own UI.
   const CONFIG = {
     secretId: 'AKIDhojT7ey61jEkHhw0830qVyGUWSDpFnEW',
     secretKey: 'GNIAMaieZyOehhWBi9QWUL4czCHAsQuG',
@@ -15,6 +17,7 @@
 
   const authListeners = new Set();
 
+  // Small pub/sub helper: pages can repaint their login UI when another page module changes login state.
   function notifyAuthChange() {
     authListeners.forEach((listener) => {
       try {
@@ -217,6 +220,7 @@
   }
 
   async function upgradePasswordIfNeeded(user, password) {
+    // Older accounts may have a plain password field; after a successful login, rewrite it as a salted hash.
     if (!user || user.passwordHash || user.password !== password) return;
     const upgradedUser = {
       ...user,
@@ -256,6 +260,7 @@
   }
 
   window.NuonuoShared = {
+    // Public API consumed by the static pages. Add new shared COS helpers here instead of duplicating SDK calls.
     config: CONFIG,
     cos,
     onAuthChange,

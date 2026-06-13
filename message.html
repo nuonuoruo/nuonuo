@@ -490,6 +490,10 @@
       object-fit: cover;
     }
 
+    .attachment-preview.is-broken {
+      display: none;
+    }
+
     .attachment-file {
       display: inline-flex;
       align-items: center;
@@ -998,7 +1002,7 @@
     <div class="modal-content">
       <button class="modal-close" id="closeModal" aria-label="关闭预览">×</button>
       <div class="modal-body">
-        <img id="previewImage" src="" alt="预览" />
+        <img id="previewImage" alt="预览" />
       </div>
       <div class="modal-caption" id="previewCaption"></div>
     </div>
@@ -1040,6 +1044,7 @@
   <script src="./assets/vendor/gsap/gsap.min.js"></script>
   <script src="./assets/site-motion.js"></script>
   <script>
+    // Message wall page script: stores each message as JSON in COS and optional attachments as separate COS objects.
     const shared = window.NuonuoShared;
     const BUCKET = shared.config.bucket;
     const REGION = shared.config.region;
@@ -1205,6 +1210,7 @@
     }
 
     function renderAuthState() {
+      // Login state controls whether the composer is editable; public visitors can still read messages.
       const user = getCurrentUser();
 
       if (user) {
@@ -1269,6 +1275,7 @@
     }
 
     function makeAttachmentKey(file) {
+      // Attachment files are kept outside message JSON so large uploads do not bloat the message list.
       const safeName = sanitizeFileName(file.name || 'file');
       return `${ATTACH_PREFIX}${Date.now()}-${randomId()}-${safeName}`;
     }
@@ -1290,6 +1297,7 @@
     }
 
     async function saveMessage() {
+      // Save flow: optionally upload attachment first, then write one message JSON record with its attachment metadata.
       const user = requireLogin();
       if (!user) return;
 
@@ -1339,6 +1347,7 @@
     }
 
     async function loadMessages() {
+      // Lists message JSON objects from COS, skips damaged records, and sorts newest first for display.
       messageList.innerHTML = `
         <div class="loading-state">
           <div class="state-card">
@@ -1517,6 +1526,7 @@
     }
 
     async function deleteMessageByKey(messageKey, attachKey) {
+      // Remove the message record and, when present, its attachment object.
       const user = requireLogin();
       if (!user) return;
 
@@ -1569,6 +1579,15 @@
         openPreview(previewNode.dataset.url, previewNode.dataset.caption || '附件预览');
       }
     });
+
+    messageList.addEventListener('error', (e) => {
+      // Some old COS attachments may be missing or private; hide only the broken preview, keeping the file link.
+      const img = e.target;
+      if (!(img instanceof HTMLImageElement)) return;
+      const preview = img.closest('.attachment-preview');
+      if (preview) preview.classList.add('is-broken');
+      img.removeAttribute('src');
+    }, true);
 
     if (previewModal) {
       previewModal.addEventListener('click', (e) => {

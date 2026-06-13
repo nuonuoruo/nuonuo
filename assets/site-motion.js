@@ -1,4 +1,5 @@
 (function () {
+  // Shared page-transition system. Feature pages call this automatically so all entries feel like one site.
   const STORAGE_KEY = 'nuonuo:motion';
   const PAGE_KEYS = ['photo', 'days', 'message', 'game', 'pet', 'drink', 'video'];
   const PATH_TO_KEY = {
@@ -59,6 +60,7 @@
   }
 
   function makeOverlay() {
+    // The overlay is created only during navigation, then removed after the transition finishes.
     const columnCount = window.matchMedia('(max-width: 720px)').matches ? 8 : 16;
     const columns = Array.from({ length: columnCount }, () => '<span class="nuonuo-transition-column"></span>').join('');
     const overlay = document.createElement('div');
@@ -122,6 +124,7 @@
   }
 
   function playPageEnter(pageKey = inferPageKey()) {
+    // Reads the sessionStorage handoff written by navigateToPage/returnHome to decide whether to animate in.
     document.body.classList.add('nuonuo-subpage', 'nuonuo-motion-ready');
     if (prefersReduced()) {
       document.body.classList.remove('nuonuo-page-enter');
@@ -203,6 +206,7 @@
   }
 
   function navigateToPage(href, options = {}) {
+    // Store the target page key before leaving so the next page can play a matching entrance animation.
     const target = normalizeHref(href);
     writeState({
       type: 'enter',
@@ -241,6 +245,7 @@
   }
 
   function bindBackLinks(sectionKey = inferPageKey()) {
+    // Intercepts ordinary "back to homepage" links so they use the same glass transition as homepage cards.
     document.addEventListener('click', (event) => {
       const link = event.target.closest('a[href]');
       if (!link) return;

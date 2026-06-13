@@ -493,6 +493,7 @@
   <script src="./assets/vendor/gsap/gsap.min.js"></script>
   <script src="./assets/site-motion.js"></script>
   <script>
+    // Dice game page script: builds the dice controls, rolls dice values, and animates each die locally.
     const countRow = document.getElementById('countRow');
     const diceStage = document.getElementById('diceStage');
     const rollAllBtn = document.getElementById('rollAllBtn');
@@ -559,6 +560,7 @@
     }
 
     function buildFace(face) {
+      // Pips are CSS-grid coordinates, so each dice face stays crisp at any responsive size.
       const pips = pipMap[face].map(([r, c]) => {
         return `<span class="pip" style="grid-row:${r};grid-column:${c};"></span>`;
       }).join('');
@@ -659,6 +661,7 @@
     }
 
     function setCount(nextCount) {
+      // Rebuild dice whenever the selected dice count changes.
       state.count = nextCount;
       state.dice = Array.from({ length: nextCount }, () => createDie(randFace()));
       renderCountButtons();
@@ -672,6 +675,7 @@
     }
 
     function rollAllDice() {
+      // Roll all visible dice, update roll counter, and stagger animations for a physical feel.
       if (rollAllBtn.disabled) return;
 
       rollAllBtn.disabled = true;

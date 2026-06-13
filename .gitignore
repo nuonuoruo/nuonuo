@@ -1,0 +1,10 @@
+# Local OS/editor noise.
+Thumbs.db
+.DS_Store
+*.tmp
+*.log
+
+# Temporary local servers or build outputs if this static site is later tooled up.
+node_modules/
+dist/
+build/

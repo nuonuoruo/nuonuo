@@ -755,6 +755,7 @@
     let gameState = defaultGameState();
     let saveChain = Promise.resolve();
 
+    // The game state is saved per user in COS, so the same account can continue on another device.
     // 移动端点击抑制：避免 touch 触发后的 click 再来一次
     let suppressNextClickUntil = 0;
 
@@ -792,6 +793,7 @@
     }
 
     function renderHeartSvg(progressPercent) {
+      // The heart fill is generated as SVG so progress can be redrawn without an image asset.
       const pct = Math.max(0, Math.min(100, progressPercent));
       const fillHeight = 180 * (pct / 100);
 
@@ -870,6 +872,7 @@
     }
 
     function renderGame() {
+      // Single render function keeps all counters, text, and the SVG heart in sync with gameState.
       const need = clicksToFill(gameState.level);
       const percent = need > 0 ? (gameState.progress / need) * 100 : 0;
 
@@ -936,6 +939,7 @@
     }
 
     async function loadGameState() {
+      // Load saved progress; if the user has no COS record yet, start from a clean default state.
       if (!currentUser) return;
 
       const key = makeGameKey(currentUser.username);
@@ -961,6 +965,7 @@
     }
 
     function queueSaveGameState() {
+      // Serialize saves so rapid clicks cannot overwrite newer progress with an older request.
       if (!currentUser) return Promise.resolve();
 
       const snapshot = {
@@ -1063,6 +1068,7 @@
     }
 
     function performIncrement() {
+      // One click advances progress; filling the heart upgrades the level and raises the next target.
       if (!currentUser) return;
 
       vibrateOnce();

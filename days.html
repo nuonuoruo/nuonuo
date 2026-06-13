@@ -314,6 +314,7 @@
   <script src="./assets/vendor/gsap/gsap.min.js"></script>
   <script src="./assets/site-motion.js"></script>
   <script>
+    // Anniversary page script: calculates days together from a fixed start date in the user's local timezone.
     // 这里改成你们“在一起”的日期
     // 格式：YYYY-MM-DD
     const START_DATE = '2023-10-29';
@@ -332,6 +333,7 @@
     }
 
     function calculateDaysTogether() {
+      // Normalize both dates to midnight so partial-day hours do not change the displayed day count.
       const start = new Date(START_DATE);
       const today = new Date();
 

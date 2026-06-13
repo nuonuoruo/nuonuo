@@ -1462,6 +1462,7 @@
       renderAuthState();
     };
 
+    // These are the seven homepage cards. Change title/href/image/story here to update the scroll experience.
     const sectionImageSources = [
       './assets/work/photo-wall.webp',
       './assets/work/anniversary.webp',
@@ -1572,6 +1573,7 @@
     let storyScrollTrigger = null;
     let storyNavProgress = null;
     let returnSectionKey = window.NuonuoMotion?.getReturnSection?.() || null;
+    // Tuning values for the scroll story timeline: reveal, hold, and exit windows inside each card's span.
     const SCENE_SPAN = 1.32;
     const REVEAL_START = 0.16;
     const REVEAL_END = 0.72;
@@ -1601,6 +1603,7 @@
     }
 
     function playLoaderBridge(done) {
+      // Turns the loading card into the first hero animation; falls back instantly for reduced motion.
       if (!window.gsap || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         loader.classList.add('is-done');
         done();
@@ -1700,6 +1703,7 @@
     }
 
     function renderAuthState() {
+      // Repaint login/register/logout controls whenever the shared auth user changes.
       const user = getCurrentUser();
       if (user) {
         authBox.innerHTML = `
@@ -1730,6 +1734,7 @@
     }
 
     function enterSection(section) {
+      // Protected sections remember the target, open login, then continue after a successful login/register.
       if (section.requiresAuth && !getCurrentUser()) {
         pendingRedirect = section.href;
         pendingRedirectSection = section;
@@ -1779,7 +1784,7 @@
         layer.dataset.key = section.key;
         layer.setAttribute('aria-label', section.title);
         layer.innerHTML = `
-          <div class="visual section-image-${section.image}" role="button" tabindex="-1" aria-label="进入${section.title}">
+          <div class="visual section-image-${section.image}" role="button" tabindex="0" aria-label="进入${section.title}">
             <div class="visual-card">
               <div><strong>${section.title}</strong></div>
               <div class="index-number">${number}</div>
@@ -1838,6 +1843,7 @@
     }
 
     function setupScrollStory() {
+      // Lightweight fallback when GSAP ScrollTrigger is unavailable: map window scroll to story progress.
       let ticking = false;
 
       const update = () => {
@@ -1967,6 +1973,7 @@
     }
 
     function setupGsapStory() {
+      // Main desktop/mobile scroll interaction. It pins the stage and animates cards/text by timeline progress.
       if (!window.gsap || !window.ScrollTrigger) {
         setupScrollStory();
         return;
@@ -2368,6 +2375,7 @@
     });
 
     authSubmitBtn.addEventListener('click', async () => {
+      // Register/login both end by setting shared auth state; pendingRedirect handles protected card continuation.
       const mode = authModal.dataset.mode || 'login';
       const username = sanitizeUsername(authUsername.value);
       const password = authPassword.value;

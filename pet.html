@@ -967,6 +967,7 @@
     let currentUser = null;
     let syncTimer = null;
 
+    // Pet state is derived from saved timestamps: hunger/thirst/cleanliness naturally decay over time.
     function clamp(n, min, max) {
       return Math.max(min, Math.min(max, n));
     }
@@ -999,6 +1000,7 @@
     }
 
     function normalizeState(data) {
+      // Merge old/incomplete COS records with today's schema so future edits stay backward compatible.
       const base = defaultState();
       const merged = { ...base, ...(data || {}) };
       merged.petName = merged.petName || DEFAULT_PET_NAME;
@@ -1139,6 +1141,7 @@
     }
 
     async function saveState() {
+      // Save the current care state to the logged-in user's COS record.
       if (!state || saving) return;
       saving = true;
       try {
@@ -1181,6 +1184,7 @@
     }
 
     async function syncFromCloud() {
+      // Pull the latest COS record before rendering so the pet stays consistent across devices.
       if (!state || saving || loading) return;
       try {
         const text = await getObjectText(PET_KEY);
@@ -1215,6 +1219,7 @@
     }
 
     async function interact(icon, logText, changes = {}, event = null) {
+      // Shared handler for feed/play/walk/etc: update state, animate feedback, then persist.
       if (!state) return;
       state.affection = clamp((state.affection || 0) + (changes.affection || 0), 0, 100);
       state.energy = clamp((state.energy || 0) + (changes.energy || 0), 0, 100);

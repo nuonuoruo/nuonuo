@@ -1,4 +1,6 @@
 ﻿const shared = window.NuonuoShared;
+// Photo wall page script: handles login UI, image upload/list/delete, and preview modal.
+// Shared COS/auth helpers live in assets/site-auth.js; this file stays focused on photo-wall behavior.
 const BUCKET = shared.config.bucket;
 const REGION = shared.config.region;
 const getCurrentUser = shared.getCurrentUser;
@@ -299,6 +301,7 @@ function ensureAuthStyles() {
 }
 
 function ensureAuthUI() {
+  // photo.html does not hard-code the login buttons; this injects them into the toolbar once.
   if (authUIReady) return;
 
   const toolbar = document.querySelector('.toolbar');
@@ -330,6 +333,7 @@ function ensureAuthUI() {
 }
 
 function ensureAuthModal() {
+  // Builds the reusable login/register modal for the photo wall.
   if (authModalReady) return;
 
   const modal = document.createElement('div');
@@ -625,6 +629,7 @@ function uploadSingleFile(file) {
 }
 
 async function uploadFiles() {
+  // Each photo gets a COS object plus a small JSON sidecar that stores uploader and upload time.
   const user = requireLogin();
   if (!user) return;
 
@@ -665,6 +670,7 @@ function deleteObject(key) {
 }
 
 async function loadList() {
+  // COS only stores flat object keys, so the gallery filters image keys and joins them with their sidecar metadata.
   gallery.innerHTML = `
     <div class="loading-state" style="grid-column: 1 / -1;">
       <div class="state-card">
@@ -719,6 +725,18 @@ async function loadList() {
 
       return { item, meta };
     }));
+
+    if (!gallery.__imageErrorBound) {
+      gallery.__imageErrorBound = true;
+      gallery.addEventListener('error', (e) => {
+        // Old COS records can point at missing/private images; hide that card instead of showing a broken image.
+        const img = e.target;
+        if (!(img instanceof HTMLImageElement)) return;
+        const item = img.closest('.photo-item');
+        if (item) item.style.display = 'none';
+        img.removeAttribute('src');
+      }, true);
+    }
 
     gallery.innerHTML = enriched.map(({ item, meta }) => {
       const url = `https://${BUCKET}.cos.${REGION}.myqcloud.com/${item.Key}`;
@@ -794,6 +812,7 @@ async function loadList() {
 }
 
 async function deleteFile(key) {
+  // Delete both the image and its metadata sidecar; metadata deletion is best-effort.
   const user = requireLogin();
   if (!user) return;
 

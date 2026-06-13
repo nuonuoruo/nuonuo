@@ -536,6 +536,7 @@
   <script src="./assets/vendor/gsap/gsap.min.js"></script>
   <script src="./assets/site-motion.js"></script>
   <script>
+    // Local video player page script: selected files stay in the browser and are never uploaded.
     const body = document.body;
     const video = document.getElementById('video');
     const photoInput = document.getElementById('photoInput');
@@ -639,6 +640,7 @@
     }
 
     function enterFullScreen() {
+      // This is page-level fullscreen styling, not native video fullscreen, so custom controls remain visible.
       if (!hasVideo()) {
         requestVideoFile();
         return;
@@ -674,6 +676,7 @@
     });
 
     function loadSelectedFile(input) {
+      // Use an object URL for local playback, and revoke the previous one to avoid leaking memory.
       const file = input.files && input.files[0];
       if (!file) {
         emptyCopy.textContent = '视频只在本机播放，不上传到网络。';
